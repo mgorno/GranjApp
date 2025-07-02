@@ -3,6 +3,7 @@ from routes import bp
 from models import init_db
 
 app = Flask(__name__)
+app.secret_key = 'esto-es-secreto-y-unico'
 app.register_blueprint(bp)
 
 if __name__ == "__main__":

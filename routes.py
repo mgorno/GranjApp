@@ -1,13 +1,52 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from models import get_conn
 from datetime import datetime
 import uuid
+import re
 
 bp = Blueprint('main', __name__)
 
 @bp.route("/")
 def index():
     return render_template("index.html")
+
+# ---------------- Clientes ----------------
+@bp.route("/clientes/nuevo", methods=['GET', 'POST'])
+def nuevo_cliente():
+    if request.method == 'POST':
+        nombre = request.form.get('nombre', '').strip()
+        telefono = request.form.get('telefono', '').strip()
+        direccion = request.form.get('direccion', '').strip()
+        mail = request.form.get('mail', '').strip()
+
+        errores = []
+        if not nombre:
+            errores.append("El nombre es obligatorio.")
+        if telefono and not re.fullmatch(r'\d{6,15}', telefono):
+            errores.append("El teléfono debe tener solo números y entre 6 y 15 dígitos.")
+        if mail and not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", mail):
+            errores.append("El email no es válido.")
+
+        if errores:
+            for e in errores:
+                flash(e, "error")
+            return render_template('nuevo_cliente.html',
+                                   nombre=nombre,
+                                   telefono=telefono,
+                                   direccion=direccion,
+                                   mail=mail)
+
+        id_cliente = str(uuid.uuid4())
+
+        with get_conn() as conn:
+            conn.execute(
+                "INSERT INTO clientes (id_cliente, nombre, telefono, direccion, mail) VALUES (?, ?, ?, ?, ?)",
+                (id_cliente, nombre, telefono or None, direccion or None, mail or None)
+            )
+        flash("Cliente creado correctamente.", "success")
+        return redirect(url_for('main.nuevo_cliente'))
+
+    return render_template('nuevo_cliente.html')
 
 # ---------------- Pedidos ----------------
 @bp.route("/pendientes")

@@ -1,44 +1,43 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8" />
-    <title>Nuevo Cliente</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 30px; }
-        .error { color: red; }
-        .success { color: green; }
-        label { display: block; margin-top: 15px; }
-        input[type="text"], input[type="email"] { width: 300px; padding: 6px; }
-        button { margin-top: 20px; padding: 10px 20px; }
-    </style>
-</head>
-<body>
-    <h1>Alta de Cliente</h1>
+{% extends "base.html" %}
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul>
-          {% for category, message in messages %}
-            <li class="{{ category }}">{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+{% block title %}Nuevo Cliente{% endblock %}
 
-    <form action="{{ url_for('nuevo_cliente') }}" method="POST">
-        <label for="nombre">Nombre*:</label>
-        <input type="text" id="nombre" name="nombre" value="{{ nombre|default('') }}" required>
+{% block content %}
+<h1 class="mb-4">Alta de Cliente</h1>
 
-        <label for="telefono">Teléfono:</label>
-        <input type="text" id="telefono" name="telefono" value="{{ telefono|default('') }}" placeholder="Sólo números">
+<!-- Mostrar mensajes flash -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
 
-        <label for="direccion">Dirección:</label>
-        <input type="text" id="direccion" name="direccion" value="{{ direccion|default('') }}">
+<!-- Formulario con Bootstrap -->
+<form action="{{ url_for('main.nuevo_cliente') }}" method="POST">
+  <div class="mb-3">
+    <label for="nombre" class="form-label">Nombre*</label>
+    <input type="text" class="form-control" id="nombre" name="nombre" value="{{ nombre|default('') }}" required>
+  </div>
 
-        <label for="mail">Email:</label>
-        <input type="email" id="mail" name="mail" value="{{ mail|default('') }}">
+  <div class="mb-3">
+    <label for="telefono" class="form-label">Teléfono</label>
+    <input type="text" class="form-control" id="telefono" name="telefono" value="{{ telefono|default('') }}" placeholder="Sólo números">
+  </div>
 
-        <button type="submit">Guardar</button>
-    </form>
-</body>
-</html>
+  <div class="mb-3">
+    <label for="direccion" class="form-label">Dirección</label>
+    <input type="text" class="form-control" id="direccion" name="direccion" value="{{ direccion|default('') }}">
+  </div>
+
+  <div class="mb-3">
+    <label for="mail" class="form-label">Email</label>
+    <input type="email" class="form-control" id="mail" name="mail" value="{{ mail|default('') }}">
+  </div>
+
+  <button type="submit" class="btn btn-primary">Guardar Cliente</button>
+</form>
+{% endblock %}

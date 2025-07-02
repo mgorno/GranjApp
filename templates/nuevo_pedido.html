@@ -1,0 +1,15 @@
+{% extends "base.html" %}{% block title %}Nuevo Pedido{% endblock %}
+{% block content %}
+<h2 class="mb-3">Nuevo Pedido</h2>
+<form method="post">
+  <div class="mb-3"><label class="form-label">Cliente</label>
+    <select class="form-select" name="id_cliente" required>
+      {% for c in clientes %}<option value="{{c[0]}}">{{c[1]}}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="mb-3"><label class="form-label">Fecha entrega</label>
+    <input type="date" name="fecha_entrega" class="form-control" required>
+  </div>
+  <button class="btn btn-primary w-100">Guardar</button>
+</form>
+{% endblock %}

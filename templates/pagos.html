@@ -1,0 +1,35 @@
+{% extends "base.html" %}{% block title %}Pagos{% endblock %}
+{% block content %}
+<h2 class="mb-3">Registrar Pago</h2>
+<form method="post" class="mb-4">
+  <div class="mb-2"><label class="form-label">Cliente</label>
+    <select class="form-select" name="id_cliente" required>
+      {% for c in clientes %}<option value="{{c[0]}}">{{c[1]}}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="mb-2"><label class="form-label">Monto</label>
+    <input type="number" step="0.01" name="monto_pagado" class="form-control" required>
+  </div>
+  <div class="mb-2"><label class="form-label">Medio de pago</label>
+    <input name="medio_pago" class="form-control">
+  </div>
+  <div class="mb-3"><label class="form-label">Observaciones</label>
+    <input name="observaciones" class="form-control">
+  </div>
+  <button class="btn btn-primary w-100">Guardar</button>
+</form>
+
+<h3 class="mb-2">Historial</h3>
+{% if pagos %}
+<ul class="list-group">
+  {% for p in pagos %}
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    <div><strong>{{p[1]}}</strong> — ${{"%.2f"|format(p[2])}}<br>
+      <small class="text-muted">{{p[3][:10]}} · {{p[4]}}</small></div>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="text-muted">Aún sin pagos.</p>
+{% endif %}
+{% endblock %}

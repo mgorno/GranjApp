@@ -1,0 +1,16 @@
+{% extends "base.html" %}{% block title %}Pendientes{% endblock %}
+{% block content %}
+<h2 class="mb-3">Pedidos pendientes</h2>
+{% if pedidos %}
+<div class="list-group">
+  {% for p in pedidos %}
+    <div class="list-group-item d-flex justify-content-between align-items-center">
+      <div><strong>{{p[1]}}</strong><br><small class="text-muted">{{p[2][:10]}}</small></div>
+      <a href="/marcar_entregado/{{p[0]}}" class="btn btn-success btn-sm">Entregado</a>
+    </div>
+  {% endfor %}
+</div>
+{% else %}
+<p class="text-muted">Sin pedidos pendientes.</p>
+{% endif %}
+{% endblock %}

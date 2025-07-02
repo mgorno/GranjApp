@@ -1,7 +1,5 @@
 # GranjApp Flask Starter
 
-Proyecto mínimo Flask + SQLite + Bootstrap listo para llevar tu app Glide a backend propio.
-
 ## Uso local
 ```bash
 pip install -r requirements.txt

@@ -65,11 +65,12 @@ def pendientes():
             pedidos = cur.fetchall()
     return render_template("pendientes.html", pedidos=pedidos)
 
-@bp.route("/nuevo", methods=['GET','POST'])
+@bp.route("/nuevo", methods=['GET', 'POST'])
 def nuevo():
     with get_conn() as conn:
         with conn.cursor() as cur:
             if request.method == 'POST':
+                # ---------- 1) Cabecera del pedido ----------
                 id_pedido = str(uuid.uuid4())
                 cur.execute(
                     "INSERT INTO pedidos (id_pedido, id_cliente, fecha_entrega) VALUES (%s, %s, %s)",
@@ -79,23 +80,33 @@ def nuevo():
                         request.form['fecha_entrega']
                     )
                 )
+
+                # ---------- 2) Detalle: arrays paralelos del form ----------
+                ids_prod   = request.form.getlist('id_producto')
+                cantidades = request.form.getlist('cantidad')
+                precios    = request.form.getlist('precio')
+
+                for id_prod, cant, prec in zip(ids_prod, cantidades, precios):
+                    if id_prod and cant:                       # evitamos filas vacías
+                        cur.execute(
+                            "INSERT INTO detalle_pedido (id_pedido, id_producto, cantidad, precio) "
+                            "VALUES (%s, %s, %s, %s)",
+                            (id_pedido, id_prod, int(cant), float(prec) if prec else None)
+                        )
+
                 conn.commit()
+                flash("Pedido creado con sus productos.", "success")
                 return redirect(url_for('main.pendientes'))
 
-            cur.execute("SELECT id_cliente, nombre FROM clientes")
+            # ---------- 3) Datos para armar el formulario ----------
+            cur.execute("SELECT id_cliente, nombre FROM clientes ORDER BY nombre")
             clientes = cur.fetchall()
-    return render_template("nuevo_pedido.html", clientes=clientes)
 
-@bp.route("/marcar_entregado/<id_pedido>")
-def marcar_entregado(id_pedido):
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "UPDATE pedidos SET estado = 'entregado', fecha_entrega = NOW() WHERE id_pedido = %s",
-                (id_pedido,)
-            )
-        conn.commit()
-    return redirect(url_for('main.pendientes'))
+            cur.execute("SELECT id_producto, descripcion, precio FROM productos ORDER BY descripcion")
+            productos = cur.fetchall()
+
+    return render_template("nuevo_pedido.html", clientes=clientes, productos=productos)
+
 
 # ---------------- Pagos ----------------
 @bp.route("/pagos", methods=['GET','POST'])

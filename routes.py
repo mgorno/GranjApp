@@ -137,3 +137,41 @@ def pagos():
             clientes = cur.fetchall()
 
     return render_template("pagos.html", pagos=pagos, clientes=clientes)
+
+
+# ---------------- Productos ----------------
+@bp.route("/productos/nuevo", methods=['GET', 'POST'])
+def nuevo_producto():
+    if request.method == 'POST':
+        descripcion = request.form.get('descripcion', '').strip()
+        unidad_base = request.form.get('unidad_base', '').strip()
+        precio = request.form.get('precio', '').strip()
+
+        errores = []
+        if not descripcion:
+            errores.append("La descripción es obligatoria.")
+        if not unidad_base:
+            errores.append("La unidad base es obligatoria.")
+        if not precio or not re.fullmatch(r'^\d+(\.\d{1,2})?$', precio):
+            errores.append("El precio debe ser un número válido.")
+
+        if errores:
+            for e in errores:
+                flash(e, "error")
+            return render_template('nuevo_producto.html',
+                                   descripcion=descripcion,
+                                   unidad_base=unidad_base,
+                                   precio=precio)
+
+        id_producto = str(uuid.uuid4())
+        with get_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "INSERT INTO productos (id_producto, descripcion, unidad_base, precio) VALUES (%s, %s, %s, %s)",
+                    (id_producto, descripcion, unidad_base, float(precio))
+                )
+            conn.commit()
+        flash("Producto creado correctamente.", "success")
+        return redirect(url_for('main.nuevo_producto'))
+
+    return render_template('nuevo_producto.html')

@@ -1,15 +1,90 @@
-{% extends "base.html" %}{% block title %}Nuevo Pedido{% endblock %}
+{% extends "base.html" %}
+{% block title %}Nuevo Pedido{% endblock %}
+
 {% block content %}
-<h2 class="mb-3">Nuevo Pedido</h2>
-<form method="post">
-  <div class="mb-3"><label class="form-label">Cliente</label>
-    <select class="form-select" name="id_cliente" required>
-      {% for c in clientes %}<option value="{{c[0]}}">{{c[1]}}</option>{% endfor %}
-    </select>
+<h1 class="mb-4">Nuevo Pedido</h1>
+
+<form method="POST" action="{{ url_for('main.nuevo') }}">
+  <!-- Cabecera -->
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <label class="form-label">Cliente</label>
+      <select name="id_cliente" class="form-select" required>
+        <option value="" disabled selected>Elegir cliente…</option>
+        {% for c in clientes %}
+          <option value="{{ c[0] }}">{{ c[1] }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Fecha de entrega</label>
+      <input type="date" name="fecha_entrega" class="form-control" required>
+    </div>
   </div>
-  <div class="mb-3"><label class="form-label">Fecha entrega</label>
-    <input type="date" name="fecha_entrega" class="form-control" required>
+
+  <!-- Detalle -->
+  <h4>Productos</h4>
+  <table class="table" id="tabla-detalle">
+    <thead>
+      <tr>
+        <th style="width:45%">Producto</th>
+        <th style="width:20%">Cantidad</th>
+        <th style="width:25%">Precio</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <button type="button" class="btn btn-outline-primary" id="agregar-fila">Agregar producto</button>
+
+  <div class="mt-4">
+    <button type="submit" class="btn btn-success">Guardar Pedido</button>
   </div>
-  <button class="btn btn-primary w-100">Guardar</button>
 </form>
+
+<!-- Template oculto para las filas -->
+<template id="fila-template">
+  <tr>
+    <td>
+      <select name="id_producto" class="form-select" required>
+        <option value="" disabled selected>Elegir…</option>
+        {% for p in productos %}
+          <option value="{{ p[0] }}" data-precio-defecto="{{ p[2] or '' }}">{{ p[1] }}</option>
+        {% endfor %}
+      </select>
+    </td>
+    <td><input type="number" name="cantidad" class="form-control" min="1" required></td>
+    <td><input type="number" step="0.01" name="precio" class="form-control"></td>
+    <td><button type="button" class="btn btn-sm btn-danger eliminar">✕</button></td>
+  </tr>
+</template>
+
+<script>
+  const tabla   = document.getElementById('tabla-detalle').querySelector('tbody');
+  const tpl     = document.getElementById('fila-template').content;
+  const addBtn  = document.getElementById('agregar-fila');
+
+  addBtn.addEventListener('click', () => {
+    tabla.appendChild(tpl.cloneNode(true));
+  });
+
+  // Eliminar fila
+  tabla.addEventListener('click', e => {
+    if (e.target.classList.contains('eliminar')) {
+      e.target.closest('tr').remove();
+    }
+  });
+
+  // Insertar precio por defecto al seleccionar producto
+  tabla.addEventListener('change', e => {
+    if (e.target.name === 'id_producto') {
+      const precio = e.target.selectedOptions[0].dataset.precioDefecto;
+      const precioInput = e.target.closest('tr').querySelector('input[name="precio"]');
+      if (precio && !precioInput.value) precioInput.value = precio;
+    }
+  });
+
+  // Insertar una fila inicial al cargar la página
+  addBtn.click();
+</script>
 {% endblock %}

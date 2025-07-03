@@ -67,13 +67,13 @@ def pendientes():
 
 @bp.route("/nuevo", methods=['GET', 'POST'])
 def nuevo():
-    if request.method == 'POST':
-        id_cliente = request.form['id_cliente']
-        fecha_entrega = request.form['fecha_entrega']
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            if request.method == 'POST':
+                id_cliente = request.form['id_cliente']
+                fecha_entrega = request.form['fecha_entrega']
 
-        with get_conn() as conn:
-            with conn.cursor() as cur:
-                # Verificar pedido pendiente para mismo cliente y misma fecha (sin hora)
+                # Verificar si ya hay un pedido pendiente
                 cur.execute("""
                     SELECT id_pedido FROM pedidos 
                     WHERE id_cliente = %s 
@@ -84,30 +84,33 @@ def nuevo():
 
                 if existe:
                     flash("Ya existe un pedido pendiente para este cliente en esa fecha.", "error")
-                    # Volver a mostrar el formulario con la lista de clientes
+                    # Traer clientes y productos para rearmar el formulario
                     cur.execute("SELECT id_cliente, nombre FROM clientes")
                     clientes = cur.fetchall()
-                    return render_template("nuevo_pedido.html", clientes=clientes)
+                    cur.execute("SELECT id_producto, descripcion, precio FROM productos ORDER BY descripcion")
+                    productos = cur.fetchall()
+                    return render_template("nuevo_pedido.html", clientes=clientes, productos=productos)
 
-                # No existe, se crea nuevo pedido
+                # Crear el pedido (solo cabecera por ahora)
                 id_pedido = str(uuid.uuid4())
-                cur.execute(
-                    "INSERT INTO pedidos (id_pedido, id_cliente, fecha_entrega) VALUES (%s, %s, %s)",
-                    (id_pedido, id_cliente, fecha_entrega)
-                )
+                cur.execute("""
+                    INSERT INTO pedidos (id_pedido, id_cliente, fecha_entrega)
+                    VALUES (%s, %s, %s)
+                """, (id_pedido, id_cliente, fecha_entrega))
+
+                # Acá podés insertar los productos si querés desde el mismo formulario (ver abajo)
+                # pero ahora solo redirigís
                 conn.commit()
                 flash("Pedido creado correctamente.", "success")
                 return redirect(url_for('main.pendientes'))
 
-    # GET: Mostrar formulario con lista de clientes
-    with get_conn() as conn:
-        with conn.cursor() as cur:
+            # GET: mostrar formulario
             cur.execute("SELECT id_cliente, nombre FROM clientes")
             clientes = cur.fetchall()
-    return render_template("nuevo_pedido.html", clientes=clientes)
+            cur.execute("SELECT id_producto, descripcion, precio FROM productos ORDER BY descripcion")
+            productos = cur.fetchall()
 
-
-
+    return render_template("nuevo_pedido.html", clientes=clientes, productos=productos)
 # ---------------- Pagos ----------------
 @bp.route("/pagos", methods=['GET','POST'])
 def pagos():

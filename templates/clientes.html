@@ -3,42 +3,43 @@
 
 {% block content %}
 <div class="d-flex align-items-center mb-3 gap-3 flex-wrap">
-  <!-- Barra de búsqueda grande a la izquierda -->
   <div class="flex-grow-1" style="min-width: 250px;">
     <input type="search" id="buscarCliente" class="form-control form-control-lg" placeholder="Buscar clientes...">
   </div>
 
-  <!-- Botón + pequeño -->
-  <button class="btn btn-primary btn-lg flex-shrink-0" data-bs-toggle="collapse" data-bs-target="#formCliente" aria-expanded="false" aria-controls="formCliente">
+  <button class="btn btn-primary btn-lg flex-shrink-0" data-bs-toggle="collapse" data-bs-target="#formCliente"
+    aria-expanded="false" aria-controls="formCliente">
     <i class="bi bi-plus-lg"></i>
   </button>
 
-  <!-- Título a la derecha, tamaño h2 -->
   <h2 class="m-0 flex-shrink-0">Clientes</h2>
 </div>
 
-<!-- Formulario nuevo cliente -->
 <form action="{{ url_for('clientes.nuevo_cliente') }}" method="POST">
   <div class="collapse mb-3" id="formCliente">
     <div class="card card-body bg-dark text-light">
       <div class="mb-2">
         <label for="nombre" class="form-label"><i class="bi bi-person-fill me-1"></i>Nombre del Cliente</label>
-        <input type="text" name="nombre" id="nombre" class="form-control form-control-sm" required placeholder="Nombre del cliente" autocomplete="off">
+        <input type="text" name="nombre" id="nombre" class="form-control form-control-sm" required
+          placeholder="Nombre del cliente" autocomplete="off">
       </div>
 
       <div class="mb-2">
         <label for="telefono" class="form-label"><i class="bi bi-telephone-fill me-1"></i>Teléfono</label>
-        <input type="text" name="telefono" id="telefono" class="form-control form-control-sm" placeholder="Teléfono del cliente" autocomplete="off">
+        <input type="text" name="telefono" id="telefono" class="form-control form-control-sm"
+          placeholder="Teléfono del cliente" autocomplete="off">
       </div>
 
       <div class="mb-2">
         <label for="direccion" class="form-label"><i class="bi bi-house-fill me-1"></i>Dirección</label>
-        <input type="text" name="direccion" id="direccion" class="form-control form-control-sm" placeholder="Dirección del cliente" autocomplete="off">
+        <input type="text" name="direccion" id="direccion" class="form-control form-control-sm"
+          placeholder="Dirección del cliente" autocomplete="off">
       </div>
 
       <div class="mb-2">
         <label for="mail" class="form-label"><i class="bi bi-envelope-fill me-1"></i>Email</label>
-        <input type="email" name="mail" id="mail" class="form-control form-control-sm" placeholder="Email del cliente (opcional)" autocomplete="off">
+        <input type="email" name="mail" id="mail" class="form-control form-control-sm"
+          placeholder="Email del cliente (opcional)" autocomplete="off">
       </div>
 
       <button type="submit" class="btn btn-success btn-sm">
@@ -48,35 +49,45 @@
   </div>
 </form>
 
-<!-- Lista simple sin agrupación -->
+<!-- Lista de clientes con formularios para editar inline -->
 <div class="clientes-lista">
   {% for letra, grupo in clientes_por_letra.items() %}
-    {% for c in grupo %}
-      <div class="cliente-item d-flex justify-content-between align-items-center bg-dark text-light px-3 py-2 rounded mb-1">
-        <div>
-          <i class="bi bi-person-circle me-2"></i>{{ c[1] | title }}
-        </div>
-        <div>
-          <a href="#collapse{{ c[0] }}" data-bs-toggle="collapse" class="btn btn-sm btn-outline-primary text-secondary" aria-expanded="false" aria-controls="collapse{{ c[0] }}">
-            <i class="bi bi-chevron-down"></i>
-          </a>
-        </div>
+  {% for c in grupo %}
+  <form action="{{ url_for('clientes.editar_cliente', id_cliente=c[0]) }}" method="POST"
+    class="cliente-item bg-dark text-light rounded px-3 py-2 mb-3">
+    <div class="row align-items-center">
+      <div class="col-md-3 d-flex align-items-center gap-2">
+        <i class="bi bi-person-circle fs-4"></i>
+        <input type="text" name="nombre" class="form-control form-control-sm" value="{{ c[1] }}" required>
       </div>
-
-      <div id="collapse{{ c[0] }}" class="accordion-collapse collapse">
-        <div class="accordion-body bg-secondary text-light rounded mt-1">
-          <div class="mb-2"><i class="bi bi-person-fill me-1"></i><strong>Nombre:</strong> {{ c[1] }}</div>
-          <div class="mb-2"><i class="bi bi-telephone-fill me-1"></i><strong>Tel:</strong> {{ c[2] or "Sin teléfono" }}</div>
-          <div class="mb-2"><i class="bi bi-house-fill me-1"></i><strong>Dirección:</strong> {{ c[3] or "Sin dirección" }}</div>
-          <div class="mb-2"><i class="bi bi-envelope-fill me-1"></i><strong>Email:</strong> {{ c[4] or "Sin email" }}</div>
-          <div class="text-end">
-            <a href="{{ url_for('clientes.borrar_cliente', id_cliente=c[0]) }}" class="btn btn-danger btn-sm">
-              <i class="bi bi-trash"></i> Borrar
-            </a>
-          </div>
-        </div>
+      <div class="col-md-2">
+        <input type="text" name="telefono" class="form-control form-control-sm" value="{{ c[2] or '' }}"
+          placeholder="Teléfono">
       </div>
-    {% endfor %}
+      <div class="col-md-3">
+        <input type="text" name="direccion" class="form-control form-control-sm" value="{{ c[3] or '' }}"
+          placeholder="Dirección">
+      </div>
+      <div class="col-md-3">
+        <input type="email" name="mail" class="form-control form-control-sm" value="{{ c[4] or '' }}"
+          placeholder="Email">
+      </div>
+      <div class="col-md-1 text-end">
+        <button type="submit" class="btn btn-sm btn-success" title="Guardar cambios">
+          <i class="bi bi-save2"></i>
+        </button>
+        <a href="{{ url_for('clientes.borrar_cliente', id_cliente=c[0]) }}" class="btn btn-sm btn-danger ms-1"
+          title="Borrar cliente" onclick="return confirm('¿Seguro que querés borrar este cliente?');">
+          <i class="bi bi-trash"></i>
+        </a>
+      </div>
+    </div>
+    {% if c|length > 5 %}
+    <small class="text-muted mt-1 d-block">Creado: {{ c[5].strftime('%d/%m/%Y %H:%M') }}</small>
+    {% endif %}
+  </form>
+  {% endfor %}
   {% endfor %}
 </div>
+
 {% endblock %}

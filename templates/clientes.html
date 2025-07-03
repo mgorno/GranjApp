@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Clientes{% endblock %}
+
+{% block content %}
+<h1 class="mb-3">Clientes</h1>
+
+<!-- botón que abre el modal -->
+<button class="btn btn-primary mb-4" data-bs-toggle="modal" data-bs-target="#modalCliente">
+  Nuevo Cliente
+</button>
+
+<!-- grilla de tarjetas -->
+<div class="row g-3">
+  {% for c in clientes %}
+    <div class="col-sm-6 col-md-4 col-lg-3">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title mb-1">{{ c[1] }}</h5>
+          <small class="text-muted">{{ c[2] }}</small>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<!-- Modal pequeño -->
+<div class="modal fade" id="modalCliente" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <form method="POST" action="{{ url_for('main.crear_cliente') }}">
+        <div class="modal-header">
+          <h5 class="modal-title">Alta de Cliente</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="mb-2">
+            <label class="form-label">Nombre*</label>
+            <input name="nombre" class="form-control" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Teléfono</label>
+            <input name="telefono" class="form-control">
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Dirección</label>
+            <input name="direccion" class="form-control">
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Email</label>
+            <input name="mail" type="email" class="form-control">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Guardar</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

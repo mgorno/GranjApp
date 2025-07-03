@@ -51,6 +51,31 @@ def nuevo_cliente():
         return redirect(url_for('main.nuevo_cliente'))
 
     return render_template('nuevo_cliente.html')
+# routes.py
+@bp.route("/clientes")
+def clientes():
+    with get_conn() as conn, conn.cursor() as cur:
+        cur.execute("SELECT id_cliente, nombre, telefono FROM clientes ORDER BY nombre")
+        clientes = cur.fetchall()
+    return render_template("clientes.html", clientes=clientes)
+
+@bp.route("/clientes/crear", methods=["POST"])
+def crear_cliente():
+    nombre     = request.form["nombre"].strip()
+    telefono   = request.form["telefono"].strip()
+    direccion  = request.form["direccion"].strip()
+    mail       = request.form["mail"].strip()
+    id_cliente = str(uuid.uuid4())
+
+    with get_conn() as conn, conn.cursor() as cur:
+        cur.execute("""
+            INSERT INTO clientes (id_cliente, nombre, telefono, direccion, mail)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (id_cliente, nombre, telefono or None, direccion or None, mail or None))
+        conn.commit()
+
+    flash("Cliente creado correctamente.", "success")
+    return redirect(url_for("main.clientes"))
 
 # ---------------- Pedidos ----------------
 @bp.route("/pendientes")

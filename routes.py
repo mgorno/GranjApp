@@ -76,6 +76,33 @@ def crear_cliente():
 
     flash("Cliente creado correctamente.", "success")
     return redirect(url_for("main.clientes"))
+@bp.route("/clientes/editar/<id_cliente>", methods=["POST"])
+def editar_cliente(id_cliente):
+    nombre = request.form.get("nombre")
+    telefono = request.form.get("telefono")
+    direccion = request.form.get("direccion")
+    mail = request.form.get("mail")
+
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                UPDATE clientes SET nombre=%s, telefono=%s, direccion=%s, mail=%s
+                WHERE id_cliente=%s
+            """, (nombre, telefono, direccion, mail, id_cliente))
+        conn.commit()
+
+    flash("Cliente actualizado", "success")
+    return redirect(url_for("main.lista_clientes"))  # asegurate de usar el nombre correcto
+
+@bp.route("/clientes/borrar/<id_cliente>")
+def borrar_cliente(id_cliente):
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM clientes WHERE id_cliente = %s", (id_cliente,))
+        conn.commit()
+
+    flash("Cliente eliminado", "success")
+    return redirect(url_for("main.lista_clientes"))
 
 # ---------------- Pedidos ----------------
 @bp.route("/pendientes")

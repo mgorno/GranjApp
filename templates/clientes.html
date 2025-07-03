@@ -2,77 +2,86 @@
 {% block title %}Clientes{% endblock %}
 
 {% block content %}
-<!-- Botón para desplegar el form -->
-<button class="btn btn-primary mb-3" data-bs-toggle="collapse" data-bs-target="#formCliente">
-  + Nuevo Cliente
-</button>
 
+<!-- Contenedor flex para título, buscador y botón + -->
+<div class="d-flex align-items-center mb-3">
+  <div class="d-flex align-items-center me-auto gap-2">
+    <!-- Botón + para desplegar formulario -->
+    <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#formCliente" aria-expanded="false"
+      aria-controls="formCliente">
+      +
+    </button>
+
+    <!-- Barra de búsqueda (sin funcionalidad JS aún) -->
+    <input type="search" id="buscarCliente" class="form-control form-control-sm" placeholder="Buscar clientes...">
+  </div>
+
+  <!-- Título -->
+  <h2 class="m-0 ms-3">Clientes</h2>
+</div>
+
+<!-- Formulario de nuevo cliente desplegable -->
 <form action="{{ url_for('clientes.nuevo_cliente') }}" method="POST">
   <div class="collapse mb-3" id="formCliente">
     <div class="card card-body bg-dark text-light">
-      <!-- Nombre -->
       <div class="mb-2">
         <label for="nombre" class="form-label">Nombre del Cliente</label>
         <input type="text" name="nombre" id="nombre" class="form-control form-control-sm" required
           placeholder="Nombre del cliente" autocomplete="off">
       </div>
 
-      <!-- Teléfono -->
       <div class="mb-2">
         <label for="telefono" class="form-label">Teléfono</label>
         <input type="text" name="telefono" id="telefono" class="form-control form-control-sm"
           placeholder="Teléfono del cliente" autocomplete="off">
       </div>
 
-      <!-- Dirección -->
       <div class="mb-2">
         <label for="direccion" class="form-label">Dirección</label>
         <input type="text" name="direccion" id="direccion" class="form-control form-control-sm"
           placeholder="Dirección del cliente" autocomplete="off">
       </div>
 
-      <!-- Email -->
       <div class="mb-2">
         <label for="mail" class="form-label">Email</label>
         <input type="email" name="mail" id="mail" class="form-control form-control-sm"
           placeholder="Email del cliente (opcional)" autocomplete="off">
       </div>
 
-      <!-- Botón de envío -->
       <button type="submit" class="btn btn-success btn-sm">💾 Guardar Cliente</button>
     </div>
   </div>
 </form>
 
-<!-- Lista de clientes agrupados -->
+<!-- Lista de clientes agrupados por letra -->
 <div class="clientes-lista">
   {% for letra, grupo in clientes_por_letra.items() %}
-    <div class="letra-separador py-1 text-muted text-uppercase fw-bold">
-      {{ letra }}
+  <div class="letra-separador py-1 text-muted text-uppercase fw-bold">
+    {{ letra }}
+  </div>
+  {% for c in grupo %}
+  <div class="cliente-item d-flex justify-content-between align-items-center bg-dark text-light px-3 py-2 rounded mb-1">
+    <div>
+      {{ c[1] | title }}
     </div>
-    {% for c in grupo %}
-      <div class="cliente-item d-flex justify-content-between align-items-center bg-dark text-light px-3 py-2 rounded mb-1">
-        <div>
-          {{ c[1] | title }}
-        </div>
-        <div>
-          <a href="#collapse{{ c[0] }}" data-bs-toggle="collapse" class="btn btn-sm btn-outline-primary">˅</a>
-        </div>
-      </div>
+    <div>
+      <a href="#collapse{{ c[0] }}" data-bs-toggle="collapse"
+        class="btn btn-sm btn-outline-primary text-secondary">˅</a>
+    </div>
+  </div>
 
-      <!-- Detalle oculto estilo acordeón -->
-      <div id="collapse{{ c[0] }}" class="accordion-collapse collapse">
-        <div class="accordion-body bg-secondary text-light rounded mt-1">
-          <div class="mb-2"><strong>Nombre:</strong> {{ c[1] }}</div>
-          <div class="mb-2">📞 <strong>Tel:</strong> {{ c[2] or "Sin teléfono" }}</div>
-          <div class="mb-2">🏠 <strong>Dirección:</strong> {{ c[3] or "Sin dirección" }}</div>
-          <div class="mb-2">✉️ <strong>Email:</strong> {{ c[4] or "Sin email" }}</div>
-          <div class="text-end">
-            <a href="{{ url_for('clientes.borrar_cliente', id_cliente=c[0]) }}" class="btn btn-danger btn-sm">🗑️ Borrar</a>
-          </div>
-        </div>
+  <div id="collapse{{ c[0] }}" class="accordion-collapse collapse">
+    <div class="accordion-body bg-secondary text-light rounded mt-1">
+      <div class="mb-2"><strong>Nombre:</strong> {{ c[1] }}</div>
+      <div class="mb-2">📞 <strong>Tel:</strong> {{ c[2] or "Sin teléfono" }}</div>
+      <div class="mb-2">🏠 <strong>Dirección:</strong> {{ c[3] or "Sin dirección" }}</div>
+      <div class="mb-2">✉️ <strong>Email:</strong> {{ c[4] or "Sin email" }}</div>
+      <div class="text-end">
+        <a href="{{ url_for('clientes.borrar_cliente', id_cliente=c[0]) }}" class="btn btn-danger btn-sm">🗑️ Borrar</a>
       </div>
-    {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
   {% endfor %}
 </div>
 

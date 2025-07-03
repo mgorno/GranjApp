@@ -2,10 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from models import get_conn
 import uuid, re
 
-
-
 bp_clientes = Blueprint("clientes", __name__, url_prefix="/clientes")
-
 
 # ---------------- Clientes ----------------
 @bp_clientes.route("/nuevo", methods=['GET', 'POST'])
@@ -27,14 +24,25 @@ def nuevo_cliente():
         if errores:
             for e in errores:
                 flash(e, "error")
+            # Devuelvo el form con datos para que no se pierdan
             return render_template('nuevo_cliente.html',
                                    nombre=nombre,
                                    telefono=telefono,
                                    direccion=direccion,
                                    mail=mail)
 
-        id_cliente = str(uuid.uuid4())
+        # VALIDAR SI EL CLIENTE YA EXISTE POR NOMBRE
+        with get_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1 FROM clientes WHERE nombre = %s", (nombre,))
+                existe = cur.fetchone()
 
+        if existe:
+            flash(f"El cliente '{nombre}' ya existe.", "warning")
+            return redirect(url_for('clientes.clientes'))
+
+        # SI NO EXISTE, CREAR NUEVO CLIENTE
+        id_cliente = str(uuid.uuid4())
         with get_conn() as conn:
             with conn.cursor() as cur:
                 cur.execute(
@@ -46,9 +54,9 @@ def nuevo_cliente():
         flash("Cliente creado correctamente.", "success")
         return redirect(url_for('clientes.clientes'))
 
-    return render_template('cliente.html')
-    
-# routes.py
+    return render_template('nuevo_cliente.html')
+
+
 @bp_clientes.route("/")
 def clientes():
     with get_conn() as conn, conn.cursor() as cur:
@@ -56,12 +64,13 @@ def clientes():
         clientes = cur.fetchall()
     return render_template("clientes.html", clientes=clientes)
 
+
 @bp_clientes.route("/crear", methods=["POST"])
 def crear_cliente():
-    nombre     = request.form["nombre"].strip()
-    telefono   = request.form["telefono"].strip()
-    direccion  = request.form["direccion"].strip()
-    mail       = request.form["mail"].strip()
+    nombre = request.form["nombre"].strip()
+    telefono = request.form["telefono"].strip()
+    direccion = request.form["direccion"].strip()
+    mail = request.form["mail"].strip()
     id_cliente = str(uuid.uuid4())
 
     with get_conn() as conn, conn.cursor() as cur:
@@ -72,7 +81,9 @@ def crear_cliente():
         conn.commit()
 
     flash("Cliente creado correctamente.", "success")
-    return redirect(url_for("main.clientes"))
+    return redirect(url_for("clientes.clientes"))  # corregí endpoint
+
+
 @bp_clientes.route("/editar/<id_cliente>", methods=["POST"])
 def editar_cliente(id_cliente):
     nombre = request.form.get("nombre")
@@ -89,7 +100,8 @@ def editar_cliente(id_cliente):
         conn.commit()
 
     flash("Cliente actualizado", "success")
-    return redirect(url_for("main.lista_clientes"))  # asegurate de usar el nombre correcto
+    return redirect(url_for("clientes.clientes"))  # corregí endpoint
+
 
 @bp_clientes.route("/borrar/<id_cliente>")
 def borrar_cliente(id_cliente):
@@ -99,4 +111,4 @@ def borrar_cliente(id_cliente):
         conn.commit()
 
     flash("Cliente eliminado", "success")
-    return redirect(url_for("main.lista_clientes"))
+    return redirect(url_for("clientes.clientes"))  # corregí endpoint

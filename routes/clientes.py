@@ -65,25 +65,6 @@ def clientes():
     return render_template("clientes.html", clientes=clientes)
 
 
-@bp_clientes.route("/crear", methods=["POST"])
-def crear_cliente():
-    nombre = request.form["nombre"].strip()
-    telefono = request.form["telefono"].strip()
-    direccion = request.form["direccion"].strip()
-    mail = request.form["mail"].strip()
-    id_cliente = str(uuid.uuid4())
-
-    with get_conn() as conn, conn.cursor() as cur:
-        cur.execute("""
-            INSERT INTO clientes (id_cliente, nombre, telefono, direccion, mail)
-            VALUES (%s, %s, %s, %s, %s)
-        """, (id_cliente, nombre, telefono or None, direccion or None, mail or None))
-        conn.commit()
-
-    flash("Cliente creado correctamente.", "success")
-    return redirect(url_for("clientes.clientes"))  # corregí endpoint
-
-
 @bp_clientes.route("/editar/<id_cliente>", methods=["POST"])
 def editar_cliente(id_cliente):
     nombre = request.form.get("nombre")

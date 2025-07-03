@@ -17,8 +17,8 @@ def nuevo_cliente():
         errores = []
         if not nombre:
             errores.append("El nombre es obligatorio.")
-        if telefono and not re.fullmatch(r'\d{6,15}', telefono):
-            errores.append("El teléfono debe tener solo números y entre 6 y 15 dígitos.")
+        if telefono and not re.fullmatch(r'\d{10,12}', telefono):
+            errores.append("El teléfono debe tener solo números y entre 10 y 12 dígitos.")
         if mail and not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", mail):
             errores.append("El email no es válido.")
 

@@ -7,6 +7,41 @@
   + Nuevo Cliente
 </button>
 
+<form action="{{ url_for('clientes.nuevo_cliente') }}" method="POST">
+  <div class="collapse mb-3" id="formCliente">
+    <div class="card card-body bg-dark text-light">
+      <!-- Nombre -->
+      <div class="mb-2">
+        <label for="nombre" class="form-label">Nombre del Cliente</label>
+        <input type="text" name="nombre" id="nombre" class="form-control form-control-sm" required
+          placeholder="Nombre del cliente" autocomplete="off">
+      </div>
+
+      <!-- Teléfono -->
+      <div class="mb-2">
+        <label for="telefono" class="form-label">Teléfono</label>
+        <input type="text" name="telefono" id="telefono" class="form-control form-control-sm"
+          placeholder="Teléfono del cliente" autocomplete="off">
+      </div>
+
+      <!-- Dirección -->
+      <div class="mb-2">
+        <label for="direccion" class="form-label">Dirección</label>
+        <input type="text" name="direccion" id="direccion" class="form-control form-control-sm"
+          placeholder="Dirección del cliente" autocomplete="off">
+      </div>
+
+      <!-- Email -->
+      <div class="mb-2">
+        <label for="mail" class="form-label">Email</label>
+        <input type="email" name="mail" id="mail" class="form-control form-control-sm"
+          placeholder="Email del cliente (opcional)" autocomplete="off">
+      </div>
+
+      <!-- Botón de envío -->
+      <button type="submit" class="btn btn-success btn-sm">💾 Guardar Cliente</button>
+    </div>
+  </div>
 <!-- Lista de clientes -->
 <div class="accordion" id="agendaClientes">
   {% for c in clientes %}

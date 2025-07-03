@@ -56,64 +56,64 @@
     <div id="collapse{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="heading{{ loop.index }}"
       data-bs-parent="#agendaClientes">
       <div class="accordion-body">
-        <form method="POST" action="{{ url_for('clientes.editar_cliente', id_cliente=c[0]) }}" class="edit-form">
-          <!-- Nombre -->
-          <div class="mb-2 d-flex align-items-center justify-content-between">
-            <div>
-              <strong>Nombre:</strong>
-              <span class="editable-text" data-target="nombre-{{ c[0] }}">{{ c[1]}}</span>
-            </div>
-            <button type="button" class="icon-btn" onclick="toggleEdit(this, 'nombre-{{ c[0] }}')">
-              <i class="fas fa-pen"></i>
-            </button>
+        <!-- Nombre -->
+        <div class="mb-2 d-flex align-items-center justify-content-between">
+          <div>
+            <strong>Nombre:</strong>
+            <span class="editable-text" data-target="nombre-{{ c[0] }}">{{ c[1] }}</span>
           </div>
-          <input type="text" name="telefono" value="{{ c[2] or '' }}" class="form-control form-control-sm d-none"
-            id="input-telefono-{{ c[0] }}" autocomplete="off">
-          <!-- Teléfono -->
-          <div class="mb-2 d-flex align-items-center justify-content-between">
-            <div>
-              📞 <strong>Tel:</strong>
-              <span class="editable-text" data-target="telefono-{{ c[0] }}">{{ c[2] or "Sin teléfono" }}</span>
-            </div>
-            <button type="button" class="icon-btn" onclick="toggleEdit(this, 'telefono-{{ c[0] }}')">
-              <i class="fas fa-pen"></i>
-            </button>
-          </div>
-          <input type="text" name="telefono" value="{{ c[2] or '' }}" class="form-control form-control-sm d-none"
-            id="input-telefono-{{ c[0] }}" autocomplete="off">
+          <button type="button" class="icon-btn" onclick="toggleEdit(this, 'nombre-{{ c[0] }}')">
+            <i class="fas fa-pen"></i>
+          </button>
+        </div>
+        <input type="text" name="nombre" value="{{ c[1] }}" class="form-control form-control-sm d-none"
+          id="input-nombre-{{ c[0] }}" autocomplete="off">
 
-          <!-- Dirección -->
-          <div class="mb-2 d-flex align-items-center justify-content-between">
-            <div>
-              🏠 <strong>Dirección:</strong>
-              <span class="editable-text" data-target="direccion-{{ c[0] }}">{{ c[3] or "Sin dirección" }}</span>
-            </div>
-            <button type="button" class="icon-btn" onclick="toggleEdit(this, 'direccion-{{ c[0] }}')">
-              <i class="fas fa-pen"></i>
-            </button>
+        <!-- Teléfono -->
+        <div class="mb-2 d-flex align-items-center justify-content-between">
+          <div>
+            📞 <strong>Tel:</strong>
+            <span class="editable-text" data-target="telefono-{{ c[0] }}">{{ c[2] or "Sin teléfono" }}</span>
           </div>
-          <input type="text" name="direccion" value="{{ c[3] or '' }}" class="form-control form-control-sm d-none"
-            id="input-direccion-{{ c[0] }}" autocomplete="off">
+          <button type="button" class="icon-btn" onclick="toggleEdit(this, 'telefono-{{ c[0] }}')">
+            <i class="fas fa-pen"></i>
+          </button>
+        </div>
+        <input type="text" name="telefono" value="{{ c[2] or '' }}" class="form-control form-control-sm d-none"
+          id="input-telefono-{{ c[0] }}" autocomplete="off">
 
-          <!-- Email -->
-          <div class="mb-2 d-flex align-items-center justify-content-between">
-            <div>
-              ✉️ <strong>Email:</strong>
-              <span class="editable-text" data-target="mail-{{ c[0] }}">{{ c[4] or "Sin email" }}</span>
-            </div>
-            <button type="button" class="icon-btn" onclick="toggleEdit(this, 'mail-{{ c[0] }}')">
-              <i class="fas fa-pen"></i>
-            </button>
+        <!-- Dirección -->
+        <div class="mb-2 d-flex align-items-center justify-content-between">
+          <div>
+            🏠 <strong>Dirección:</strong>
+            <span class="editable-text" data-target="direccion-{{ c[0] }}">{{ c[3] or "Sin dirección" }}</span>
           </div>
-          <input type="email" name="mail" value="{{ c[4] or '' }}" class="form-control form-control-sm d-none"
-            id="input-mail-{{ c[0] }}" autocomplete="off">
+          <button type="button" class="icon-btn" onclick="toggleEdit(this, 'direccion-{{ c[0] }}')">
+            <i class="fas fa-pen"></i>
+          </button>
+        </div>
+        <input type="text" name="direccion" value="{{ c[3] or '' }}" class="form-control form-control-sm d-none"
+          id="input-direccion-{{ c[0] }}" autocomplete="off">
 
-          <!-- Botones -->
-          <div class="text-end mt-2">
-            <button class="btn btn-success btn-sm">💾 Guardar</button>
-            <a href="{{ url_for('clientes.borrar_cliente', id_cliente=c[0]) }}" class="btn btn-danger btn-sm">🗑️
-              Borrar</a>
+        <!-- Email -->
+        <div class="mb-2 d-flex align-items-center justify-content-between">
+          <div>
+            ✉️ <strong>Email:</strong>
+            <span class="editable-text" data-target="mail-{{ c[0] }}">{{ c[4] or "Sin email" }}</span>
           </div>
+          <button type="button" class="icon-btn" onclick="toggleEdit(this, 'mail-{{ c[0] }}')">
+            <i class="fas fa-pen"></i>
+          </button>
+        </div>
+        <input type="email" name="mail" value="{{ c[4] or '' }}" class="form-control form-control-sm d-none"
+          id="input-mail-{{ c[0] }}" autocomplete="off">
+
+        <!-- Botones -->
+        <div class="text-end mt-2">
+          <button class="btn btn-success btn-sm">💾 Guardar</button>
+          <a href="{{ url_for('clientes.borrar_cliente', id_cliente=c[0]) }}" class="btn btn-danger btn-sm">🗑️
+            Borrar</a>
+        </div>
         </form>
       </div>
     </div>

@@ -14,7 +14,7 @@ def redirigir_a_formulario():
     destinos = {
         "cliente": "clientes.nuevo_cliente",
         "producto": "productos.nuevo_producto",
-        "pedido": "pedidos.nuevo_pedido",
+        "pedido": "pedidos.nuevo",
         "pago": "pagos.nuevo_pago"
     }
 
@@ -25,3 +25,4 @@ def redirigir_a_formulario():
             f"Tipo inválido: {tipo}. Usá uno de: {', '.join(destinos.keys())}",
             400
         )
+

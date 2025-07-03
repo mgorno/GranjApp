@@ -44,7 +44,7 @@ def nuevo_cliente():
             conn.commit()
 
         flash("Cliente creado correctamente.", "success")
-        return redirect(url_for('main.nuevo_cliente'))
+        return redirect(url_for('clientes.lista_clientes'))
 
     return render_template('nuevo_cliente.html')
 # routes.py

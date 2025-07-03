@@ -1,16 +1,13 @@
 import os
 from flask import Flask
-from routes import blueprints
+from routes import bp
 from models import init_db
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-key")
 
-# Registrar todos los blueprints
 for bp in blueprints:
     app.register_blueprint(bp)
-
-# Inicializar base de datos
 init_db()
 
 if __name__ == "__main__":

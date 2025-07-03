@@ -8,7 +8,7 @@ bp_clientes = Blueprint("clientes", __name__, url_prefix="/clientes")
 
 
 # ---------------- Clientes ----------------
-@bp_clientes("/clientes/nuevo", methods=['GET', 'POST'])
+@bp_clientes.route("/nuevo", methods=['GET', 'POST'])
 def nuevo_cliente():
     if request.method == 'POST':
         nombre = request.form.get('nombre', '').strip()
@@ -48,14 +48,14 @@ def nuevo_cliente():
 
     return render_template('nuevo_cliente.html')
 # routes.py
-@bp_clientes("/clientes")
+@bp_clientes.route("/")
 def clientes():
     with get_conn() as conn, conn.cursor() as cur:
         cur.execute("SELECT id_cliente, nombre, telefono FROM clientes ORDER BY nombre")
         clientes = cur.fetchall()
     return render_template("clientes.html", clientes=clientes)
 
-@bp_clientes("/clientes/crear", methods=["POST"])
+@bp_clientes.route("/crear", methods=["POST"])
 def crear_cliente():
     nombre     = request.form["nombre"].strip()
     telefono   = request.form["telefono"].strip()
@@ -72,7 +72,7 @@ def crear_cliente():
 
     flash("Cliente creado correctamente.", "success")
     return redirect(url_for("main.clientes"))
-@bp_clientes("/clientes/editar/<id_cliente>", methods=["POST"])
+@bp_clientes.route("/editar/<id_cliente>", methods=["POST"])
 def editar_cliente(id_cliente):
     nombre = request.form.get("nombre")
     telefono = request.form.get("telefono")
@@ -90,7 +90,7 @@ def editar_cliente(id_cliente):
     flash("Cliente actualizado", "success")
     return redirect(url_for("main.lista_clientes"))  # asegurate de usar el nombre correcto
 
-@bp_clientes("/clientes/borrar/<id_cliente>")
+@bp_clientes.route("/borrar/<id_cliente>")
 def borrar_cliente(id_cliente):
     with get_conn() as conn:
         with conn.cursor() as cur:

@@ -145,6 +145,29 @@
       margin-bottom: 10px;
       font-size: 32px;
     }
+
+    .form-control-sm {
+      padding: 6px 10px;
+      font-size: 0.9rem;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    .editable-text {
+      font-size: 0.95rem;
+      color: #ddd;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      color: #888;
+      font-size: 1rem;
+    }
+
+    .icon-btn:hover {
+      color: #fff;
+    }
   </style>
 
 
@@ -183,6 +206,19 @@
   <main class="flex-shrink-0" style="margin-top:56px">
     <div class="container py-4">{% block content %}{% endblock %}</div>
   </main>
+  <script>
+    function toggleEdit(btn, field) {
+      const input = document.getElementById('input-' + field);
+      const span = document.querySelector('.editable-text[data-target="' + field + '"]');
+
+      span.classList.add('d-none');
+      input.classList.remove('d-none');
+      input.focus();
+
+      btn.classList.add('d-none');
+    }
+  </script>
+
 </body>
 
 </html>

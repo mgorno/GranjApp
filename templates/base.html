@@ -217,11 +217,11 @@
       btn.classList.add('d-none');
     }
   </script>
-  {% with messages = get_flashed_messages(with_categories=true) %}
+ {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       <div class="container mt-3">
         {% for category, message in messages %}
-          <div class="alert alert-{{ 'success' if category == 'success' else 'warning' if category == 'warning' else 'danger' if category == 'error' else 'info' }} alert-dismissible fade show" role="alert">
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
             {{ message }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>
@@ -229,8 +229,9 @@
       </div>
     {% endif %}
   {% endwith %}
-  {% block content %}{% endblock %}
 
+  {% block content %}
+  {% endblock %}
 </body>
 
 </html>

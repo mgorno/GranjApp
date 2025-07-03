@@ -44,9 +44,10 @@ def nuevo_cliente():
             conn.commit()
 
         flash("Cliente creado correctamente.", "success")
-        return redirect(url_for('clientes.lista_clientes'))
+        return redirect(url_for('clientes.clientes'))
 
-    return render_template('nuevo_cliente.html')
+    return render_template('cliente.html')
+    
 # routes.py
 @bp_clientes.route("/")
 def clientes():

@@ -12,7 +12,7 @@ def redirigir_a_formulario():
     tipo = request.args.get("tipo")
 
     destinos = {
-        "cliente": "clientes.nuevo_cliente",
+        "cliente": "clientes.clientes",
         "producto": "productos.nuevo_producto",
         "pedido": "pedidos.nuevo",
         "pago": "pagos.nuevo_pago"

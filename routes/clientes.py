@@ -58,11 +58,6 @@ def nuevo_cliente():
     return render_template('nuevo_cliente.html')
 
 
-from collections import defaultdict
-from flask import render_template
-from . import bp_clientes          # ya tenés tu blueprint
-from models import get_conn        # tu helper de conexión
-
 @bp_clientes.route("/")
 def clientes():
     
@@ -72,12 +67,11 @@ def clientes():
             FROM clientes
             ORDER BY nombre
         """)
-        clientes = cur.fetchall()          # [(id, nombre, tel, dir, mail), ...]
-
+        clientes = cur.fetchall()          
     
     clientes_por_letra = defaultdict(list)
     for c in clientes:
-        letra = c[1][0].upper() if c[1] else "#"    # Si no hay nombre, va al grupo #
+        letra = c[1][0].upper() if c[1] else "#"    
         clientes_por_letra[letra].append(c)
 
     

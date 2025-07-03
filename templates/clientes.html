@@ -57,6 +57,18 @@
       data-bs-parent="#agendaClientes">
       <div class="accordion-body">
         <form method="POST" action="{{ url_for('clientes.editar_cliente', id_cliente=c[0]) }}" class="edit-form">
+          <!-- Nombre -->
+          <div class="mb-2 d-flex align-items-center justify-content-between">
+            <div>
+              <strong>Nombre:</strong>
+              <span class="editable-text" data-target="nombre-{{ c[0] }}">{{ c[1]}}</span>
+            </div>
+            <button type="button" class="icon-btn" onclick="toggleEdit(this, 'nombre-{{ c[0] }}')">
+              <i class="fas fa-pen"></i>
+            </button>
+          </div>
+          <input type="text" name="telefono" value="{{ c[2] or '' }}" class="form-control form-control-sm d-none"
+            id="input-telefono-{{ c[0] }}" autocomplete="off">
           <!-- Teléfono -->
           <div class="mb-2 d-flex align-items-center justify-content-between">
             <div>

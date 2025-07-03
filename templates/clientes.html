@@ -20,8 +20,7 @@
     <div id="collapse{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="heading{{ loop.index }}"
       data-bs-parent="#agendaClientes">
       <div class="accordion-body">
-        <form method="POST" action="{{ url_for('main.editar_cliente', id_cliente=c[0]) }}" class="edit-form">
-
+        <form method="POST" action="{{ url_for('clientes.editar_cliente', id_cliente=c[0]) }}" class="edit-form">
           <!-- Teléfono -->
           <div class="mb-2 d-flex align-items-center justify-content-between">
             <div>
@@ -64,7 +63,7 @@
           <!-- Botones -->
           <div class="text-end mt-2">
             <button class="btn btn-success btn-sm">💾 Guardar</button>
-            <a href="{{ url_for('main.borrar_cliente', id_cliente=c[0]) }}" class="btn btn-danger btn-sm">🗑️ Borrar</a>
+            <a href="{{ url_for('clientes.borrar_cliente', id_cliente=c[0]) }}" class="btn btn-danger btn-sm">🗑️ Borrar</a>
           </div>
         </form>
       </div>

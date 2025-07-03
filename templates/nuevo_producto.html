@@ -5,13 +5,13 @@
 <h1 class="mb-4">Alta de Producto</h1>
 
 {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    <div>
-      {% for category, message in messages %}
-        <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }}">{{ message }}</div>
-      {% endfor %}
-    </div>
-  {% endif %}
+{% if messages %}
+<div>
+  {% for category, message in messages %}
+  <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }}">{{ message }}</div>
+  {% endfor %}
+</div>
+{% endif %}
 {% endwith %}
 
 <form method="POST" action="{{ url_for('main.nuevo_producto') }}">
@@ -20,9 +20,14 @@
     <input type="text" class="form-control" name="descripcion" value="{{ descripcion|default('') }}" required>
   </div>
   <div class="mb-3">
-    <label for="unidad_base" class="form-label">Unidad Base*</label>
-    <input type="text" class="form-control" name="unidad_base" value="{{ unidad_base|default('') }}" required>
+    <label>Unidad Base:</label>
+    <select name="unidad_base" required class="form-select">
+      <option value="">Seleccionar unidad</option>
+      <option value="kg">kg</option>
+      <option value="Cajon">litro</option>
+    </select>
   </div>
+
   <div class="mb-3">
     <label for="precio" class="form-label">Precio*</label>
     <input type="number" step="0.01" class="form-control" name="precio" value="{{ precio|default('') }}" required>

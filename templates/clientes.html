@@ -2,122 +2,110 @@
 {% block title %}Clientes{% endblock %}
 
 {% block content %}
-<!-- Botón para desplegar el form -->
-<button class="btn btn-primary mb-3" data-bs-toggle="collapse" data-bs-target="#formCliente">
-  + Nuevo Cliente
-</button>
+<!-- ===== Encabezado estilo iOS ===== -->
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h1 class="display-5 fw-bold m-0">Clientes</h1>
+  <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#formCliente">
+    + Agregar
+  </button>
+</div>
 
-<form action="{{ url_for('clientes.nuevo_cliente') }}" method="POST">
-  <div class="collapse mb-3" id="formCliente">
-    <div class="card card-body bg-dark text-light">
-      <!-- Nombre -->
-      <div class="mb-2">
-        <label for="nombre" class="form-label">Nombre del Cliente</label>
-        <input type="text" name="nombre" id="nombre" class="form-control form-control-sm" required
-          placeholder="Nombre del cliente" autocomplete="off">
-      </div>
+<!-- ===== Buscador ===== -->
+<div class="input-group mb-4">
+  <span class="input-group-text bg-transparent border-0"><i class="fas fa-search"></i></span>
+  <input type="text" id="buscadorClientes" class="form-control border-0" placeholder="Buscar" onkeyup="filtrarClientes()">
+</div>
 
-      <!-- Teléfono -->
-      <div class="mb-2">
-        <label for="telefono" class="form-label">Teléfono</label>
-        <input type="text" name="telefono" id="telefono" class="form-control form-control-sm"
-          placeholder="Teléfono del cliente" autocomplete="off">
-      </div>
-
-      <!-- Dirección -->
-      <div class="mb-2">
-        <label for="direccion" class="form-label">Dirección</label>
-        <input type="text" name="direccion" id="direccion" class="form-control form-control-sm"
-          placeholder="Dirección del cliente" autocomplete="off">
-      </div>
-
-      <!-- Email -->
-      <div class="mb-2">
-        <label for="mail" class="form-label">Email</label>
-        <input type="email" name="mail" id="mail" class="form-control form-control-sm"
-          placeholder="Email del cliente (opcional)" autocomplete="off">
-      </div>
-
-      <!-- Botón de envío -->
-      <button type="submit" class="btn btn-success btn-sm">💾 Guardar Cliente</button>
+<!-- ===== Formulario nuevo cliente ===== -->
+<div class="collapse mb-4" id="formCliente">
+  <div class="card shadow-sm bg-dark text-light border-0">
+    <div class="card-body">
+      <form action="{{ url_for('clientes.nuevo_cliente') }}" method="POST">
+        <div class="mb-3">
+          <label class="form-label">Nombre</label>
+          <input type="text" name="nombre" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Teléfono</label>
+          <input type="text" name="telefono" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Dirección</label>
+          <input type="text" name="direccion" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input type="email" name="mail" class="form-control">
+        </div>
+        <div class="text-end">
+          <button type="submit" class="btn btn-success">💾 Guardar</button>
+        </div>
+      </form>
     </div>
   </div>
-</form>
-<!-- Lista de clientes -->
-<div class="accordion" id="agendaClientes">
-  {% for c in clientes %}
-  <div class="accordion-item bg-dark text-light border-0 mb-2 rounded">
-    <h2 class="accordion-header" id="heading{{ loop.index }}">
-      <button class="accordion-button collapsed bg-dark text-light" type="button" data-bs-toggle="collapse"
-        data-bs-target="#collapse{{ loop.index }}" aria-expanded="false" aria-controls="collapse{{ loop.index }}">
-        📇 {{ c[1] }}
-      </button>
-    </h2>
-    <div id="collapse{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="heading{{ loop.index }}"
-      data-bs-parent="#agendaClientes">
-      <div class="accordion-body">
-        <!-- Nombre -->
-        <div class="mb-2 d-flex align-items-center justify-content-between">
-          <div>
-            <strong>Nombre:</strong>
-            <span class="editable-text" data-target="nombre-{{ c[0] }}">{{ c[1] }}</span>
-          </div>
-          <button type="button" class="icon-btn" onclick="toggleEdit(this, 'nombre-{{ c[0] }}')">
-            <i class="fas fa-pen"></i>
-          </button>
-        </div>
-        <input type="text" name="nombre" value="{{ c[1] }}" class="form-control form-control-sm d-none"
-          id="input-nombre-{{ c[0] }}" autocomplete="off">
+</div>
 
-        <!-- Teléfono -->
-        <div class="mb-2 d-flex align-items-center justify-content-between">
-          <div>
-            📞 <strong>Tel:</strong>
-            <span class="editable-text" data-target="telefono-{{ c[0] }}">{{ c[2] or "Sin teléfono" }}</span>
-          </div>
-          <button type="button" class="icon-btn" onclick="toggleEdit(this, 'telefono-{{ c[0] }}')">
-            <i class="fas fa-pen"></i>
-          </button>
+<!-- ===== Lista de clientes (agrupados por letra) ===== -->
+<div id="listaClientes" class="list-group list-group-flush">
+  {% set grupo_actual = None %}
+  {% for c in clientes|sort(attribute=1) %}
+    {% set inicial = c[1][:1]|upper %}
+    {% if inicial != grupo_actual %}
+      {% if not loop.first %}</div>{% endif %}
+      <div class="list-group-item bg-secondary text-light fw-bold small py-1 px-2">{{ inicial }}</div>
+      {% set grupo_actual = inicial %}
+    {% endif %}
+    <div class="list-group-item bg-dark text-light px-3 py-2 d-flex flex-column gap-1">
+      <div class="d-flex justify-content-between align-items-center">
+        <span class="fs-6 fw-semibold">{{ c[1] }}</span>
+        <div class="d-flex gap-2">
+          <a href="#" class="btn btn-sm btn-outline-light" onclick="toggleDetalle('{{ c[0] }}')">▶️</a>
+          <a href="{{ url_for('clientes.borrar_cliente', id_cliente=c[0]) }}" class="btn btn-sm btn-outline-danger">🗑️</a>
         </div>
-        <input type="text" name="telefono" value="{{ c[2] or '' }}" class="form-control form-control-sm d-none"
-          id="input-telefono-{{ c[0] }}" autocomplete="off">
-
-        <!-- Dirección -->
-        <div class="mb-2 d-flex align-items-center justify-content-between">
-          <div>
-            🏠 <strong>Dirección:</strong>
-            <span class="editable-text" data-target="direccion-{{ c[0] }}">{{ c[3] or "Sin dirección" }}</span>
-          </div>
-          <button type="button" class="icon-btn" onclick="toggleEdit(this, 'direccion-{{ c[0] }}')">
-            <i class="fas fa-pen"></i>
-          </button>
-        </div>
-        <input type="text" name="direccion" value="{{ c[3] or '' }}" class="form-control form-control-sm d-none"
-          id="input-direccion-{{ c[0] }}" autocomplete="off">
-
-        <!-- Email -->
-        <div class="mb-2 d-flex align-items-center justify-content-between">
-          <div>
-            ✉️ <strong>Email:</strong>
-            <span class="editable-text" data-target="mail-{{ c[0] }}">{{ c[4] or "Sin email" }}</span>
-          </div>
-          <button type="button" class="icon-btn" onclick="toggleEdit(this, 'mail-{{ c[0] }}')">
-            <i class="fas fa-pen"></i>
-          </button>
-        </div>
-        <input type="email" name="mail" value="{{ c[4] or '' }}" class="form-control form-control-sm d-none"
-          id="input-mail-{{ c[0] }}" autocomplete="off">
-
-        <!-- Botones -->
-        <div class="text-end mt-2">
-          <button class="btn btn-success btn-sm">💾 Guardar</button>
-          <a href="{{ url_for('clientes.borrar_cliente', id_cliente=c[0]) }}" class="btn btn-danger btn-sm">🗑️
-            Borrar</a>
-        </div>
-        </form>
+      </div>
+      <!-- Detalle oculto -->
+      <div id="detalle-{{ c[0] }}" class="mt-2 d-none">
+        <div class="small mb-1">📞 {{ c[2] or 'Sin teléfono' }}</div>
+        <div class="small mb-1">🏠 {{ c[3] or 'Sin dirección' }}</div>
+        <div class="small mb-2">✉️ {{ c[4] or 'Sin email' }}</div>
+        <a href="{{ url_for('clientes.editar_cliente', id_cliente=c[0]) }}" class="btn btn-outline-primary btn-sm">✏️ Editar</a>
       </div>
     </div>
-  </div>
+    {% if loop.last %}</div>{% endif %}
   {% endfor %}
 </div>
+
+<!-- ===== Índice lateral (A‑Z) ===== -->
+<div id="indiceLateral" class="position-fixed top-50 end-0 translate-middle-y pe-2">
+  {% for letra in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
+    <div class="text-muted small lh-1" onclick="scrollToGrupo('{{ letra }}')">{{ letra }}</div>
+  {% endfor %}
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Mostrar/ocultar detalles
+  function toggleDetalle(id) {
+    const el = document.getElementById(`detalle-${id}`);
+    el.classList.toggle('d-none');
+  }
+
+  // Filtro por texto
+  function filtrarClientes() {
+    const term = document.getElementById('buscadorClientes').value.toLowerCase();
+    document.querySelectorAll('#listaClientes .list-group-item.bg-dark').forEach(item => {
+      const text = item.querySelector('span').innerText.toLowerCase();
+      item.style.display = text.includes(term) ? '' : 'none';
+    });
+  }
+
+  // Scroll por índice lateral
+  function scrollToGrupo(letra) {
+    const header = Array.from(document.querySelectorAll('#listaClientes .bg-secondary'))
+      .find(h => h.innerText.trim() === letra);
+    if (header) header.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+</script>
 {% endblock %}

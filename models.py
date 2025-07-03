@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS productos (
     id_producto  TEXT PRIMARY KEY,
     descripcion  TEXT NOT NULL,
     unidad_base  TEXT,
-    precio       NUMERIC
+    precio       INTERGER
 );
 
 CREATE TABLE IF NOT EXISTS pedidos (
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS detalle_pedido (
     id_pedido    TEXT REFERENCES pedidos(id_pedido),
     id_producto  TEXT REFERENCES productos(id_producto),
     cantidad     INTEGER,
-    precio       NUMERIC
+    precio       INTERGER
 );
 
 CREATE TABLE IF NOT EXISTS pagos (

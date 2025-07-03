@@ -2,6 +2,8 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app.models import get_conn
 import uuid, re
 
+
+
 bp_clientes = Blueprint("clientes", __name__, url_prefix="/clientes")
 
 

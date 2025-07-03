@@ -1,4 +1,6 @@
 from flask import Blueprint, render_template
+from models import get_conn
+
 
 bp_main = Blueprint("main", __name__)
 

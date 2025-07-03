@@ -7,176 +7,13 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
 
-
-
-  <!-- Estilo personalizado para dark mode y botones -->
-  <style>
-    body {
-      background-color: #111;
-      color: #fff;
-    }
-
-    .card-dark {
-      background-color: #1e1e1e;
-      border: 1px solid #333;
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-
-    .editable:hover {
-      cursor: pointer;
-      background-color: #2c2c2c;
-    }
-
-    .icon-btn {
-      background: none;
-      border: none;
-      color: #ccc;
-      margin-left: 10px;
-    }
-
-    .icon-btn:hover {
-      color: #fff;
-    }
-
-    .form-control,
-    .form-select {
-      background-color: #1e1e1e;
-      color: #f1f1f1;
-      border: 1px solid #444;
-      border-radius: 12px;
-    }
-
-    .form-control::placeholder {
-      color: #999;
-    }
-
-    .form-select:focus,
-    .form-control:focus {
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
-    }
-
-    .btn {
-      border-radius: 10px;
-      font-weight: 500;
-      padding: 10px 20px;
-    }
-
-    .btn-success {
-      background-color: #22c55e;
-      border: none;
-    }
-
-    .btn-success:hover {
-      background-color: #16a34a;
-    }
-
-    .btn-outline-primary {
-      border: 1px solid #3b82f6;
-      color: #3b82f6;
-    }
-
-    .btn-outline-primary:hover {
-      background-color: #3b82f6;
-      color: #fff;
-    }
-
-    label {
-      font-weight: 500;
-      margin-top: 12px;
-      color: #fff;
-    }
-
-    h2,
-    h3,
-    h4 {
-      color: #fff;
-    }
-
-    .accordion-button {
-      background-color: #1f1f1f;
-      color: #fff;
-    }
-
-    .accordion-item {
-      background-color: #1a1a1a;
-      border: 1px solid #333;
-    }
-
-    .accordion-body {
-      background-color: #1f1f1f;
-    }
-
-    .offcanvas,
-    .offcanvas-body {
-      background-color: #1a1a1a;
-      color: #fff;
-    }
-
-    .list-group-item {
-      background-color: #1f1f1f;
-      color: #fff;
-      border: 1px solid #333;
-    }
-
-    .list-group-item:hover {
-      background-color: #333;
-    }
-
-    .card-dark {
-      background-color: #1e1e1e;
-      color: white;
-      border: 1px solid #333;
-      border-radius: 12px;
-      padding: 20px;
-      transition: background-color 0.2s;
-    }
-
-    .card-dark:hover {
-      background-color: #2a2a2a;
-      cursor: pointer;
-    }
-
-    .card-dark i {
-      color: #fff;
-      margin-bottom: 10px;
-      font-size: 32px;
-    }
-
-    .form-control-sm {
-      padding: 6px 10px;
-      font-size: 0.9rem;
-      height: auto;
-      border-radius: 8px;
-    }
-
-    .editable-text {
-      font-size: 0.95rem;
-      color: #ddd;
-    }
-
-    .icon-btn {
-      background: none;
-      border: none;
-      color: #888;
-      font-size: 1rem;
-    }
-
-    .icon-btn:hover {
-      color: #fff;
-    }
-  </style>
-
-
+</head>
 
 <body class="d-flex flex-column h-100">
 
   <nav class="navbar navbar-dark bg-dark fixed-top">
-
-
     <div class="container-fluid d-flex align-items-center">
       <button class="navbar-toggler me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#menu">
         <span class="navbar-toggler-icon"></span>
@@ -203,8 +40,27 @@
   </div>
 
   <main class="flex-shrink-0" style="margin-top:56px">
-    <div class="container py-4">{% block content %}{% endblock %}</div>
+    <div class="container py-4">
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div class="container mt-3">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endwith %}
+
+      {% block content %}
+      {% endblock %}
+
+    </div>
   </main>
+
   <script>
     function toggleEdit(btn, field) {
       const input = document.getElementById('input-' + field);
@@ -217,22 +73,7 @@
       btn.classList.add('d-none');
     }
   </script>
- {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="container mt-3">
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
 
-  {% block content %}
-  {% endblock %}
 </body>
 
 </html>
-

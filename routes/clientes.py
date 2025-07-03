@@ -60,26 +60,15 @@ def nuevo_cliente():
 
 @bp_clientes.route("/")
 def clientes():
-    
     with get_conn() as conn, conn.cursor() as cur:
         cur.execute("""
             SELECT id_cliente, nombre, telefono, direccion, mail
             FROM clientes
             ORDER BY nombre
         """)
-        clientes = cur.fetchall()          
-    
-    clientes_por_letra = defaultdict(list)
-    for c in clientes:
-        letra = c[1][0].upper() if c[1] else "#"    
-        clientes_por_letra[letra].append(c)
+        clientes = cur.fetchall()
 
-    
-    clientes_por_letra = dict(sorted(clientes_por_letra.items()))
-
-   
-    return render_template("clientes.html",
-                           clientes_por_letra=clientes_por_letra)
+    return render_template("clientes.html", clientes=clientes)
 
 
 @bp_clientes.route("/editar/<id_cliente>", methods=["POST"])

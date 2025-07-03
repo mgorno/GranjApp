@@ -20,3 +20,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.btn-editar-campo').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = btn.previousElementSibling;
+      if (input.hasAttribute('readonly')) {
+        input.removeAttribute('readonly');
+        input.focus();
+        btn.classList.remove('btn-outline-light');
+        btn.classList.add('btn-warning');
+      } else {
+        input.setAttribute('readonly', true);
+        btn.classList.add('btn-outline-light');
+        btn.classList.remove('btn-warning');
+      }
+    });
+  });
+});

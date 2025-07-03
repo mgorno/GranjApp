@@ -9,11 +9,12 @@
     <input type="search" id="buscarCliente" class="form-control form-control-lg" placeholder="Buscar clientes...">
   </div>
 
-  <button class="btn btn-primary btn-lg flex-shrink-0" data-bs-toggle="collapse" data-bs-target="#formCliente" aria-expanded="false" aria-controls="formCliente">
+  <button class="btn btn-primary btn-lg flex-shrink-0" data-bs-toggle="collapse" data-bs-target="#formCliente"
+    aria-expanded="false" aria-controls="formCliente">
     <i class="bi bi-plus-lg"></i>
   </button>
 
- 
+
 </div>
 
 <!-- Formulario nuevo cliente -->
@@ -22,105 +23,117 @@
     <div class="card card-body bg-dark text-light">
       <div class="mb-2">
         <label for="nombre" class="form-label">Nombre del Cliente</label>
-        <input type="text" name="nombre" id="nombre" class="form-control form-control-sm" required placeholder="Nombre del cliente" autocomplete="off">
+        <input type="text" name="nombre" id="nombre" class="form-control form-control-sm" required
+          placeholder="Nombre del cliente" autocomplete="off">
       </div>
       <div class="mb-2">
         <label for="telefono" class="form-label">Teléfono</label>
-        <input type="text" name="telefono" id="telefono" class="form-control form-control-sm" placeholder="Teléfono del cliente" autocomplete="off">
+        <input type="text" name="telefono" id="telefono" class="form-control form-control-sm"
+          placeholder="Teléfono del cliente" autocomplete="off">
       </div>
       <div class="mb-2">
         <label for="direccion" class="form-label">Dirección</label>
-        <input type="text" name="direccion" id="direccion" class="form-control form-control-sm" placeholder="Dirección del cliente" autocomplete="off">
+        <input type="text" name="direccion" id="direccion" class="form-control form-control-sm"
+          placeholder="Dirección del cliente" autocomplete="off">
       </div>
       <div class="mb-2">
         <label for="mail" class="form-label">Email</label>
-        <input type="email" name="mail" id="mail" class="form-control form-control-sm" placeholder="Email del cliente (opcional)" autocomplete="off">
+        <input type="email" name="mail" id="mail" class="form-control form-control-sm"
+          placeholder="Email del cliente (opcional)" autocomplete="off">
       </div>
       <button type="submit" class="btn btn-success btn-sm">💾 Guardar Cliente</button>
     </div>
   </div>
 </form>
 
-<!-- Lista clientes sin agrupación por letra -->
 <div class="clientes-lista">
   {% for c in clientes %}
-    <div class="cliente-item d-flex justify-content-between align-items-center bg-dark text-light px-3 py-2 rounded mb-1">
-      <div>{{ c[1] | title }}</div>
-      <div>
-        <a href="#collapse{{ c[0] }}" data-bs-toggle="collapse" class="btn btn-sm btn-outline-primary text-secondary">˅</a>
-      </div>
+  <div class="cliente-item d-flex justify-content-between align-items-center bg-dark text-light px-3 py-2 rounded mb-1">
+    <div>{{ c[1] | title }}</div>
+    <div>
+      <a href="#collapse{{ c[0] }}" data-bs-toggle="collapse"
+        class="btn btn-sm btn-outline-primary text-secondary">˅</a>
     </div>
+  </div>
 
-    <div id="collapse{{ c[0] }}" class="accordion-collapse collapse">
-      <form action="{{ url_for('clientes.editar_cliente', id_cliente=c[0]) }}" method="POST" class="accordion-body bg-secondary text-light rounded mt-1">
-        <!-- Nombre -->
-        <div class="mb-2 d-flex align-items-center gap-2">
-          <label class="form-label mb-0 flex-grow-1"><strong>Nombre:</strong></label>
-          <input type="text" name="nombre" value="{{ c[1] }}" class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-3" required>
-          <button type="button" class="btn btn-outline-light btn-sm" disabled>
-            <i class="bi bi-pencil-fill"></i>
-          </button>
-        </div>
+  <div id="collapse{{ c[0] }}" class="accordion-collapse collapse">
+    <form action="{{ url_for('clientes.editar_cliente', id_cliente=c[0]) }}" method="POST"
+      class="accordion-body bg-dark text-light rounded mt-1 p-3">
+      <!-- Nombre -->
+      <div class="mb-2 d-flex align-items-center gap-2">
+        <label class="form-label mb-0 flex-grow-1"><strong>Nombre:</strong></label>
+        <input type="text" name="nombre" value="{{ c[1] }}"
+          class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-3" readonly>
+        <button type="button" class="btn btn-outline-light btn-sm btn-editar-campo">
+          <i class="bi bi-pencil-fill"></i>
+        </button>
+      </div>
 
-        <!-- Teléfono -->
-        <div class="mb-2 d-flex align-items-center gap-2">
-          <label class="form-label mb-0 flex-grow-1"><strong>📞 Tel:</strong></label>
-          <input type="text" name="telefono" value="{{ c[2] or '' }}" class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-3" placeholder="Sin teléfono">
-          <button type="button" class="btn btn-outline-light btn-sm" disabled>
-            <i class="bi bi-pencil-fill"></i>
-          </button>
-        </div>
+      <!-- Teléfono -->
+      <div class="mb-2 d-flex align-items-center gap-2">
+        <label class="form-label mb-0 flex-grow-1"><strong>📞 Tel:</strong></label>
+        <input type="text" name="telefono" value="{{ c[2] or '' }}"
+          class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-3"
+          placeholder="Sin teléfono" readonly>
+        <button type="button" class="btn btn-outline-light btn-sm btn-editar-campo">
+          <i class="bi bi-pencil-fill"></i>
+        </button>
+      </div>
 
-        <!-- Dirección -->
-        <div class="mb-2 d-flex align-items-center gap-2">
-          <label class="form-label mb-0 flex-grow-1"><strong>🏠 Dirección:</strong></label>
-          <input type="text" name="direccion" value="{{ c[3] or '' }}" class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-3" placeholder="Sin dirección">
-          <button type="button" class="btn btn-outline-light btn-sm" disabled>
-            <i class="bi bi-pencil-fill"></i>
-          </button>
-        </div>
+      <!-- Dirección -->
+      <div class="mb-2 d-flex align-items-center gap-2">
+        <label class="form-label mb-0 flex-grow-1"><strong>🏠 Dirección:</strong></label>
+        <input type="text" name="direccion" value="{{ c[3] or '' }}"
+          class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-3"
+          placeholder="Sin dirección" readonly>
+        <button type="button" class="btn btn-outline-light btn-sm btn-editar-campo">
+          <i class="bi bi-pencil-fill"></i>
+        </button>
+      </div>
 
-        <!-- Email -->
-        <div class="mb-3 d-flex align-items-center gap-2">
-          <label class="form-label mb-0 flex-grow-1"><strong>✉️ Email:</strong></label>
-          <input type="email" name="mail" value="{{ c[4] or '' }}" class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-3" placeholder="Sin email">
-          <button type="button" class="btn btn-outline-light btn-sm" disabled>
-            <i class="bi bi-pencil-fill"></i>
-          </button>
-        </div>
+      <!-- Email -->
+      <div class="mb-3 d-flex align-items-center gap-2">
+        <label class="form-label mb-0 flex-grow-1"><strong>✉️ Email:</strong></label>
+        <input type="email" name="mail" value="{{ c[4] or '' }}"
+          class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-3" placeholder="Sin email"
+          readonly>
+        <button type="button" class="btn btn-outline-light btn-sm btn-editar-campo">
+          <i class="bi bi-pencil-fill"></i>
+        </button>
+      </div>
 
-        <div class="d-flex justify-content-between">
-          <button type="submit" class="btn btn-success btn-sm">
-            💾 Guardar
-          </button>
+      <div class="d-flex justify-content-between">
+        <button type="submit" class="btn btn-success btn-sm">💾 Guardar</button>
 
-          <!-- Botón borrar con confirmación pequeña y custom -->
-          <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ c[0] }}">
-            🗑️ Borrar
-          </button>
-        </div>
-      </form>
+        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+          data-bs-target="#confirmDeleteModal{{ c[0] }}">
+          🗑️ Borrar
+        </button>
+      </div>
+    </form>
 
-      <!-- Modal confirmación borrar -->
-      <div class="modal fade" id="confirmDeleteModal{{ c[0] }}" tabindex="-1" aria-labelledby="confirmDeleteLabel{{ c[0] }}" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-sm">
-          <div class="modal-content bg-dark text-light">
-            <div class="modal-header p-2">
-              <h5 class="modal-title fs-6" id="confirmDeleteLabel{{ c[0] }}">Confirmar eliminación</h5>
-              <button type="button" class="btn-close btn-close-white p-1" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body p-3">
-              ¿Seguro que querés borrar al cliente <strong>{{ c[1] }}</strong>?
-            </div>
-            <div class="modal-footer p-2">
-              <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
-              <a href="{{ url_for('clientes.borrar_cliente', id_cliente=c[0]) }}" class="btn btn-danger btn-sm">Borrar</a>
-            </div>
+    <!-- Modal confirmación borrar -->
+    <div class="modal fade" id="confirmDeleteModal{{ c[0] }}" tabindex="-1"
+      aria-labelledby="confirmDeleteLabel{{ c[0] }}" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content bg-dark text-light">
+          <div class="modal-header p-2">
+            <h5 class="modal-title fs-6" id="confirmDeleteLabel{{ c[0] }}">Confirmar eliminación</h5>
+            <button type="button" class="btn-close btn-close-white p-1" data-bs-dismiss="modal"
+              aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body p-3">
+            ¿Seguro que querés borrar al cliente <strong>{{ c[1] }}</strong>?
+          </div>
+          <div class="modal-footer p-2">
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+            <a href="{{ url_for('clientes.borrar_cliente', id_cliente=c[0]) }}" class="btn btn-danger btn-sm">Borrar</a>
           </div>
         </div>
       </div>
-
     </div>
+  </div>
   {% endfor %}
 </div>
+
 {% endblock %}

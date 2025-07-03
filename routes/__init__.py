@@ -15,3 +15,4 @@ def register_all_blueprints(app):
     app.register_blueprint(bp_pedidos)
     app.register_blueprint(bp_productos)
     app.register_blueprint(bp)
+    

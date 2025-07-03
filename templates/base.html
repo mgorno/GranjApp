@@ -11,84 +11,129 @@
 
 
   <!-- Estilo personalizado para dark mode y botones -->
-<style>
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+    }
 
-   body { background-color: #111; color: #fff; }
-  .card-dark { background-color: #1e1e1e; border: 1px solid #333; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
-  .editable:hover { cursor: pointer; background-color: #2c2c2c; }
-  .icon-btn { background: none; border: none; color: #ccc; margin-left: 10px; }
-  .icon-btn:hover { color: #fff; }
+    .card-dark {
+      background-color: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
 
-  .form-control, .form-select {
-    background-color: #1e1e1e;
-    color: #f1f1f1;
-    border: 1px solid #444;
-    border-radius: 12px;
-  }
+    .editable:hover {
+      cursor: pointer;
+      background-color: #2c2c2c;
+    }
 
-  .form-control::placeholder {
-    color: #999;
-  }
+    .icon-btn {
+      background: none;
+      border: none;
+      color: #ccc;
+      margin-left: 10px;
+    }
 
-  .form-select:focus,
-  .form-control:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
-  }
+    .icon-btn:hover {
+      color: #fff;
+    }
 
-  .btn {
-    border-radius: 10px;
-    font-weight: 500;
-    padding: 10px 20px;
-  }
+    .form-control,
+    .form-select {
+      background-color: #1e1e1e;
+      color: #f1f1f1;
+      border: 1px solid #444;
+      border-radius: 12px;
+    }
 
-  .btn-success {
-    background-color: #22c55e;
-    border: none;
-  }
+    .form-control::placeholder {
+      color: #999;
+    }
 
-  .btn-success:hover {
-    background-color: #16a34a;
-  }
+    .form-select:focus,
+    .form-control:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+    }
 
-  .btn-outline-primary {
-    border: 1px solid #3b82f6;
-    color: #3b82f6;
-  }
+    .btn {
+      border-radius: 10px;
+      font-weight: 500;
+      padding: 10px 20px;
+    }
 
-  .btn-outline-primary:hover {
-    background-color: #3b82f6;
-    color: #fff;
-  }
+    .btn-success {
+      background-color: #22c55e;
+      border: none;
+    }
 
-  label {
-    font-weight: 500;
-    margin-top: 12px;
-    color: #fff;
-  }
+    .btn-success:hover {
+      background-color: #16a34a;
+    }
 
-  h2, h3, h4 {
-    color: #fff;
-  }
+    .btn-outline-primary {
+      border: 1px solid #3b82f6;
+      color: #3b82f6;
+    }
 
-  .accordion-button {
-    background-color: #1f1f1f;
-    color: #fff;
-  }
+    .btn-outline-primary:hover {
+      background-color: #3b82f6;
+      color: #fff;
+    }
 
-  .accordion-item {
-    background-color: #1a1a1a;
-    border: 1px solid #333;
-  }
+    label {
+      font-weight: 500;
+      margin-top: 12px;
+      color: #fff;
+    }
 
-  .accordion-body {
-    background-color: #1f1f1f;
-  }
-</style>
+    h2,
+    h3,
+    h4 {
+      color: #fff;
+    }
+
+    .accordion-button {
+      background-color: #1f1f1f;
+      color: #fff;
+    }
+
+    .accordion-item {
+      background-color: #1a1a1a;
+      border: 1px solid #333;
+    }
+
+    .accordion-body {
+      background-color: #1f1f1f;
+    }
+
+    .offcanvas,
+    .offcanvas-body {
+      background-color: #1a1a1a;
+      color: #fff;
+    }
+
+    .list-group-item {
+      background-color: #1f1f1f;
+      color: #fff;
+      border: 1px solid #333;
+    }
+
+    .list-group-item:hover {
+      background-color: #333;
+    }
+  </style>
+
 
 
 <body class="d-flex flex-column h-100">
-  <nav class="navbar navbar-light bg-light fixed-top">
+
+  <nav class="navbar navbar-dark bg-dark fixed-top">
+
+
     <div class="container-fluid d-flex align-items-center">
       <button class="navbar-toggler me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#menu">
         <span class="navbar-toggler-icon"></span>

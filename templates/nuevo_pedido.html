@@ -12,7 +12,7 @@
       <select name="id_cliente" class="form-select" required>
         <option value="" disabled selected>Elegir cliente…</option>
         {% for c in clientes %}
-          <option value="{{ c[0] }}">{{ c[1] }}</option>
+        <option value="{{ c[0] }}">{{ c[1] }}</option>
         {% endfor %}
       </select>
     </div>
@@ -24,7 +24,9 @@
 
   <!-- Detalle -->
   <h4>Productos</h4>
-  <table class="table" id="tabla-detalle">
+
+  <table class="table table-dark table-bordered" id="tabla-detalle">
+
     <thead>
       <tr>
         <th style="width:45%">Producto</th>
@@ -49,7 +51,7 @@
       <select name="id_producto" class="form-select" required>
         <option value="" disabled selected>Elegir…</option>
         {% for p in productos %}
-          <option value="{{ p[0] }}" data-precio-defecto="{{ p[2] or '' }}">{{ p[1] }}</option>
+        <option value="{{ p[0] }}" data-precio-defecto="{{ p[2] or '' }}">{{ p[1] }}</option>
         {% endfor %}
       </select>
     </td>
@@ -60,9 +62,9 @@
 </template>
 
 <script>
-  const tabla   = document.getElementById('tabla-detalle').querySelector('tbody');
-  const tpl     = document.getElementById('fila-template').content;
-  const addBtn  = document.getElementById('agregar-fila');
+  const tabla = document.getElementById('tabla-detalle').querySelector('tbody');
+  const tpl = document.getElementById('fila-template').content;
+  const addBtn = document.getElementById('agregar-fila');
 
   addBtn.addEventListener('click', () => {
     tabla.appendChild(tpl.cloneNode(true));

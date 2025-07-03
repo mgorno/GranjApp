@@ -3,6 +3,7 @@ from models import get_conn
 
 bp_pagos = Blueprint("pagos", __name__, url_prefix="/pagos")
 
+
 @bp_pagos.route("/", methods=["GET", "POST"])
 def lista():
     with get_conn() as conn, conn.cursor() as cur:

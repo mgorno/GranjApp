@@ -1,11 +1,8 @@
 import os, psycopg2
 from urllib.parse import urlparse
 
-# ------------------------------------------------------------------------------
-# 1) Conexión
-# ------------------------------------------------------------------------------
 
-DATABASE_URL = os.environ["DATABASE_URL"]          # la URL externa que te dio Render
+DATABASE_URL = os.environ["DATABASE_URL"]          
 
 def get_conn():
     """
@@ -14,9 +11,7 @@ def get_conn():
     """
     return psycopg2.connect(DATABASE_URL)
 
-# ------------------------------------------------------------------------------
-# 2) Creación de tablas (equivalentes a tu esquema SQLite)
-# ------------------------------------------------------------------------------
+----------------------------------------------------------------------------
 
 DDL = """
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";                                -- UUID opcionales
@@ -67,6 +62,6 @@ def init_db():
     Ejecuta el DDL una sola vez para crear las tablas si no existen.
     """
     with get_conn() as conn:
-        conn.autocommit = True                         # para que cada comando se ejecute enseguida
+        conn.autocommit = True                        
         with conn.cursor() as cur:
             cur.execute(DDL)

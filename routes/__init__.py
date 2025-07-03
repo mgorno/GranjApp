@@ -2,7 +2,6 @@ from flask import Blueprint
 
 bp = Blueprint('root', __name__)
 
-# Luego registrá los blueprints
 def register_all_blueprints(app):
     from .clientes import bp_clientes
     from .main import bp_main

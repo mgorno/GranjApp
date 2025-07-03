@@ -1,14 +1,11 @@
 import os
 from flask import Flask
-from routes import bp
 from models import init_db
+from routes import register_all_blueprints
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-key")
-
-for bp in blueprints:
-    app.register_blueprint(bp)
-init_db()
+register_all_blueprints(app) 
 
 if __name__ == "__main__":
     port  = int(os.environ.get("PORT", 5000))

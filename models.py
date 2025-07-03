@@ -11,7 +11,6 @@ def get_conn():
     """
     return psycopg2.connect(DATABASE_URL)
 
-----------------------------------------------------------------------------
 
 DDL = """
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";                                -- UUID opcionales

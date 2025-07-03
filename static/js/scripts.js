@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         clientes.forEach(cliente => {
             const nombre = cliente.querySelector('div').textContent.toLowerCase();
-            const collapseId = cliente.querySelector('a').getAttribute('href');
-            const detalle = document.querySelector(collapseId);
+            const idCollapse = cliente.querySelector('a').getAttribute('href');
+            const detalle = document.querySelector(idCollapse);
 
             if (nombre.includes(filtro)) {
                 cliente.style.display = '';
@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
 
 
 document.addEventListener('DOMContentLoaded', () => {

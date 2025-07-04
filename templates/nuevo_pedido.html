@@ -11,8 +11,9 @@
 
 {% block content %}
 <h1 class="mb-4">Nuevo Pedido</h1>
+<form method="POST" action="{{ url_for('pedidos.nuevo') }}">
+  <!-- Cliente / Fecha -->
 
-<form method="POST" action="{{ url_for('pedidos.nuevo') }}" <!-- Cliente / Fecha -->
   <div class="row g-3 mb-4">
     <div class="col-md-6">
       <label class="form-label">Cliente</label>
@@ -41,8 +42,9 @@
           {% for p in productos %}
           <option value="{{ p[0] }}" data-desc="{{ p[1] }}" data-precio="{{ " %.2f"|format(p[2]) }}"
             data-unidad="{{ p[3] }}">
-
+            {{ p[1] }}
           </option>
+
           {% endfor %}
         </select>
       </div>

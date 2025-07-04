@@ -5,15 +5,14 @@
 <!-- Encabezado -->
 <div class="d-flex align-items-center mb-4 gap-3 flex-wrap">
   <h1 class="flex-grow-1">Nuevo Pedido</h1>
+</div>
 
-  <!-- Buscador de filas añadidas -->
-  <div class="flex-grow-1" style="min-width:220px;">
-    <input type="search" id="buscarFila" class="form-control bg-dark text-light border-secondary"
-      placeholder="Filtrar productos…">
-  </div>
-
-  <!-- Botón + que abre off‑canvas para agregar producto -->
-  <button class="btn btn-primary btn-lg flex-shrink-0" data-bs-toggle="offcanvas" data-bs-target="#offNuevoItem">
+<!-- Título Detalle con ícono + al lado -->
+<div class="d-flex align-items-center mb-3 gap-2">
+  <h4 class="mb-0 d-flex align-items-center">
+    <i class="bi bi-list-check me-2"></i>Detalle
+  </h4>
+  <button class="btn btn-primary btn-sm" data-bs-toggle="offcanvas" data-bs-target="#offNuevoItem" title="Agregar producto">
     <i class="bi bi-plus-lg"></i>
   </button>
 </div>
@@ -26,19 +25,18 @@
       <select name="id_cliente" class="form-select bg-dark text-light border-secondary" required>
         <option value="" disabled selected>Elegir…</option>
         {% for c in clientes %}
-        <option value="{{ c[0] }}">{{ c[1] }}</option>
+          <option value="{{ c[0] }}">{{ c[1] }}</option>
         {% endfor %}
       </select>
     </div>
     <div class="col-md-6">
       <label class="form-label">Fecha de entrega</label>
-      <input type="date" name="fecha_entrega" class="form-control bg-dark text-light border-secondary" required>
+      <input type="date" name="fecha_entrega"
+             class="form-control bg-dark text-light border-secondary" required>
     </div>
   </div>
 
-  <!-- Detalle de productos añadidos -->
-  <h4 class="mb-3"><i class="bi bi-list-check me-2"></i>Detalle</h4>
-
+  <!-- Tabla de detalle -->
   <table class="table table-dark table-bordered align-middle" id="tabla-detalle">
     <thead class="table-secondary text-dark">
       <tr>
@@ -58,7 +56,7 @@
   </div>
 </form>
 
-<!-- OFF‑CANVAS: Nuevo Ítem -->
+<!-- OFFCANVAS PARA AGREGAR PRODUCTO -->
 <div class="offcanvas offcanvas-end bg-dark text-light" tabindex="-1" id="offNuevoItem">
   <div class="offcanvas-header border-bottom border-secondary">
     <h5 class="offcanvas-title">
@@ -74,10 +72,9 @@
         <select id="selProducto" class="form-select bg-dark text-light border-secondary" required>
           <option value="" disabled selected>Elegir…</option>
           {% for p in productos %}
-          <option value="{{ p[0] }}" data-desc="{{ p[1] }}" data-precio="{{ p[2] or '' }}"
-            data-unidad="{{ p[3] or '' }}">
-            {{ p[1] }}
-          </option>
+            <option value="{{ p[0] }}" data-desc="{{ p[1] }}" data-precio="{{ p[2] or '' }}" data-unidad="{{ p[3] or '' }}">
+              {{ p[1] }}
+            </option>
           {% endfor %}
         </select>
       </div>
@@ -85,17 +82,18 @@
       <div class="mb-3 d-flex align-items-center gap-2">
         <div style="flex-grow:1">
           <label class="form-label">Cantidad</label>
-          <input id="inpCantidad" type="number" min="1" class="form-control bg-dark text-light border-secondary"
-            required>
+          <input id="inpCantidad" type="number" min="1"
+                 class="form-control bg-dark text-light border-secondary" required>
         </div>
         <div style="min-width:70px; margin-top: 30px;">
-          <span id="unidadBase" class="text-secondary"></span>
+          <span id="unidadBase" class="text-secondary fw-bold"></span>
         </div>
       </div>
 
       <div class="mb-4">
         <label class="form-label">Precio ($)</label>
-        <input id="inpPrecio" type="number" step="0.01" class="form-control bg-dark text-light border-secondary">
+        <input id="inpPrecio" type="number" step="0.01"
+               class="form-control bg-dark text-light border-secondary" required>
       </div>
 
       <button class="btn btn-primary w-100" id="btnAddLinea" type="submit">
@@ -105,7 +103,7 @@
   </div>
 </div>
 
-<!-- Template de fila -->
+<!-- Template fila -->
 <template id="fila-template">
   <tr>
     <td>
@@ -113,11 +111,11 @@
       <span class="nombre"></span>
     </td>
     <td>
-      <input type="number" name="cantidad" class="form-control bg-dark text-light border-secondary" min="1" required>
-      <small class="text-secondary unidad-base"></small>
+      <input type="number" name="cantidad" class="form-control bg-dark text-light border-secondary" min="1" required style="display:inline-block; width:70%;">
+      <span class="unidad-base ms-2 text-secondary fw-bold"></span>
     </td>
     <td>
-      <input type="number" step="0.01" name="precio" class="form-control bg-dark text-light border-secondary">
+      <input type="number" step="0.01" name="precio" class="form-control bg-dark text-light border-secondary" required>
     </td>
     <td class="text-center">
       <button type="button" class="btn btn-sm btn-danger eliminar" title="Eliminar">
@@ -126,4 +124,83 @@
     </td>
   </tr>
 </template>
+
+<script>
+  const tabla = document.querySelector('#tabla-detalle tbody');
+  const tpl = document.getElementById('fila-template').content;
+  const addBtn = document.getElementById('btnAddLinea');
+  const offcanvas = new bootstrap.Offcanvas(document.getElementById('offNuevoItem'));
+
+  // Actualizar unidad base y precio al seleccionar producto
+  document.getElementById('selProducto').addEventListener('change', function() {
+    const opcion = this.selectedOptions[0];
+    document.getElementById('unidadBase').textContent = opcion.dataset.unidad || '';
+    if (!document.getElementById('inpPrecio').value) {
+      document.getElementById('inpPrecio').value = opcion.dataset.precio || '';
+    }
+  });
+
+  // Agregar línea al detalle
+  addBtn.addEventListener('click', e => {
+    e.preventDefault();
+
+    const selProducto = document.getElementById('selProducto');
+    const cantidad = document.getElementById('inpCantidad');
+    const precio = document.getElementById('inpPrecio');
+
+    if (!selProducto.value) {
+      alert('Por favor, elegí un producto.');
+      return;
+    }
+    if (!cantidad.value || cantidad.value < 1) {
+      alert('La cantidad debe ser 1 o más.');
+      return;
+    }
+    if (!precio.value || precio.value < 0) {
+      alert('Por favor, ingresá un precio válido.');
+      return;
+    }
+
+    const fila = tpl.cloneNode(true);
+    const tr = fila.querySelector('tr');
+
+    tr.querySelector('input[name="id_producto"]').value = selProducto.value;
+    tr.querySelector('.nombre').textContent = selProducto.selectedOptions[0].dataset.desc;
+
+    const cantidadInput = tr.querySelector('input[name="cantidad"]');
+    cantidadInput.value = cantidad.value;
+
+    const unidadSpan = tr.querySelector('.unidad-base');
+    unidadSpan.textContent = selProducto.selectedOptions[0].dataset.unidad || '';
+
+    const precioInput = tr.querySelector('input[name="precio"]');
+    precioInput.value = precio.value;
+
+    tabla.appendChild(fila);
+
+    // Limpiar form y ocultar offcanvas
+    selProducto.value = '';
+    cantidad.value = '';
+    precio.value = '';
+    document.getElementById('unidadBase').textContent = '';
+
+    offcanvas.hide();
+  });
+
+  // Eliminar fila
+  tabla.addEventListener('click', e => {
+    if (e.target.closest('button.eliminar')) {
+      e.target.closest('tr').remove();
+    }
+  });
+
+  // Filtrar tabla
+  document.getElementById('buscarFila').addEventListener('input', e => {
+    const filtro = e.target.value.toLowerCase();
+    tabla.querySelectorAll('tr').forEach(tr => {
+      const texto = tr.querySelector('.nombre').textContent.toLowerCase();
+      tr.style.display = texto.includes(filtro) ? '' : 'none';
+    });
+  });
+</script>
 {% endblock %}

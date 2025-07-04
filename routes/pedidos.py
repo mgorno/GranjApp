@@ -70,7 +70,11 @@ def obtener_clientes_productos(cur):
     clientes = cur.fetchall()
     cur.execute("SELECT id_producto, descripcion, precio, unidad_base FROM productos ORDER BY descripcion")
     productos = cur.fetchall()
-    return clientes, productos
+    return render_template("nuevo_pedido.html",
+                       clientes=clientes,
+                       productos=productos)
+
+    
 
 @bp_pedidos.route("/marcar_entregado/<id_pedido>")
 def marcar_entregado(id_pedido):
@@ -81,7 +85,7 @@ def marcar_entregado(id_pedido):
         conn.commit()
     flash("Pedido marcado como entregado.", "success")
     return redirect(url_for('pedidos.pendientes'))
-    
+
 @bp_pedidos.route("/eliminar/<id_pedido>", methods=["POST", "GET"])
 def eliminar(id_pedido):
     """

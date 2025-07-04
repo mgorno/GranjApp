@@ -1,59 +1,66 @@
 {% extends "base.html" %}
-{% block title %}Nuevo Pedido{% endblock %}
+{% block title %}Nuevo Pedido{% endblock %}
 
 {% block content %}
-<h1 class="mb-4">Nuevo Pedido</h1>
+<h1 class="mb-4">Nuevo Pedido</h1>
 
 <form method="POST" action="{{ url_for('pedidos.nuevo') }}">
 
-  <!-- Cliente y Fecha -->
+  <!-- Cliente / Fecha -->
   <div class="row g-3 mb-4">
     <div class="col-md-6">
       <label class="form-label">Cliente</label>
-      <select name="id_cliente" class="form-select bg-dark text-light border-secondary" required>
+      <select name="id_cliente" class="form-select bg-dark text-light" required>
         <option value="" disabled selected>Elegir…</option>
         {% for c in clientes %}
-        <option value="{{ c[0] }}">{{ c[1] }}</option>
+          <option value="{{ c[0] }}">{{ c[1] }}</option>
         {% endfor %}
       </select>
     </div>
     <div class="col-md-6">
       <label class="form-label">Fecha de entrega</label>
-      <input type="date" name="fecha_entrega" class="form-control bg-dark text-light border-secondary" required>
+      <input type="date" name="fecha_entrega" class="form-control bg-dark text-light" required>
     </div>
   </div>
 
-  <!-- Agregar Producto -->
+  <!-- Producto -->
   <div class="mb-4">
-    <h4 class="mb-3"><i class="bi bi-list-check me-2"></i>Agregar Producto</h4>
+    <h4 class="mb-3">Agregar Producto</h4>
 
     <div class="row g-2 align-items-end">
       <div class="col-md-4">
         <label class="form-label">Producto</label>
-        <select id="selProducto" class="form-select bg-dark text-light border-secondary" required>
+        <select id="selProducto" class="form-select bg-dark text-light" required>
           <option value="" disabled selected>Elegir…</option>
           {% for p in productos %}
-          <option value="{{ p[0] }}" data-desc="{{ p[1] }}" data-precio="{{ p[2] or '' }}" data-unidad="{{ p[3] or '' }}">
-            {{ p[1] }}
-          </option>
+            <option
+              value="{{ p[0] }}"
+              data-desc="{{ p[1] }}"
+              data-precio="{{ "%.2f"|format(p[2]) }}"
+              data-unidad="{{ p[3] }}"
+            >
+              {{ p[1] }}
+            </option>
           {% endfor %}
         </select>
       </div>
 
       <div class="col-md-2">
         <label class="form-label">Cantidad</label>
-        <input id="inpCantidad" type="number" min="1" class="form-control bg-dark text-light border-secondary" required>
+        <input id="inpCantidad" type="number" min="1"
+               class="form-control bg-dark text-light" required>
       </div>
 
       <div class="col-md-2">
         <label class="form-label">Unidad</label>
-        <span id="inpUnidad" class="form-control bg-dark text-light border-secondary fw-bold"
-              style="height:38px; display:flex; align-items:center;"></span>
+        <span id="inpUnidad" class="form-control bg-dark text-light fw-bold"
+              style="height:38px;display:flex;align-items:center;"></span>
       </div>
 
       <div class="col-md-2">
-        <label class="form-label">Precio ($)</label>
-        <input id="inpPrecio" type="number" step="0.01" class="form-control bg-dark text-light border-secondary" required>
+        <label class="form-label">Precio ($)</label>
+        <input id="inpPrecio" type="number" step="0.01"
+               class="form-control bg-dark text-light" required>
       </div>
 
       <div class="col-md-2 d-grid">
@@ -64,12 +71,12 @@
     </div>
   </div>
 
-  <!-- Tabla de Detalle -->
+  <!-- Detalle -->
   <table class="table table-dark table-bordered align-middle" id="tabla-detalle">
     <thead class="table-secondary text-dark">
       <tr>
         <th style="width:40%">Producto</th>
-        <th style="width:15%">Cantidad</th>
+        <th style="width:15%">Cant.</th>
         <th style="width:15%">Unidad</th>
         <th style="width:20%">Precio</th>
         <th style="width:10%"></th>
@@ -78,34 +85,34 @@
     <tbody></tbody>
   </table>
 
-  <!-- Total general -->
   <div class="mt-3 text-end fs-5">
-    <strong>Total: $<span id="totalGeneral">0.00</span></strong>
+    <strong>Total: $<span id="totalGeneral">0.00</span></strong>
   </div>
 
-  <!-- Botón Guardar -->
   <div class="mt-4 text-end">
     <button type="submit" class="btn btn-success btn-lg">
-      <i class="bi bi-save2 me-1"></i>Guardar Pedido
+      <i class="bi bi-save2 me-1"></i>Guardar Pedido
     </button>
   </div>
 
-  <!-- Template de Fila -->
+  <!-- Fila plantilla -->
   <template id="fila-template">
     <tr>
       <td>
-        <input type="hidden" name="id_producto" />
+        <input type="hidden" name="id_producto">
         <span class="nombre"></span>
       </td>
       <td>
-        <input type="number" name="cantidad" class="form-control bg-dark text-light border-secondary" min="1" required />
+        <input type="number" name="cantidad" class="form-control bg-dark text-light"
+               min="1" required>
       </td>
       <td>
-        <input type="hidden" name="unidad" />
+        <input type="hidden" name="unidad">
         <span class="unidad-base fw-bold"></span>
       </td>
       <td>
-        <input type="number" step="0.01" name="precio" class="form-control bg-dark text-light border-secondary" required />
+        <input type="number" step="0.01" name="precio"
+               class="form-control bg-dark text-light" required>
       </td>
       <td class="text-center">
         <button type="button" class="btn btn-sm btn-danger eliminar" title="Eliminar">
@@ -114,58 +121,64 @@
       </td>
     </tr>
   </template>
-
 </form>
+{% endblock %}
 
-<!-- SCRIPT -->
+{% block scripts %}
+{{ super() }}  {# conserva los scripts comunes de base.html #}
+
 <script>
-  const tabla = document.querySelector('#tabla-detalle tbody');
-  const tpl = document.getElementById('fila-template').content;
-  const addBtn = document.getElementById('btnAddLinea');
+/* Todo el JS espera a que el DOM esté listo */
+document.addEventListener('DOMContentLoaded', () => {
 
-  const selProducto = document.getElementById('selProducto');
-  const cantidad = document.getElementById('inpCantidad');
-  const unidad = document.getElementById('inpUnidad');
-  const precio = document.getElementById('inpPrecio');
+  /* ► Referencias a nodos */
+  const selProd   = document.getElementById('selProducto');
+  const cantInput = document.getElementById('inpCantidad');
+  const unidadLbl = document.getElementById('inpUnidad');
+  const precioInp = document.getElementById('inpPrecio');
+  const tabla     = document.querySelector('#tabla-detalle tbody');
+  const tpl       = document.getElementById('fila-template').content;
+  const addBtn    = document.getElementById('btnAddLinea');
+  const totalLbl  = document.getElementById('totalGeneral');
 
-  // Actualiza unidad y precio al elegir producto
-  selProducto.addEventListener('change', () => {
-    const opt = selProducto.selectedOptions[0];
-    if (!opt || !opt.dataset) return;
-
-    unidad.textContent = opt.dataset.unidad || '';
-    precio.value = opt.dataset.precio || '';
+  /* ► Completar precio y unidad al seleccionar producto */
+  selProd.addEventListener('change', () => {
+    const opt = selProd.selectedOptions[0];
+    if (!opt) return;               // opción “Elegir…”
+    unidadLbl.textContent = opt.dataset.unidad || '';
+    precioInp.value       = opt.dataset.precio || '';
   });
 
-  // Agregar producto a la tabla
+  /* ► Añadir línea a la tabla */
   addBtn.addEventListener('click', () => {
-    if (!selProducto.value || !cantidad.value || cantidad.value < 1 || !precio.value || precio.value < 0) {
-      alert('Completa todos los campos correctamente');
+    const opt  = selProd.selectedOptions[0];
+    const cant = Number(cantInput.value);
+    const prec = Number(precioInp.value);
+
+    if (!opt || !opt.value || cant < 1 || prec <= 0) {
+      alert('Completá producto, cantidad (>0) y precio (>0)');
       return;
     }
 
     const fila = tpl.cloneNode(true);
-    const tr = fila.querySelector('tr');
-
-    tr.querySelector('input[name="id_producto"]').value = selProducto.value;
-    tr.querySelector('.nombre').textContent = selProducto.selectedOptions[0].dataset.desc;
-    tr.querySelector('input[name="cantidad"]').value = cantidad.value;
-    tr.querySelector('input[name="unidad"]').value = unidad.textContent;
-    tr.querySelector('.unidad-base').textContent = unidad.textContent;
-    tr.querySelector('input[name="precio"]').value = precio.value;
-
+    fila.querySelector('input[name="id_producto"]').value  = opt.value;
+    fila.querySelector('.nombre').textContent              = opt.dataset.desc;
+    fila.querySelector('input[name="cantidad"]').value     = cant;
+    fila.querySelector('input[name="unidad"]').value       = unidadLbl.textContent;
+    fila.querySelector('.unidad-base').textContent         = unidadLbl.textContent;
+    fila.querySelector('input[name="precio"]').value       = prec.toFixed(2);
     tabla.appendChild(fila);
 
-    // Limpiar inputs
-    selProducto.selectedIndex = 0;
-    cantidad.value = '';
-    unidad.textContent = '';
-    precio.value = '';
+    /* limpiar formulario de producto */
+    selProd.selectedIndex = 0;
+    cantInput.value = '';
+    unidadLbl.textContent = '';
+    precioInp.value = '';
 
     actualizarTotal();
   });
 
-  // Eliminar producto
+  /* ► Quitar línea */
   tabla.addEventListener('click', e => {
     if (e.target.closest('button.eliminar')) {
       e.target.closest('tr').remove();
@@ -173,15 +186,17 @@
     }
   });
 
-  // Actualizar total general
+  /* ► Recalcular total */
   function actualizarTotal() {
     let total = 0;
     tabla.querySelectorAll('tr').forEach(tr => {
-      const precio = parseFloat(tr.querySelector('input[name="precio"]').value || 0);
-      const cantidad = parseFloat(tr.querySelector('input[name="cantidad"]').value || 0);
-      total += precio * cantidad;
+      const p = parseFloat(tr.querySelector('input[name="precio"]').value)   || 0;
+      const c = parseFloat(tr.querySelector('input[name="cantidad"]').value) || 0;
+      total += p * c;
     });
-    document.getElementById('totalGeneral').textContent = total.toFixed(2);
+    totalLbl.textContent = total.toFixed(2);
   }
+
+});
 </script>
 {% endblock %}

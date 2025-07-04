@@ -1,88 +1,89 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const selProducto = document.getElementById('selProducto');
-  const inpCantidad = document.getElementById('inpCantidad');
-  const inpUnidad   = document.getElementById('inpUnidad');
-  const inpPrecio   = document.getElementById('inpPrecio');
-  const tabla       = document.querySelector('#tabla-detalle tbody');
-  const tpl         = document.getElementById('fila-template').content;
-  const btnAdd      = document.getElementById('btnAddLinea');
-  const total       = document.getElementById('totalGeneral');
+  const sel   = document.getElementById('selProducto');
+  const cInp  = document.getElementById('inpCantidad');
+  const uSpan = document.getElementById('inpUnidad');
+  const pInp  = document.getElementById('inpPrecio');
+  const tabla = document.querySelector('#tabla-detalle tbody');
+  const tpl   = document.getElementById('fila-template').content;
+  const addBt = document.getElementById('btnAddLinea');
+  const tot   = document.getElementById('totalGeneral');
 
-  if (!selProducto || !inpCantidad || !inpUnidad || !inpPrecio || !tabla || !tpl || !btnAdd || !total) return;
+  if (!sel || !cInp || !uSpan || !pInp || !tabla || !tpl || !addBt || !tot) return;
 
-  // Cuando cambia el producto, actualizar unidad y precio
-  selProducto.addEventListener('change', () => {
-    const opt = selProducto.selectedOptions[0];
-    inpUnidad.textContent = opt.dataset.unidad || '';
-    inpPrecio.value = parseFloat(opt.dataset.precio || 0).toFixed(2);
+  /* Cargar unidad y precio al cambiar producto */
+  sel.addEventListener('change', () => {
+    const o = sel.selectedOptions[0];
+    uSpan.textContent = o.dataset.unidad || '';
+    pInp.value        = o.dataset.precio || '';
   });
 
-  // Añadir línea al detalle
-  btnAdd.addEventListener('click', () => {
-    const opt = selProducto.selectedOptions[0];
-    const idProd = opt?.value;
-    const desc   = opt?.dataset?.desc;
-    const unidad = opt?.dataset?.unidad;
-    const precio = parseFloat(inpPrecio.value);
-    const cant   = parseFloat(inpCantidad.value);
+  /* Añadir producto */
+  addBt.addEventListener('click', () => {
+    const o       = sel.selectedOptions[0];
+    const idProd  = o?.value;
+    const desc    = o?.dataset?.desc;
+    const unidad  = o?.dataset?.unidad;
+    const precio  = parseFloat(pInp.value);
+    const cant    = parseFloat(cInp.value);
 
-    if (!idProd || cant <= 0 || precio <= 0) {
-      alert("Completar los campos correctamente.");
+    if (!idProd)        return alert('Elegí un producto.');
+    if (!cant || cant<=0)   return alert('Cantidad inválida.');
+    if (!precio || precio<=0) return alert('Precio inválido.');
+
+    /* Evitar duplicados */
+    if ([...tabla.querySelectorAll('input[name="id_producto"]')]
+        .some(input => input.value === idProd)) {
+      alert('Ese producto ya está en el detalle.');
       return;
     }
 
-    // Validar que no esté ya agregado
-    const yaExiste = [...tabla.querySelectorAll('input[name="id_producto"]')]
-                      .some(input => input.value === idProd);
-    if (yaExiste) {
-      alert("Ese producto ya está en el detalle.");
-      return;
-    }
-
-    // Clonar la fila y cargar datos
     const fila = tpl.cloneNode(true);
+
     fila.querySelector('input[name="id_producto"]').value = idProd;
-    fila.querySelector('.nombre').textContent = desc;
-    fila.querySelector('input[name="cantidad"]').value = cant;
-    fila.querySelector('input[name="unidad"]').value = unidad;
-    fila.querySelector('.unidad-base').textContent = unidad;
-    fila.querySelector('input[name="precio"]').value = precio.toFixed(2);
-    fila.querySelector('input[name="cantidad"]').readOnly = true;
-    fila.querySelector('input[name="precio"]').readOnly = true;
+    fila.querySelector('.nombre').textContent             = desc;
+
+    fila.querySelector('input[name="cantidad"]').value    = cant;
+    fila.querySelector('.cantidad').textContent           = cant;
+
+    fila.querySelector('input[name="unidad"]').value      = unidad;
+    fila.querySelector('.unidad-base').textContent        = unidad;
+
+    fila.querySelector('input[name="precio"]').value      = precio.toFixed(2);
+    fila.querySelector('.precio').textContent             = precio.toFixed(2);
 
     tabla.appendChild(fila);
 
-    // Desactivar required para evitar bloqueo en el submit
-    selProducto.required = inpCantidad.required = inpPrecio.required = false;
+    /* Desactivar required para evitar bloqueo al enviar */
+    sel.required = cInp.required = pInp.required = false;
 
-    // Limpiar inputs
-    selProducto.selectedIndex = 0;
-    inpCantidad.value = '';
-    inpUnidad.textContent = '';
-    inpPrecio.value = '';
+    /* Limpiar para siguiente carga */
+    sel.selectedIndex = 0;
+    cInp.value = '';
+    uSpan.textContent = '';
+    pInp.value = '';
 
-    // Recalcular total
-    let sum = 0;
-    tabla.querySelectorAll('tr').forEach(tr => {
-      const c = parseFloat(tr.querySelector('input[name="cantidad"]').value);
-      const p = parseFloat(tr.querySelector('input[name="precio"]').value);
-      sum += c * p;
-    });
-    total.textContent = sum.toFixed(2);
+    recalcularTotal();
   });
 
-  // Eliminar línea
+  /* Eliminar línea */
   tabla.addEventListener('click', e => {
     if (e.target.closest('button.eliminar')) {
       e.target.closest('tr').remove();
-      // Recalcular total
-      let sum = 0;
-      tabla.querySelectorAll('tr').forEach(tr => {
-        const c = parseFloat(tr.querySelector('input[name="cantidad"]').value);
-        const p = parseFloat(tr.querySelector('input[name="precio"]').value);
-        sum += c * p;
-      });
-      total.textContent = sum.toFixed(2);
+      recalcularTotal();
+      /* Si no queda ningún producto, volvemos a exigir required */
+      if (tabla.querySelectorAll('tr').length === 0) {
+        sel.required = cInp.required = pInp.required = true;
+      }
     }
   });
+
+  function recalcularTotal() {
+    let suma = 0;
+    tabla.querySelectorAll('tr').forEach(tr => {
+      const c = parseFloat(tr.querySelector('input[name="cantidad"]').value) || 0;
+      const p = parseFloat(tr.querySelector('input[name="precio"]').value)   || 0;
+      suma += c * p;
+    });
+    tot.textContent = suma.toFixed(2);
+  }
 });

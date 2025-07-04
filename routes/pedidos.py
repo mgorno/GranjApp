@@ -52,7 +52,7 @@ def nuevo():
 
             for i in range(len(ids_producto)):
                 cur.execute("""
-                    INSERT INTO pedido_detalle (id_pedido, id_producto, cantidad, precio, unidad)
+                    INSERT INTO detalle_pedido (id_pedido, id_producto, cantidad, precio, unidad)
                     VALUES (%s, %s, %s, %s, %s)
                 """, (id_pedido, ids_producto[i], cantidades[i], precios[i], unidades[i]))
 

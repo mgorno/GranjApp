@@ -1,54 +1,50 @@
 body {
   background-color: #111;
   color: #fff;
+  font-family: system-ui, sans-serif;
+  /* Agrego font para consistencia */
 }
 
+/* --- Cards --- */
 .card-dark {
   background-color: #1e1e1e;
+  color: white; /* para asegurar legibilidad */
   border: 1px solid #333;
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 20px;
   margin-bottom: 20px;
+  transition: background-color 0.2s;
 }
 
-.editable:hover {
+.card-dark:hover {
+  background-color: #2a2a2a;
   cursor: pointer;
-  background-color: #2c2c2c;
 }
 
+.card-dark i {
+  color: #fff;
+  margin-bottom: 10px;
+  font-size: 32px;
+}
+
+/* --- Botones e iconos --- */
 .icon-btn {
   background: none;
   border: none;
-  color: #ccc;
-  margin-left: 10px;
+  color: #888;
+  font-size: 1rem;
+  margin-left: 10px; /* mantengo para separación */
 }
 
 .icon-btn:hover {
   color: #fff;
 }
 
-.form-control,
-.form-select {
-  background-color: #1e1e1e;
-  color: #f1f1f1;
-  border: 1px solid #444;
-  border-radius: 12px;
-}
-
-.form-control::placeholder {
-  color: #999;
-}
-
-.form-select:focus,
-.form-control:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
-}
-
 .btn {
   border-radius: 10px;
   font-weight: 500;
   padding: 10px 20px;
+  transition: background-color 0.3s ease;
 }
 
 .btn-success {
@@ -70,18 +66,51 @@ body {
   color: #fff;
 }
 
+/* --- Formularios --- */
+.form-control,
+.form-select {
+  background-color: #1e1e1e;
+  color: #f1f1f1;
+  border: 1px solid #444;
+  border-radius: 12px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  width: 100%; /* importante para que no queden apretados */
+}
+
+.form-control::placeholder {
+  color: #999;
+}
+
+.form-select:focus,
+.form-control:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+  outline: none;
+}
+
+.form-control-sm {
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* --- Labels y textos --- */
 label {
   font-weight: 500;
   margin-top: 12px;
   color: #fff;
+  display: block;
 }
 
+/* Títulos */
 h2,
 h3,
 h4 {
   color: #fff;
 }
 
+/* --- Accordion --- */
 .accordion-button {
   background-color: #1f1f1f;
   color: #fff;
@@ -93,68 +122,26 @@ h4 {
 }
 
 .accordion-body {
-  background-color: #1f1f1f;
-}
-
-.offcanvas,
-.offcanvas-body {
-  background-color: #1a1a1a;
+  background-color: #2b2b2b;
+  border: 1px solid #444;
+  padding: 10px;
+  font-size: 1rem;
   color: #fff;
 }
 
+/* --- List groups --- */
 .list-group-item {
   background-color: #1f1f1f;
   color: #fff;
   border: 1px solid #333;
+  transition: background-color 0.2s ease;
 }
 
 .list-group-item:hover {
   background-color: #333;
 }
 
-.card-dark {
-  background-color: #1e1e1e;
-  color: white;
-  border: 1px solid #333;
-  border-radius: 12px;
-  padding: 20px;
-  transition: background-color 0.2s;
-}
-
-.card-dark:hover {
-  background-color: #2a2a2a;
-  cursor: pointer;
-}
-
-.card-dark i {
-  color: #fff;
-  margin-bottom: 10px;
-  font-size: 32px;
-}
-
-.form-control-sm {
-  padding: 6px 10px;
-  font-size: 0.9rem;
-  height: auto;
-  border-radius: 8px;
-}
-
-.editable-text {
-  font-size: 0.95rem;
-  color: #ddd;
-}
-
-.icon-btn {
-  background: none;
-  border: none;
-  color: #888;
-  font-size: 1rem;
-}
-
-.icon-btn:hover {
-  color: #fff;
-}
-
+/* --- Otros --- */
 .letra-separador {
   background-color: #444;
   padding: 5px 10px;
@@ -170,21 +157,32 @@ h4 {
   background-color: #333;
 }
 
-.accordion-body {
-  background-color: #2b2b2b;
-  border: 1px solid #444;
-  padding: 10px;
+.editable:hover {
+  cursor: pointer;
+  background-color: #2c2c2c;
 }
 
+.editable-text {
+  font-size: 0.95rem;
+  color: #ddd;
+}
+
+/* --- Ajustes específicos para tablas en móviles --- */
+
+/* Esto hace que la tabla pueda scroll horizontal en pantallas pequeñas */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Opcional: ajustar padding y fuente para tabla en móvil */
 @media (max-width: 576px) {
   body {
-    font-size: 1.1rem;
-    /* Fuente un poco más grande */
+    font-size: 1.1rem; /* un poco más grande para legibilidad */
   }
 
   .form-control-sm {
     font-size: 1.2rem !important;
-    /* Input más grande */
     padding: 10px 12px !important;
   }
 
@@ -210,5 +208,25 @@ h4 {
 
   .d-flex.align-items-center.gap-3.flex-wrap {
     gap: 1rem !important;
+  }
+
+  /* Tabla detalle ajustes */
+  #tabla-detalle th,
+  #tabla-detalle td {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.9rem;
+    white-space: nowrap; /* evita quiebre extraño */
+  }
+
+  #tabla-detalle th:last-child,
+  #tabla-detalle td:last-child {
+    width: 40px; /* espacio para botón eliminar */
+  }
+
+  /* Inputs y selects en formulario */
+  .form-control,
+  .form-select {
+    font-size: 1rem;
+    padding: 8px 12px;
   }
 }

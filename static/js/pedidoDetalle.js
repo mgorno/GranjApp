@@ -1,63 +1,78 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const selProd   = document.getElementById('selProducto');
-  const cantInput = document.getElementById('inpCantidad');
-  const unidadLbl = document.getElementById('inpUnidad');
-  const precioInp = document.getElementById('inpPrecio');
-  const tabla     = document.querySelector('#tabla-detalle tbody');
-  const tpl       = document.getElementById('fila-template').content;
-  const addBtn    = document.getElementById('btnAddLinea');
-  const totalLbl  = document.getElementById('totalGeneral');
+  const sel = document.getElementById('selProducto');
+  const cant = document.getElementById('inpCantidad');
+  const unidad = document.getElementById('inpUnidad');
+  const precio = document.getElementById('inpPrecio');
+  const tabla = document.querySelector('#tabla-detalle tbody');
+  const tpl = document.getElementById('fila-template').content;
+  const btn = document.getElementById('btnAddLinea');
+  const total = document.getElementById('totalGeneral');
 
-  if (!selProd || !cantInput || !unidadLbl || !precioInp
-      || !tabla || !tpl || !addBtn || !totalLbl) {
-    console.error('Faltan elementos para pedidoDetalle.js');
-    return;
-  }
+  if (!sel || !cant || !unidad || !precio || !tabla || !tpl || !btn || !total) return;
 
-  selProd.addEventListener('change', () => {
-    const opt = selProd.selectedOptions[0];
-    unidadLbl.textContent = opt?.dataset.unidad || '';
-    precioInp.value       = opt?.dataset.precio || '';
+  // Cuando cambias el producto seleccionado, carga unidad y precio
+  sel.addEventListener('change', () => {
+    const opt = sel.selectedOptions[0];
+    unidad.textContent = opt.dataset.unidad || '';
+    precio.value = opt.dataset.precio || '';
   });
 
-  addBtn.addEventListener('click', () => {
-    const opt  = selProd.selectedOptions[0];
-    const cant = Number(cantInput.value);
-    const prec = Number(precioInp.value);
-    if (!opt?.value || cant < 1 || prec <= 0) {
-      return alert('Completar producto, cantidad (>0) y precio (>0)');
+  btn.addEventListener('click', () => {
+    const opt = sel.selectedOptions[0];
+    const c = Number(cant.value);
+    const p = Number(precio.value);
+
+    if (!opt || !opt.value || c < 1 || p <= 0) {
+      alert('Completar todos los campos correctamente.');
+      return;
     }
 
+    // Clona la fila plantilla
     const fila = tpl.cloneNode(true);
-    fila.querySelector('input[name="id_producto"]').value  = opt.value;
-    fila.querySelector('.nombre').textContent              = opt.dataset.desc;
-    fila.querySelector('input[name="cantidad"]').value     = cant;
-    fila.querySelector('input[name="unidad"]').value       = unidadLbl.textContent;
-    fila.querySelector('.unidad-base').textContent         = unidadLbl.textContent;
-    fila.querySelector('input[name="precio"]').value       = prec.toFixed(2);
 
+    // Setea los valores en inputs ocultos y textos visibles
+    fila.querySelector('input[name="id_producto"]').value = opt.value;
+    fila.querySelector('.nombre').textContent = opt.dataset.desc;
+
+    fila.querySelector('span.cantidad').textContent = c;
+    fila.querySelector('input[name="cantidad"]').value = c;
+
+    fila.querySelector('input[name="unidad"]').value = unidad.textContent;
+    fila.querySelector('.unidad-base').textContent = unidad.textContent;
+
+    fila.querySelector('span.precio').textContent = p.toFixed(2);
+    fila.querySelector('input[name="precio"]').value = p.toFixed(2);
+
+    // Agrega la fila a la tabla
     tabla.appendChild(fila);
-    selProd.selectedIndex = 0;
-    cantInput.value       = '';
-    unidadLbl.textContent = '';
-    precioInp.value       = '';
-    actualizarTotal();
+
+    // Limpia inputs para la próxima carga
+    sel.selectedIndex = 0;
+    cant.value = '';
+    unidad.textContent = '';
+    precio.value = '';
+
+    // Recalcula total
+    let suma = 0;
+    tabla.querySelectorAll('tr').forEach(tr => {
+      suma += parseFloat(tr.querySelector('input[name="precio"]').value) *
+              parseFloat(tr.querySelector('input[name="cantidad"]').value);
+    });
+    total.textContent = suma.toFixed(2);
   });
 
+  // Evento para eliminar fila
   tabla.addEventListener('click', e => {
     if (e.target.closest('button.eliminar')) {
       e.target.closest('tr').remove();
-      actualizarTotal();
+
+      // Recalcula total al eliminar
+      let suma = 0;
+      tabla.querySelectorAll('tr').forEach(tr => {
+        suma += parseFloat(tr.querySelector('input[name="precio"]').value) *
+                parseFloat(tr.querySelector('input[name="cantidad"]').value);
+      });
+      total.textContent = suma.toFixed(2);
     }
   });
-
-  function actualizarTotal() {
-    let total = 0;
-    tabla.querySelectorAll('tr').forEach(tr => {
-      const p = parseFloat(tr.querySelector('input[name="precio"]').value)   || 0;
-      const c = parseFloat(tr.querySelector('input[name="cantidad"]').value) || 0;
-      total += p * c;
-    });
-    totalLbl.textContent = total.toFixed(2);
-  }
 });

@@ -97,28 +97,31 @@
 
   <!-- Fila plantilla -->
   <template id="fila-template">
-    <tr>
-      <td>
-        <input type="hidden" name="id_producto">
-        <span class="nombre"></span>
-      </td>
-      <td>
-        <input type="number" name="cantidad" class="form-control bg-dark text-light" min="1" required readonly>
-      </td>
-      <td>
-        <input type="hidden" name="unidad">
-        <span class="unidad-base fw-bold"></span>
-      </td>
-      <td>
-        <input type="number" step="0.01" name="precio" class="form-control bg-dark text-light" required readonly>
-      </td>
-      <td class="text-center">
-        <button type="button" class="btn btn-sm btn-danger eliminar" title="Eliminar">
-          <i class="bi bi-x-lg"></i>
-        </button>
-      </td>
-    </tr>
-  </template>
+  <tr>
+    <td>
+      <input type="hidden" name="id_producto">
+      <span class="nombre"></span>
+    </td>
+    <td>
+      <input type="hidden" name="cantidad">
+      <span class="cantidad"></span>
+    </td>
+    <td>
+      <input type="hidden" name="unidad">
+      <span class="unidad-base fw-bold"></span>
+    </td>
+    <td>
+      <input type="hidden" name="precio">
+      <span class="precio"></span>
+    </td>
+    <td class="text-center">
+      <button type="button" class="btn btn-sm btn-danger eliminar" title="Eliminar">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </td>
+  </tr>
+</template>
+
 </form>
 {% endblock %}
 

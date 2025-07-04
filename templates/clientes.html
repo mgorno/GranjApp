@@ -51,13 +51,13 @@
   
 <div class="cliente-item d-flex justify-content-between align-items-center bg-dark text-light px-3 py-2 rounded mb-1">
   <div>{{ c[1] | title }}</div>
-  <a href="#collapse{{ c[0] }}" data-bs-toggle="collapse"
+  <a href="#collapse{{ c[] }}" data-bs-toggle="collapse"
      class="btn btn-sm btn-outline-primary text-secondary">
     <i class="bi bi-chevron-down"></i>
   </a>
 </div>
 
-<div id="collapse{{ c[0] }}" class="accordion-collapse collapse">
+<div id="collapse{{ c[] }}" class="accordion-collapse collapse">
   <form action="{{ url_for('clientes.editar_cliente', id_cliente=c[0]) }}"
         method="POST"
         class="accordion-body bg-dark text-light rounded mt-1 p-3">

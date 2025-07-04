@@ -13,9 +13,9 @@ def redirigir_a_formulario():
 
     destinos = {
         "cliente": "clientes.clientes",
-        "producto": "productos.nuevo_producto",
-        "pedido": "pedidos.nuevo",
-        "pago": "pagos.nuevo_pago"
+        "producto": "productos.productos",
+        "pedido": "pedidos.nuevo_pedido",
+        "pago": "pagos.pagos",
     }
 
     if tipo in destinos:

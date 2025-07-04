@@ -47,6 +47,6 @@ def nuevo():
             conn.commit()
 
         flash("Producto creado correctamente.", "success")
-        return redirect(url_for("productos.nuevo"))
+        return redirect(url_for("productos.productos"))
 
     return render_template("producto.html")

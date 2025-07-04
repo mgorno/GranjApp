@@ -33,31 +33,51 @@ def nuevo():
 
             if existe:
                 flash("Ya existe un pedido pendiente para este cliente en esa fecha.", "error")
-                cur.execute("SELECT id_cliente, nombre FROM clientes")
-                clientes = cur.fetchall()
-                cur.execute("SELECT id_producto, descripcion, precio FROM productos ORDER BY descripcion")
-                productos = cur.fetchall()
+                clientes, productos = obtener_clientes_productos(cur)
                 return render_template("nuevo_pedido.html", clientes=clientes, productos=productos)
 
             id_pedido = str(uuid.uuid4())
+
+            # Insertar cabecera del pedido
             cur.execute("""
-                INSERT INTO pedidos (id_pedido, id_cliente, fecha_entrega)
-                VALUES (%s, %s, %s)
+                INSERT INTO pedidos (id_pedido, id_cliente, fecha_entrega, estado)
+                VALUES (%s, %s, %s, 'pendiente')
             """, (id_pedido, id_cliente, fecha_entrega))
+
+            # Insertar detalle
+            ids_producto = request.form.getlist("id_producto")
+            cantidades = request.form.getlist("cantidad")
+            precios = request.form.getlist("precio")
+            unidades = request.form.getlist("unidad")
+
+            for i in range(len(ids_producto)):
+                cur.execute("""
+                    INSERT INTO pedido_detalle (id_pedido, id_producto, cantidad, precio, unidad)
+                    VALUES (%s, %s, %s, %s, %s)
+                """, (id_pedido, ids_producto[i], cantidades[i], precios[i], unidades[i]))
 
             conn.commit()
             flash("Pedido creado correctamente.", "success")
             return redirect(url_for("pedidos.pendientes"))
 
-        cur.execute("SELECT id_cliente, nombre FROM clientes")
-        clientes = cur.fetchall()
-        cur.execute("SELECT id_producto, descripcion, precio FROM productos ORDER BY descripcion")
-        productos = cur.fetchall()
+        # Si es GET
+        with get_conn() as conn, conn.cursor() as cur:
+            clientes, productos = obtener_clientes_productos(cur)
+        return render_template("nuevo_pedido.html", clientes=clientes, productos=productos)
 
-    return render_template("nuevo_pedido.html", clientes=clientes, productos=productos)
+def obtener_clientes_productos(cur):
+    cur.execute("SELECT id_cliente, nombre FROM clientes ORDER BY nombre")
+    clientes = cur.fetchall()
+    cur.execute("SELECT id_producto, descripcion, precio, unidad FROM productos ORDER BY descripcion")
+    productos = cur.fetchall()
+    return clientes, productos
 
 @bp_pedidos.route("/marcar_entregado/<id_pedido>")
 def marcar_entregado(id_pedido):
-    # lógica para marcar pedido entregado
-    ...
+    with get_conn() as conn, conn.cursor() as cur:
+        cur.execute("""
+            UPDATE pedidos SET estado = 'entregado' WHERE id_pedido = %s
+        """, (id_pedido,))
+        conn.commit()
+    flash("Pedido marcado como entregado.", "success")
     return redirect(url_for('pedidos.pendientes'))

@@ -33,8 +33,7 @@
         <select id="selProducto" class="form-select bg-dark text-light border-secondary" required>
           <option value="" disabled selected>Elegir…</option>
           {% for p in productos %}
-          <option value="{{ p[0] }}" data-desc="{{ p[1] }}" data-precio="{{ p[2] or '' }}"
-            data-unidad="{{ p[3] or '' }}">
+          <option value="{{ p[0] }}" data-desc="{{ p[1] }}" data-precio="{{ p[2] or '' }}" data-unidad="{{ p[3] or '' }}">
             {{ p[1] }}
           </option>
           {% endfor %}
@@ -49,13 +48,12 @@
       <div class="col-md-2">
         <label class="form-label">Unidad</label>
         <span id="inpUnidad" class="form-control bg-dark text-light border-secondary fw-bold"
-          style="height:38px; display:flex; align-items:center;"></span>
+              style="height:38px; display:flex; align-items:center;"></span>
       </div>
 
       <div class="col-md-2">
         <label class="form-label">Precio ($)</label>
-        <input id="inpPrecio" type="number" step="0.01" class="form-control bg-dark text-light border-secondary"
-          required>
+        <input id="inpPrecio" type="number" step="0.01" class="form-control bg-dark text-light border-secondary" required>
       </div>
 
       <div class="col-md-2 d-grid">
@@ -96,21 +94,18 @@
   <template id="fila-template">
     <tr>
       <td>
-        <!-- Inputs con name en plural para enviar listas -->
         <input type="hidden" name="id_producto" />
         <span class="nombre"></span>
       </td>
       <td>
-        <input type="number" name="cantidad" class="form-control bg-dark text-light border-secondary" min="1"
-          required />
+        <input type="number" name="cantidad" class="form-control bg-dark text-light border-secondary" min="1" required />
       </td>
       <td>
         <input type="hidden" name="unidad" />
         <span class="unidad-base fw-bold"></span>
       </td>
       <td>
-        <input type="number" step="0.01" name="precio" class="form-control bg-dark text-light border-secondary"
-          required />
+        <input type="number" step="0.01" name="precio" class="form-control bg-dark text-light border-secondary" required />
       </td>
       <td class="text-center">
         <button type="button" class="btn btn-sm btn-danger eliminar" title="Eliminar">
@@ -122,6 +117,7 @@
 
 </form>
 
+<!-- SCRIPT -->
 <script>
   const tabla = document.querySelector('#tabla-detalle tbody');
   const tpl = document.getElementById('fila-template').content;
@@ -132,12 +128,14 @@
   const unidad = document.getElementById('inpUnidad');
   const precio = document.getElementById('inpPrecio');
 
-selProducto.addEventListener('change', () => {
-  const opt = selProducto.selectedOptions[0];
-  unidad.textContent = opt.dataset.unidad || '';
-  precio.value = opt.dataset.precio || '';
-});
+  // Actualiza unidad y precio al elegir producto
+  selProducto.addEventListener('change', () => {
+    const opt = selProducto.selectedOptions[0];
+    if (!opt || !opt.dataset) return;
 
+    unidad.textContent = opt.dataset.unidad || '';
+    precio.value = opt.dataset.precio || '';
+  });
 
   // Agregar producto a la tabla
   addBtn.addEventListener('click', () => {
@@ -159,7 +157,7 @@ selProducto.addEventListener('change', () => {
     tabla.appendChild(fila);
 
     // Limpiar inputs
-    selProducto.value = '';
+    selProducto.selectedIndex = 0;
     cantidad.value = '';
     unidad.textContent = '';
     precio.value = '';

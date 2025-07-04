@@ -33,7 +33,7 @@ def nuevo():
         if errores:
             for e in errores:
                 flash(e, "error")
-            return render_template("nuevo_producto.html",
+            return render_template("producto.html",
                                    descripcion=descripcion,
                                    unidad_base=unidad_base,
                                    precio=precio)
@@ -49,4 +49,4 @@ def nuevo():
         flash("Producto creado correctamente.", "success")
         return redirect(url_for("productos.nuevo"))
 
-    return render_template("nuevo_producto.html")
+    return render_template("producto.html")

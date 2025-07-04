@@ -4,79 +4,82 @@
 {% block content %}
 <!-- Encabezado: título · buscador · botón + -->
 <div class="d-flex align-items-center mb-4 gap-3 flex-wrap">
-  <h1 class="flex-grow-1">Productos</h1>
+    <h1 class="flex-grow-1">Productos</h1>
 
-  <!-- Buscador -->
-  <div class="flex-grow-1" style="min-width:240px;">
-    <input type="search" id="buscarProducto"
-           class="form-control form-control-lg bg-dark text-light border-secondary"
-           placeholder="Buscar productos…">
-  </div>
+    <!-- Buscador -->
+    <div class="flex-grow-1" style="min-width:240px;">
+        <input type="search" id="buscarProducto"
+            class="form-control form-control-lg bg-dark text-light border-secondary" placeholder="Buscar productos…">
+    </div>
 
-  <!-- Botón + que abre el off‑canvas “Nuevo Producto” -->
-  <button class="btn btn-primary btn-lg flex-shrink-0"
-          data-bs-toggle="offcanvas" data-bs-target="#offNuevoProd">
-    <i class="bi bi-plus-lg"></i>
-  </button>
+    <!-- Botón + que abre el off‑canvas “Nuevo Producto” -->
+    <button class="btn btn-primary btn-lg flex-shrink-0" data-bs-toggle="offcanvas" data-bs-target="#offNuevoProd">
+        <i class="bi bi-plus-lg"></i>
+    </button>
 </div>
 
 <!-- LISTA de productos -->
 <div class="list-group list-group-flush">
-  {% for p in productos %}
-  <div class="list-group-item bg-dark text-light border-secondary rounded mb-2 py-3 px-4 producto-item">
-    <div class="d-flex justify-content-between align-items-center">
-      <h5 class="mb-1 fw-semibold nombre-producto">
-        <i class="bi bi-box-seam text-secondary me-2"></i>{{ p[1] | title }}
-      </h5>
-      <span class="badge bg-success fs-6">${{ "%.2f"|format(p[3]) }}</span>
+    {% for p in productos %}
+    <div class="list-group-item bg-dark text-light border-secondary rounded mb-2 py-3 px-4 producto-item">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-1 fw-semibold nombre-producto">
+                <i class="bi bi-box-seam text-secondary me-2"></i>{{ p[1] | title }}
+            </h5>
+            <span class="badge bg-success fs-6">${{ "%.2f"|format(p[3]) }}</span>
+        </div>
+        <small class="text-secondary">
+            <i class="bi bi-rulers me-1"></i>Unidad base: {{ p[2] }}
+        </small>
     </div>
-    <small class="text-secondary">
-      <i class="bi bi-rulers me-1"></i>Unidad base: {{ p[2] }}
-    </small>
-  </div>
-  {% endfor %}
+    {% endfor %}
 </div>
 
 <!-- OFF‑CANVAS “Nuevo Producto” -->
 <div class="offcanvas offcanvas-end bg-dark text-light" tabindex="-1" id="offNuevoProd">
-  <div class="offcanvas-header border-bottom border-secondary">
-    <h5 class="offcanvas-title"><i class="bi bi-plus-circle me-2"></i>Nuevo Producto</h5>
-    <button class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
-  </div>
-
-  <form action="{{ url_for('productos.nuevo') }}" method="POST" class="offcanvas-body">
-    <div class="mb-3">
-      <label class="form-label">Descripción</label>
-      <input name="descripcion" class="form-control bg-dark text-light border-secondary" required>
+    <div class="offcanvas-header border-bottom border-secondary">
+        <h5 class="offcanvas-title"><i class="bi bi-plus-circle me-2"></i>Nuevo Producto</h5>
+        <button class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
     </div>
 
-    <div class="mb-3">
-      <label class="form-label">Unidad base</label>
-      <input name="unidad_base" class="form-control bg-dark text-light border-secondary" required>
-    </div>
+    <form action="{{ url_for('productos.nuevo') }}" method="POST" class="offcanvas-body">
+        <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <input name="descripcion" class="form-control bg-dark text-light border-secondary" required>
+        </div>
 
-    <div class="mb-4">
-      <label class="form-label">Precio ($)</label>
-      <input name="precio" class="form-control bg-dark text-light border-secondary" required>
-    </div>
+        <div class="mb-3">
+            <label class="form-label">Unidad base</label>
+            <select name="unidad_base" class="form-select bg-dark text-light border-secondary" required>
+                <option value="" disabled selected>Elegí una unidad...</option>
+                <option value="Kg">Kg</option>
+                <option value="Cajón">Cajón</option>
+            </select>
+        </div>
 
-    <button class="btn btn-success w-100"><i class="bi bi-save2 me-1"></i>Guardar</button>
-  </form>
+
+        <div class="mb-4">
+            <label class="form-label">Precio ($)</label>
+            <input name="precio" class="form-control bg-dark text-light border-secondary" required>
+        </div>
+
+        <button class="btn btn-success w-100"><i class="bi bi-save2 me-1"></i>Guardar</button>
+    </form>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  /* Filtro en vivo */
-  const busc = document.getElementById('buscarProducto');
-  busc.addEventListener('input', () => {
-    const f = busc.value.toLowerCase().trim();
-    document.querySelectorAll('.producto-item').forEach(it => {
-      const txt = it.querySelector('.nombre-producto').textContent.toLowerCase();
-      it.style.display = txt.includes(f) ? '' : 'none';
+    document.addEventListener('DOMContentLoaded', () => {
+        /* Filtro en vivo */
+        const busc = document.getElementById('buscarProducto');
+        busc.addEventListener('input', () => {
+            const f = busc.value.toLowerCase().trim();
+            document.querySelectorAll('.producto-item').forEach(it => {
+                const txt = it.querySelector('.nombre-producto').textContent.toLowerCase();
+                it.style.display = txt.includes(f) ? '' : 'none';
+            });
+        });
     });
-  });
-});
 </script>
 {% endblock %}

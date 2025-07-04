@@ -70,10 +70,7 @@ def obtener_clientes_productos(cur):
     clientes = cur.fetchall()
     cur.execute("SELECT id_producto, descripcion, precio, unidad_base FROM productos ORDER BY descripcion")
     productos = cur.fetchall()
-    return render_template("nuevo_pedido.html",
-                       clientes=clientes,
-                       productos=productos)
-
+    return clientes, productos
     
 
 @bp_pedidos.route("/marcar_entregado/<id_pedido>")

@@ -1,19 +1,25 @@
 {% extends "base.html" %}
-{% block title %}Nuevo Pedido{% endblock %}
+
+{% block title %}Nuevo Pedido{% endblock %}
+
+{% block head_extra %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/clientes.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/inlineEdit.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/pedidoDetalle.js') }}" defer></script>
+{% endblock %}
 
 {% block content %}
-<h1 class="mb-4">Nuevo Pedido</h1>
+<h1 class="mb-4">Nuevo Pedido</h1>
 
-<form method="POST" action="{{ url_for('pedidos.nuevo') }}">
-
-  <!-- Cliente / Fecha -->
+<form method="POST" action="{{ url_for('pedidos.nuevo') }}" <!-- Cliente / Fecha -->
   <div class="row g-3 mb-4">
     <div class="col-md-6">
       <label class="form-label">Cliente</label>
       <select name="id_cliente" class="form-select bg-dark text-light" required>
         <option value="" disabled selected>Elegir…</option>
         {% for c in clientes %}
-          <option value="{{ c[0] }}">{{ c[1] }}</option>
+        <option value="{{ c[0] }}">{{ c[1] }}</option>
         {% endfor %}
       </select>
     </div>
@@ -33,34 +39,28 @@
         <select id="selProducto" class="form-select bg-dark text-light" required>
           <option value="" disabled selected>Elegir…</option>
           {% for p in productos %}
-            <option
-              value="{{ p[0] }}"
-              data-desc="{{ p[1] }}"
-              data-precio="{{ "%.2f"|format(p[2]) }}"
-              data-unidad="{{ p[3] }}"
-            >
-              {{ p[1] }}
-            </option>
+          <option value="{{ p[0] }}" data-desc="{{ p[1] }}" data-precio="{{ \" %.2f\"|format(p[2]) }}"
+            data-unidad="{{ p[3] }}">
+            {{ p[1] }}
+          </option>
           {% endfor %}
         </select>
       </div>
 
       <div class="col-md-2">
         <label class="form-label">Cantidad</label>
-        <input id="inpCantidad" type="number" min="1"
-               class="form-control bg-dark text-light" required>
+        <input id="inpCantidad" type="number" min="1" class="form-control bg-dark text-light" required>
       </div>
 
       <div class="col-md-2">
         <label class="form-label">Unidad</label>
         <span id="inpUnidad" class="form-control bg-dark text-light fw-bold"
-              style="height:38px;display:flex;align-items:center;"></span>
+          style="height:38px;display:flex;align-items:center;"></span>
       </div>
 
       <div class="col-md-2">
         <label class="form-label">Precio ($)</label>
-        <input id="inpPrecio" type="number" step="0.01"
-               class="form-control bg-dark text-light" required>
+        <input id="inpPrecio" type="number" step="0.01" class="form-control bg-dark text-light" required>
       </div>
 
       <div class="col-md-2 d-grid">
@@ -103,16 +103,14 @@
         <span class="nombre"></span>
       </td>
       <td>
-        <input type="number" name="cantidad" class="form-control bg-dark text-light"
-               min="1" required>
+        <input type="number" name="cantidad" class="form-control bg-dark text-light" min="1" required>
       </td>
       <td>
         <input type="hidden" name="unidad">
         <span class="unidad-base fw-bold"></span>
       </td>
       <td>
-        <input type="number" step="0.01" name="precio"
-               class="form-control bg-dark text-light" required>
+        <input type="number" step="0.01" name="precio" class="form-control bg-dark text-light" required>
       </td>
       <td class="text-center">
         <button type="button" class="btn btn-sm btn-danger eliminar" title="Eliminar">
@@ -125,7 +123,5 @@
 {% endblock %}
 
 {% block scripts %}
-{{ super() }}  {# conserva los scripts comunes de base.html #}
-
-
+{{ super() }}
 {% endblock %}

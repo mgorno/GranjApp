@@ -230,3 +230,18 @@ h4 {
     padding: 8px 12px;
   }
 }
+#btnAddLinea {
+  box-shadow: 0 4px 6px rgba(34, 197, 94, 0.4);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  font-weight: 600;
+}
+
+#btnAddLinea:hover {
+  background-color: #16a34a;
+  box-shadow: 0 6px 12px rgba(22, 163, 74, 0.6);
+}
+
+#btnAddLinea:focus {
+  box-shadow: 0 0 0 0.25rem rgba(34, 197, 94, 0.5);
+  outline: none;
+}

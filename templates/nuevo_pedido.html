@@ -132,12 +132,12 @@
   const unidad = document.getElementById('inpUnidad');
   const precio = document.getElementById('inpPrecio');
 
-  // Actualiza unidad y precio al elegir producto
-  selProducto.addEventListener('change', () => {
-    const opt = selProducto.selectedOptions[0];
-    unidad.textContent = opt.dataset.unidad || '';
-    if (!precio.value) precio.value = opt.dataset.precio || '';
-  });
+selProducto.addEventListener('change', () => {
+  const opt = selProducto.selectedOptions[0];
+  unidad.textContent = opt.dataset.unidad || '';
+  precio.value = opt.dataset.precio || '';
+});
+
 
   // Agregar producto a la tabla
   addBtn.addEventListener('click', () => {

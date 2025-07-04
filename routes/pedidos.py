@@ -81,3 +81,20 @@ def marcar_entregado(id_pedido):
         conn.commit()
     flash("Pedido marcado como entregado.", "success")
     return redirect(url_for('pedidos.pendientes'))
+    
+@bp_pedidos.route("/eliminar/<id_pedido>", methods=["POST", "GET"])
+def eliminar(id_pedido):
+    """
+    Borra un pedido y sus líneas de detalle.
+    Si preferís “marcar borrado” en lugar de borrar físicamente,
+    cambiá el DELETE por un UPDATE de estado.
+    """
+    with get_conn() as conn, conn.cursor() as cur:
+        # Primero borro las líneas para respetar la FK
+        cur.execute("DELETE FROM detalle_pedido WHERE id_pedido = %s", (id_pedido,))
+        # Luego la cabecera
+        cur.execute("DELETE FROM pedidos WHERE id_pedido = %s", (id_pedido,))
+        conn.commit()
+
+    flash("Pedido eliminado correctamente.", "success")
+    return redirect(url_for("pedidos.pendientes"))

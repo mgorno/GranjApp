@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (!sel || !cant || !unidad || !precio || !tabla || !tpl || !btn || !total) return;
 
-  // Cuando cambias el producto seleccionado, carga unidad y precio
   sel.addEventListener('change', () => {
     const opt = sel.selectedOptions[0];
     unidad.textContent = opt.dataset.unidad || '';
@@ -27,52 +26,46 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Clona la fila plantilla
     const fila = tpl.cloneNode(true);
 
-    // Setea los valores en inputs ocultos y textos visibles
     fila.querySelector('input[name="id_producto"]').value = opt.value;
     fila.querySelector('.nombre').textContent = opt.dataset.desc;
 
-    fila.querySelector('span.cantidad').textContent = c;
     fila.querySelector('input[name="cantidad"]').value = c;
+    fila.querySelector('.cantidad').textContent = c;
 
     fila.querySelector('input[name="unidad"]').value = unidad.textContent;
     fila.querySelector('.unidad-base').textContent = unidad.textContent;
 
-    fila.querySelector('span.precio').textContent = p.toFixed(2);
     fila.querySelector('input[name="precio"]').value = p.toFixed(2);
+    fila.querySelector('.precio').textContent = p.toFixed(2);
 
-    // Agrega la fila a la tabla
     tabla.appendChild(fila);
 
-    // Limpia inputs para la próxima carga
+    // Limpiar inputs para el próximo producto
     sel.selectedIndex = 0;
     cant.value = '';
     unidad.textContent = '';
     precio.value = '';
 
-    // Recalcula total
-    let suma = 0;
-    tabla.querySelectorAll('tr').forEach(tr => {
-      suma += parseFloat(tr.querySelector('input[name="precio"]').value) *
-              parseFloat(tr.querySelector('input[name="cantidad"]').value);
-    });
-    total.textContent = suma.toFixed(2);
+    // Recalcular total
+    actualizarTotal();
   });
 
-  // Evento para eliminar fila
   tabla.addEventListener('click', e => {
     if (e.target.closest('button.eliminar')) {
       e.target.closest('tr').remove();
-
-      // Recalcula total al eliminar
-      let suma = 0;
-      tabla.querySelectorAll('tr').forEach(tr => {
-        suma += parseFloat(tr.querySelector('input[name="precio"]').value) *
-                parseFloat(tr.querySelector('input[name="cantidad"]').value);
-      });
-      total.textContent = suma.toFixed(2);
+      actualizarTotal();
     }
   });
+
+  function actualizarTotal() {
+    let suma = 0;
+    tabla.querySelectorAll('tr').forEach(tr => {
+      const precio = parseFloat(tr.querySelector('input[name="precio"]').value) || 0;
+      const cantidad = parseFloat(tr.querySelector('input[name="cantidad"]').value) || 0;
+      suma += precio * cantidad;
+    });
+    total.textContent = suma.toFixed(2);
+  }
 });

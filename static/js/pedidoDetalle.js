@@ -1,81 +1,88 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const sel     = document.getElementById('selProducto');
-  const cantInp = document.getElementById('inpCantidad');
-  const unidad  = document.getElementById('inpUnidad');
-  const precio  = document.getElementById('inpPrecio');
-  const tabla   = document.querySelector('#tabla-detalle tbody');
-  const tpl     = document.getElementById('fila-template').content;
-  const addBtn  = document.getElementById('btnAddLinea');
-  const total   = document.getElementById('totalGeneral');
+  const selProducto = document.getElementById('selProducto');
+  const inpCantidad = document.getElementById('inpCantidad');
+  const inpUnidad   = document.getElementById('inpUnidad');
+  const inpPrecio   = document.getElementById('inpPrecio');
+  const tabla       = document.querySelector('#tabla-detalle tbody');
+  const tpl         = document.getElementById('fila-template').content;
+  const btnAdd      = document.getElementById('btnAddLinea');
+  const total       = document.getElementById('totalGeneral');
 
-  if (!sel || !cantInp || !unidad || !precio || !tabla || !tpl || !addBtn || !total) {
-    console.error('Faltan elementos para pedidoDetalle.js');
-    return;
-  }
+  if (!selProducto || !inpCantidad || !inpUnidad || !inpPrecio || !tabla || !tpl || !btnAdd || !total) return;
 
-  /* Al seleccionar producto → unidad y precio */
-  sel.addEventListener('change', () => {
-    const opt = sel.selectedOptions[0];
-    if (!opt) return;
-    unidad.textContent = opt.dataset.unidad || '';
-    precio.value       = opt.dataset.precio || '';
+  // Cuando cambia el producto, actualizar unidad y precio
+  selProducto.addEventListener('change', () => {
+    const opt = selProducto.selectedOptions[0];
+    inpUnidad.textContent = opt.dataset.unidad || '';
+    inpPrecio.value = parseFloat(opt.dataset.precio || 0).toFixed(2);
   });
 
-  /* Añadir línea */
-  addBtn.addEventListener('click', () => {
-    const opt = sel.selectedOptions[0];
-    const cantidad = Number(cantInp.value);
-    const precioNum = Number(precio.value);
+  // Añadir línea al detalle
+  btnAdd.addEventListener('click', () => {
+    const opt = selProducto.selectedOptions[0];
+    const idProd = opt?.value;
+    const desc   = opt?.dataset?.desc;
+    const unidad = opt?.dataset?.unidad;
+    const precio = parseFloat(inpPrecio.value);
+    const cant   = parseFloat(inpCantidad.value);
 
-    if (!opt || !opt.value)            return alert('Elegí un producto.');
-    if (cantidad < 1)                  return alert('Cantidad inválida.');
-    if (!precioNum || precioNum <= 0)  return alert('Precio inválido.');
-
-    /* Evitar duplicados */
-    if ([...tabla.querySelectorAll('input[name="id_producto"]')]
-          .some(i => i.value === opt.value)) {
-      return alert('Ese producto ya está en el detalle.');
+    if (!idProd || cant <= 0 || precio <= 0) {
+      alert("Completar los campos correctamente.");
+      return;
     }
 
-    /* Clonar fila y completar */
+    // Validar que no esté ya agregado
+    const yaExiste = [...tabla.querySelectorAll('input[name="id_producto"]')]
+                      .some(input => input.value === idProd);
+    if (yaExiste) {
+      alert("Ese producto ya está en el detalle.");
+      return;
+    }
+
+    // Clonar la fila y cargar datos
     const fila = tpl.cloneNode(true);
-    fila.querySelector('input[name="id_producto"]').value = opt.value;
-    fila.querySelector('.nombre').textContent             = opt.dataset.desc;
-
-    fila.querySelector('input[name="cantidad"]').value    = cantidad;
-    fila.querySelector('.cantidad').textContent           = cantidad;
-
-    fila.querySelector('input[name="unidad"]').value      = unidad.textContent;
-    fila.querySelector('.unidad-base').textContent        = unidad.textContent;
-
-    fila.querySelector('input[name="precio"]').value      = precioNum.toFixed(2);
-    fila.querySelector('.precio').textContent             = precioNum.toFixed(2);
+    fila.querySelector('input[name="id_producto"]').value = idProd;
+    fila.querySelector('.nombre').textContent = desc;
+    fila.querySelector('input[name="cantidad"]').value = cant;
+    fila.querySelector('input[name="unidad"]').value = unidad;
+    fila.querySelector('.unidad-base').textContent = unidad;
+    fila.querySelector('input[name="precio"]').value = precio.toFixed(2);
+    fila.querySelector('input[name="cantidad"]').readOnly = true;
+    fila.querySelector('input[name="precio"]').readOnly = true;
 
     tabla.appendChild(fila);
 
-    /* Limpiar inputs */
-    sel.selectedIndex = 0;
-    cantInp.value = '';
-    unidad.textContent = '';
-    precio.value = '';
+    // Desactivar required para evitar bloqueo en el submit
+    selProducto.required = inpCantidad.required = inpPrecio.required = false;
 
-    recalcularTotal();
+    // Limpiar inputs
+    selProducto.selectedIndex = 0;
+    inpCantidad.value = '';
+    inpUnidad.textContent = '';
+    inpPrecio.value = '';
+
+    // Recalcular total
+    let sum = 0;
+    tabla.querySelectorAll('tr').forEach(tr => {
+      const c = parseFloat(tr.querySelector('input[name="cantidad"]').value);
+      const p = parseFloat(tr.querySelector('input[name="precio"]').value);
+      sum += c * p;
+    });
+    total.textContent = sum.toFixed(2);
   });
 
-  /* Eliminar línea */
+  // Eliminar línea
   tabla.addEventListener('click', e => {
     if (e.target.closest('button.eliminar')) {
       e.target.closest('tr').remove();
-      recalcularTotal();
+      // Recalcular total
+      let sum = 0;
+      tabla.querySelectorAll('tr').forEach(tr => {
+        const c = parseFloat(tr.querySelector('input[name="cantidad"]').value);
+        const p = parseFloat(tr.querySelector('input[name="precio"]').value);
+        sum += c * p;
+      });
+      total.textContent = sum.toFixed(2);
     }
   });
-
-  function recalcularTotal() {
-    let sum = 0;
-    tabla.querySelectorAll('tr').forEach(tr => {
-      sum += parseFloat(tr.querySelector('input[name="precio"]').value) *
-             parseFloat(tr.querySelector('input[name="cantidad"]').value);
-    });
-    total.textContent = sum.toFixed(2);
-  }
 });

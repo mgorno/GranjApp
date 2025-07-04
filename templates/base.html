@@ -31,21 +31,33 @@
       <a class="navbar-brand fw-bold" href="/">GranjApp</a>
     </div>
   </nav>
-
-  <div class="offcanvas offcanvas-start" tabindex="-1" id="menu">
-    <div class="offcanvas-header">
-      <h5 class="offcanvas-title">Menú</h5>
-      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+  <div class="offcanvas offcanvas-start bg-dark text-light" tabindex="-1" id="menu">
+    <div class="offcanvas-header border-bottom border-secondary">
+      <h5 class="offcanvas-title">📋 Menú</h5>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
     </div>
-    <div class="offcanvas-body">
-      <ul class="list-group">
-        <a class="list-group-item" href="/">Inicio</a>
-        <a class="list-group-item" href="/nuevo">Nuevo Pedido</a>
-        <a class="list-group-item" href="/pendientes">Pedidos Pendientes</a>
-        <a class="list-group-item" href="/pagos">Pagos</a>
-        <a class="list-group-item" href="/clientes">Clientes</a>
-        <a class="list-group-item" href="/productos">Productos</a>
-      </ul>
+
+    <div class="offcanvas-body px-0">
+      <nav class="nav flex-column">
+        <a class="nav-link text-light px-4 py-3 border-bottom border-secondary" href="/">
+          <i class="bi bi-house-door-fill me-2"></i>Inicio
+        </a>
+        <a class="nav-link text-light px-4 py-3 border-bottom border-secondary" href="/nuevo">
+          <i class="bi bi-plus-circle-fill me-2"></i>Nuevo Pedido
+        </a>
+        <a class="nav-link text-light px-4 py-3 border-bottom border-secondary" href="/clientes">
+          <i class="bi bi-people-fill me-2"></i>Clientes
+        </a>
+        <a class="nav-link text-light px-4 py-3 border-bottom border-secondary" href="/productos">
+          <i class="bi bi-box-seam me-2"></i>Productos
+        </a>
+        <a class="nav-link text-light px-4 py-3 border-bottom border-secondary" href="/pendientes">
+          <i class="bi bi-hourglass-split me-2"></i>Pendientes
+        </a>
+        <a class="nav-link text-light px-4 py-3" href="/pagos">
+          <i class="bi bi-cash-stack me-2"></i>Pagos
+        </a>
+      </nav>
     </div>
   </div>
 

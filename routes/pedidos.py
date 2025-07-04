@@ -68,7 +68,7 @@ def nuevo():
 def obtener_clientes_productos(cur):
     cur.execute("SELECT id_cliente, nombre FROM clientes ORDER BY nombre")
     clientes = cur.fetchall()
-    cur.execute("SELECT id_producto, descripcion, precio, unidad FROM productos ORDER BY descripcion")
+    cur.execute("SELECT id_producto, descripcion, precio, unidad_base FROM productos ORDER BY descripcion")
     productos = cur.fetchall()
     return clientes, productos
 

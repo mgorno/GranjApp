@@ -175,3 +175,40 @@ h4 {
   border: 1px solid #444;
   padding: 10px;
 }
+
+@media (max-width: 576px) {
+  body {
+    font-size: 1.1rem;
+    /* Fuente un poco más grande */
+  }
+
+  .form-control-sm {
+    font-size: 1.2rem !important;
+    /* Input más grande */
+    padding: 10px 12px !important;
+  }
+
+  label {
+    font-size: 1.1rem;
+  }
+
+  button.btn,
+  button.btn-sm {
+    font-size: 1.2rem;
+    padding: 12px 24px;
+  }
+
+  .clientes-lista .cliente-item {
+    font-size: 1.2rem;
+    padding: 12px 15px;
+  }
+
+  .accordion-body {
+    font-size: 1.1rem;
+    padding: 15px;
+  }
+
+  .d-flex.align-items-center.gap-3.flex-wrap {
+    gap: 1rem !important;
+  }
+}

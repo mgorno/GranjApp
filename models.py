@@ -1,7 +1,6 @@
 import os, psycopg2
 from urllib.parse import urlparse
 
-
 DATABASE_URL = os.environ["DATABASE_URL"]          
 
 def get_conn():
@@ -26,8 +25,8 @@ CREATE TABLE IF NOT EXISTS clientes (
 CREATE TABLE IF NOT EXISTS productos (
     id_producto  TEXT PRIMARY KEY,
     descripcion  TEXT NOT NULL,
-    unidad_base  TEXT,
-    precio       INTEGER
+    unidad_base  TEXT NOT NULL,
+    precio       NUMERIC(10,2) NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS pedidos (
@@ -42,8 +41,9 @@ CREATE TABLE IF NOT EXISTS detalle_pedido (
     id_detalle   SERIAL PRIMARY KEY,
     id_pedido    TEXT REFERENCES pedidos(id_pedido),
     id_producto  TEXT REFERENCES productos(id_producto),
-    cantidad     INTEGER,
-    precio       INTEGER
+    cantidad     INTEGER NOT NULL CHECK (cantidad > 0),
+    precio       NUMERIC(10,2) NOT NULL,
+    unidad       TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS pagos (

@@ -4,6 +4,17 @@ import uuid, re
 
 bp_productos = Blueprint("productos", __name__, url_prefix="/productos")
 
+@bp_productos.route("/")
+def productos():
+    with get_conn() as conn, conn.cursor() as cur:
+        cur.execute("""
+            SELECT id_producto, descripcion, unidad_base, precio
+            FROM productos
+            ORDER BY descripcion
+        """)
+        productos = cur.fetchall()                # [(id, desc, unidad, precio), …]
+    return render_template("productos.html", productos=productos)
+
 @bp_productos.route("/nuevo", methods=["GET", "POST"])
 def nuevo():
     if request.method == "POST":

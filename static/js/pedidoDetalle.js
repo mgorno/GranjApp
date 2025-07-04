@@ -1,4 +1,35 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // --- Cliente/Fecha plegable ---
+  const clienteForm = document.getElementById("cliente-fecha-form");
+  const clienteSummary = document.getElementById("cliente-fecha-summary");
+  const selectCliente = document.getElementById("selectCliente");
+  const inputFecha = document.getElementById("inputFecha");
+  const clienteNombreSpan = document.getElementById("cliente-nombre");
+  const fechaEntregaSpan = document.getElementById("fecha-entrega");
+  const btnEditar = document.getElementById("btnEditarClienteFecha");
+
+  function actualizarResumen() {
+    const clienteSeleccionado = selectCliente.options[selectCliente.selectedIndex];
+    const clienteNombre = clienteSeleccionado ? clienteSeleccionado.text : "";
+    const fecha = inputFecha.value;
+
+    if (clienteNombre && fecha) {
+      clienteNombreSpan.textContent = clienteNombre;
+      fechaEntregaSpan.textContent = fecha;
+      clienteForm.classList.add("d-none");
+      clienteSummary.classList.remove("d-none");
+    }
+  }
+
+  selectCliente.addEventListener("change", actualizarResumen);
+  inputFecha.addEventListener("change", actualizarResumen);
+
+  btnEditar.addEventListener("click", () => {
+    clienteSummary.classList.add("d-none");
+    clienteForm.classList.remove("d-none");
+  });
+
+  // --- Manejo productos ---
   const sel   = document.getElementById('selProducto');
   const cInp  = document.getElementById('inpCantidad');
   const uSpan = document.getElementById('inpUnidad');
@@ -10,14 +41,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (!sel || !cInp || !uSpan || !pInp || !tabla || !tpl || !addBt || !tot) return;
 
-  /* Cargar unidad y precio al cambiar producto */
   sel.addEventListener('change', () => {
     const o = sel.selectedOptions[0];
     uSpan.textContent = o.dataset.unidad || '';
     pInp.value        = o.dataset.precio || '';
   });
 
-  /* Añadir producto */
   addBt.addEventListener('click', () => {
     const o       = sel.selectedOptions[0];
     const idProd  = o?.value;
@@ -26,11 +55,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const precio  = parseFloat(pInp.value);
     const cant    = parseFloat(cInp.value);
 
-    if (!idProd)        return alert('Elegí un producto.');
-    if (!cant || cant<=0)   return alert('Cantidad inválida.');
-    if (!precio || precio<=0) return alert('Precio inválido.');
+    if (!idProd)              return alert('Elegí un producto.');
+    if (!cant || cant <= 0)   return alert('Cantidad inválida.');
+    if (!precio || precio <= 0) return alert('Precio inválido.');
 
-    /* Evitar duplicados */
     if ([...tabla.querySelectorAll('input[name="id_producto"]')]
         .some(input => input.value === idProd)) {
       alert('Ese producto ya está en el detalle.');
@@ -53,10 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     tabla.appendChild(fila);
 
-    /* Desactivar required para evitar bloqueo al enviar */
     sel.required = cInp.required = pInp.required = false;
 
-    /* Limpiar para siguiente carga */
     sel.selectedIndex = 0;
     cInp.value = '';
     uSpan.textContent = '';
@@ -65,12 +91,11 @@ document.addEventListener('DOMContentLoaded', () => {
     recalcularTotal();
   });
 
-  /* Eliminar línea */
   tabla.addEventListener('click', e => {
     if (e.target.closest('button.eliminar')) {
       e.target.closest('tr').remove();
       recalcularTotal();
-      /* Si no queda ningún producto, volvemos a exigir required */
+
       if (tabla.querySelectorAll('tr').length === 0) {
         sel.required = cInp.required = pInp.required = true;
       }

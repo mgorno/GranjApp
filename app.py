@@ -2,8 +2,9 @@ import os
 from flask import Flask
 from models import init_db
 from routes import register_all_blueprints
-
+from models import init_db 
 app = Flask(__name__)
+init_db()
 app.secret_key = os.environ.get("SECRET_KEY", "dev-key")
 register_all_blueprints(app) 
 

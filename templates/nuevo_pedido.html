@@ -1,44 +1,42 @@
 {% extends "base.html" %}
-{% block title %}Nuevo Pedido{% endblock %}
+{% block title %}Nuevo Pedido{% endblock %}
 
 {% block content %}
 <!-- Encabezado -->
 <div class="d-flex align-items-center mb-4 gap-3 flex-wrap">
-  <h1 class="flex-grow-1">Nuevo Pedido</h1>
+  <h1 class="flex-grow-1">Nuevo Pedido</h1>
 
-  <!-- (Opcional) buscador de filas ya añadidas -->
+  <!-- Buscador de filas añadidas -->
   <div class="flex-grow-1" style="min-width:220px;">
     <input type="search" id="buscarFila" class="form-control bg-dark text-light border-secondary"
-           placeholder="Filtrar productos…">
+      placeholder="Filtrar productos…">
   </div>
 
   <!-- Botón + que abre off‑canvas para agregar producto -->
-  <button class="btn btn-primary btn-lg flex-shrink-0"
-          data-bs-toggle="offcanvas" data-bs-target="#offNuevoItem">
+  <button class="btn btn-primary btn-lg flex-shrink-0" data-bs-toggle="offcanvas" data-bs-target="#offNuevoItem">
     <i class="bi bi-plus-lg"></i>
   </button>
 </div>
 
 <form method="POST" action="{{ url_for('pedidos.nuevo') }}">
-  <!-- ===== Cabecera del pedido ===== -->
+  <!-- Cabecera del pedido -->
   <div class="row g-3 mb-4">
     <div class="col-md-6">
       <label class="form-label">Cliente</label>
       <select name="id_cliente" class="form-select bg-dark text-light border-secondary" required>
         <option value="" disabled selected>Elegir…</option>
         {% for c in clientes %}
-          <option value="{{ c[0] }}">{{ c[1] }}</option>
+        <option value="{{ c[0] }}">{{ c[1] }}</option>
         {% endfor %}
       </select>
     </div>
     <div class="col-md-6">
       <label class="form-label">Fecha de entrega</label>
-      <input type="date" name="fecha_entrega"
-             class="form-control bg-dark text-light border-secondary" required>
+      <input type="date" name="fecha_entrega" class="form-control bg-dark text-light border-secondary" required>
     </div>
   </div>
 
-  <!-- ===== Detalle de productos añadidos ===== -->
+  <!-- Detalle de productos añadidos -->
   <h4 class="mb-3"><i class="bi bi-list-check me-2"></i>Detalle</h4>
 
   <table class="table table-dark table-bordered align-middle" id="tabla-detalle">
@@ -60,7 +58,7 @@
   </div>
 </form>
 
-<!-- ===== OFF‑CANVAS: Nuevo Ítem ===== -->
+<!-- OFF‑CANVAS: Nuevo Ítem -->
 <div class="offcanvas offcanvas-end bg-dark text-light" tabindex="-1" id="offNuevoItem">
   <div class="offcanvas-header border-bottom border-secondary">
     <h5 class="offcanvas-title">
@@ -76,23 +74,28 @@
         <select id="selProducto" class="form-select bg-dark text-light border-secondary" required>
           <option value="" disabled selected>Elegir…</option>
           {% for p in productos %}
-            <option value="{{ p[0] }}" data-desc="{{ p[1] }}" data-precio="{{ p[2] or '' }}">
-              {{ p[1] }}
-            </option>
+          <option value="{{ p[0] }}" data-desc="{{ p[1] }}" data-precio="{{ p[2] or '' }}"
+            data-unidad="{{ p[3] or '' }}">
+            {{ p[1] }}
+          </option>
           {% endfor %}
         </select>
       </div>
 
-      <div class="mb-3">
-        <label class="form-label">Cantidad</label>
-        <input id="inpCantidad" type="number" min="1"
-               class="form-control bg-dark text-light border-secondary" required>
+      <div class="mb-3 d-flex align-items-center gap-2">
+        <div style="flex-grow:1">
+          <label class="form-label">Cantidad</label>
+          <input id="inpCantidad" type="number" min="1" class="form-control bg-dark text-light border-secondary"
+            required>
+        </div>
+        <div style="min-width:70px; margin-top: 30px;">
+          <span id="unidadBase" class="text-secondary"></span>
+        </div>
       </div>
 
       <div class="mb-4">
         <label class="form-label">Precio ($)</label>
-        <input id="inpPrecio" type="number" step="0.01"
-               class="form-control bg-dark text-light border-secondary">
+        <input id="inpPrecio" type="number" step="0.01" class="form-control bg-dark text-light border-secondary">
       </div>
 
       <button class="btn btn-primary w-100" id="btnAddLinea" type="submit">
@@ -102,21 +105,25 @@
   </div>
 </div>
 
-<!-- ===== Template de fila ===== -->
+<!-- Template de fila -->
 <template id="fila-template">
   <tr>
     <td>
       <input type="hidden" name="id_producto">
       <span class="nombre"></span>
     </td>
-    <td><input type="number" name="cantidad" class="form-control bg-dark text-light border-secondary" min="1"></td>
-    <td><input type="number" step="0.01" name="precio" class="form-control bg-dark text-light border-secondary"></td>
+    <td>
+      <input type="number" name="cantidad" class="form-control bg-dark text-light border-secondary" min="1" required>
+      <small class="text-secondary unidad-base"></small>
+    </td>
+    <td>
+      <input type="number" step="0.01" name="precio" class="form-control bg-dark text-light border-secondary">
+    </td>
     <td class="text-center">
-      <button type="button" class="btn btn-sm btn-danger eliminar">
+      <button type="button" class="btn btn-sm btn-danger eliminar" title="Eliminar">
         <i class="bi bi-x-lg"></i>
       </button>
     </td>
   </tr>
 </template>
 {% endblock %}
-

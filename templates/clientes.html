@@ -48,92 +48,90 @@
 
 <div class="clientes-lista">
   {% for c in clientes %}
-  
-<div class="cliente-item d-flex justify-content-between align-items-center bg-dark text-light px-3 py-2 rounded mb-1">
-  <div>{{ c[1] | title }}</div>
-  <a href="#collapse{{ c[0] }}" data-bs-toggle="collapse"
-     class="btn btn-sm btn-outline-primary text-secondary">
-    <i class="bi bi-chevron-down"></i>
-  </a>
-</div>
 
-<div id="collapse{{ c[0] }}" class="accordion-collapse collapse">
-  <form action="{{ url_for('clientes.editar_cliente', id_cliente=c[0]) }}"
-        method="POST"
-        class="accordion-body bg-dark text-light rounded mt-1 p-3">
-
-    <!-- Nombre -->
-<div class="mb-3">
-  <label class="form-label mb-1 text-secondary">
-    <i class="bi bi-person-fill me-1"></i><strong>Nombre:</strong>
-  </label>
-  <div class="d-flex align-items-center gap-2">
-    <span class="valor-campo flex-grow-1">{{ c[1] }}</span>
-    <input type="text" name="nombre" value="{{ c[1] }}"
-           class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-1 d-none">
-    <button type="button" class="btn btn-outline-light btn-sm btn-editar-campo">
-      <i class="bi bi-pencil-fill"></i>
-    </button>
+  <div class="cliente-item d-flex justify-content-between align-items-center bg-dark text-light px-3 py-2 rounded mb-1">
+    <div class="nombre-cliente">{{ c[1] | title }}</div>
+    <a href="#collapse{{ c[0] }}" data-bs-toggle="collapse" class="btn btn-sm btn-outline-primary text-secondary">
+      <i class="bi bi-chevron-down"></i>
+    </a>
   </div>
-</div>
 
-<!-- Teléfono -->
-<div class="mb-3">
-  <label class="form-label mb-1 text-secondary">
-    <i class="bi bi-telephone-fill me-1"></i><strong>Teléfono:</strong>
-  </label>
-  <div class="d-flex align-items-center gap-2">
-    <span class="valor-campo flex-grow-1">{{ c[2] or "Sin teléfono" }}</span>
-    <input type="text" name="telefono" value="{{ c[2] or '' }}"
-           class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-1 d-none">
-    <button type="button" class="btn btn-outline-light btn-sm btn-editar-campo">
-      <i class="bi bi-pencil-fill"></i>
-    </button>
-  </div>
-</div>
+  <div id="collapse{{ c[0] }}" class="accordion-collapse collapse">
+    <form action="{{ url_for('clientes.editar_cliente', id_cliente=c[0]) }}" method="POST"
+      class="accordion-body bg-dark text-light rounded mt-1 p-3">
 
-<!-- Dirección -->
-<div class="mb-3">
-  <label class="form-label mb-1 text-secondary">
-    <i class="bi bi-geo-alt-fill me-1"></i><strong>Dirección:</strong>
-  </label>
-  <div class="d-flex align-items-center gap-2">
-    <span class="valor-campo flex-grow-1">{{ c[3] or "Sin dirección" }}</span>
-    <input type="text" name="direccion" value="{{ c[3] or '' }}"
-           class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-1 d-none">
-    <button type="button" class="btn btn-outline-light btn-sm btn-editar-campo">
-      <i class="bi bi-pencil-fill"></i>
-    </button>
-  </div>
-</div>
+      <!-- Nombre -->
+      <div class="mb-3">
+        <label class="form-label mb-1 text-secondary">
+          <i class="bi bi-person-fill me-1"></i><strong>Nombre:</strong>
+        </label>
+        <div class="d-flex align-items-center gap-2">
+          <span class="valor-campo flex-grow-1">{{ c[1] }}</span>
+          <input type="text" name="nombre" value="{{ c[1] }}"
+            class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-1 d-none">
+          <button type="button" class="btn btn-outline-light btn-sm btn-editar-campo">
+            <i class="bi bi-pencil-fill"></i>
+          </button>
+        </div>
+      </div>
 
-<!-- Email -->
-<div class="mb-4">
-  <label class="form-label mb-1 text-secondary">
-    <i class="bi bi-envelope-fill me-1"></i><strong>Email:</strong>
-  </label>
-  <div class="d-flex align-items-center gap-2">
-    <span class="valor-campo flex-grow-1">{{ c[4] or "Sin email" }}</span>
-    <input type="email" name="mail" value="{{ c[4] or '' }}"
-           class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-1 d-none">
-    <button type="button" class="btn btn-outline-light btn-sm btn-editar-campo">
-      <i class="bi bi-pencil-fill"></i>
-    </button>
-  </div>
-</div>
+      <!-- Teléfono -->
+      <div class="mb-3">
+        <label class="form-label mb-1 text-secondary">
+          <i class="bi bi-telephone-fill me-1"></i><strong>Teléfono:</strong>
+        </label>
+        <div class="d-flex align-items-center gap-2">
+          <span class="valor-campo flex-grow-1">{{ c[2] or "Sin teléfono" }}</span>
+          <input type="text" name="telefono" value="{{ c[2] or '' }}"
+            class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-1 d-none">
+          <button type="button" class="btn btn-outline-light btn-sm btn-editar-campo">
+            <i class="bi bi-pencil-fill"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Dirección -->
+      <div class="mb-3">
+        <label class="form-label mb-1 text-secondary">
+          <i class="bi bi-geo-alt-fill me-1"></i><strong>Dirección:</strong>
+        </label>
+        <div class="d-flex align-items-center gap-2">
+          <span class="valor-campo flex-grow-1">{{ c[3] or "Sin dirección" }}</span>
+          <input type="text" name="direccion" value="{{ c[3] or '' }}"
+            class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-1 d-none">
+          <button type="button" class="btn btn-outline-light btn-sm btn-editar-campo">
+            <i class="bi bi-pencil-fill"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="mb-4">
+        <label class="form-label mb-1 text-secondary">
+          <i class="bi bi-envelope-fill me-1"></i><strong>Email:</strong>
+        </label>
+        <div class="d-flex align-items-center gap-2">
+          <span class="valor-campo flex-grow-1">{{ c[4] or "Sin email" }}</span>
+          <input type="email" name="mail" value="{{ c[4] or '' }}"
+            class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-1 d-none">
+          <button type="button" class="btn btn-outline-light btn-sm btn-editar-campo">
+            <i class="bi bi-pencil-fill"></i>
+          </button>
+        </div>
+      </div>
 
 
-    <div class="d-flex justify-content-between">
-      <button type="submit" class="btn btn-success btn-sm">
-        <i class="bi bi-save2 me-1"></i>Guardar
-      </button>
+      <div class="d-flex justify-content-between">
+        <button type="submit" class="btn btn-success btn-sm">
+          <i class="bi bi-save2 me-1"></i>Guardar
+        </button>
 
-      <button type="button" class="btn btn-danger btn-sm"
-              data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ c[0] }}">
-        <i class="bi bi-trash"></i> Borrar
-      </button>
-    </div>
-  </form>
+        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+          data-bs-target="#confirmDeleteModal{{ c[0] }}">
+          <i class="bi bi-trash"></i> Borrar
+        </button>
+      </div>
+    </form>
 
     <!-- Modal confirmación borrar -->
     <div class="modal fade" id="confirmDeleteModal{{ c[0] }}" tabindex="-1"

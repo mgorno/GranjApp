@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     input.addEventListener('input', () => {
         const filtro = input.value.toLowerCase();
-        const clientes = document.querySelectorAll('.cliente-item');
+        const clientes = document.querySelectorAll('.nombre-cliente');
 
         clientes.forEach(cliente => {
             const nombre = cliente.querySelector('div').textContent.toLowerCase();

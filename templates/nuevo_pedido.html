@@ -7,7 +7,10 @@
 {% endblock %}
 
 {% block content %}
-<h1 class="mb-4">Nuevo Pedido</h1>
+<h1 class="mb-4 text-white border-bottom pb-2" style="font-weight: 500;">
+  <i class="bi bi-journal-plus me-2 text-success"></i>Nuevo Pedido
+</h1>
+
 
 <form method="POST" action="{{ url_for('pedidos.nuevo') }}">
 
@@ -81,9 +84,9 @@
 
     <!-- Botón Añadir -->
     <div class="d-flex justify-content-end mt-3">
-      <button type="button" id="btnAddLinea" class="btn btn-sm btn-outline-light"
-        style="font-size: 0.85rem; padding: 0.25rem 0.8rem;">
-        <i class="bi bi-plus-lg me-1"></i> Añadir
+      <button type="button" class="btn btn-sm btn-outline-danger eliminar"
+        style="font-size: 0.85rem; padding: 0.25rem 0.6rem;" title="Eliminar">
+        <i class="bi bi-x-lg"></i>
       </button>
     </div>
   </div>

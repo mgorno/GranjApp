@@ -35,7 +35,7 @@ def nuevo_cliente():
         # VALIDAR SI EL CLIENTE YA EXISTE POR NOMBRE
         with get_conn() as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT 1 FROM clientes WHERE nombre = %s", (nombre,))
+                cur.execute("SELECT 1 FROM clientes WHERE LOWER(nombre) = LOWER(%s)", (nombre,))
                 existe = cur.fetchone()
 
         if existe:

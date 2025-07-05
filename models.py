@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS detalle_pedido (
     cantidad        NUMERIC(10,3) NOT NULL CHECK (cantidad > 0),
     precio          NUMERIC(10,0) NOT NULL,
     unidad          TEXT NOT NULL,
-    cantidad_real   NUMERIC(10,3) NOT NULL CHECK (cantidad > 0) 
+    cantidad_real   NUMERIC(10,3) NOT NULL CHECK (cantidad_real > 0) 
 );
 
 CREATE TABLE IF NOT EXISTS pagos (

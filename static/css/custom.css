@@ -2,13 +2,31 @@ body {
   background-color: #111;
   color: #fff;
   font-family: system-ui, sans-serif;
-  /* Agrego font para consistencia */
+}
+
+/* --- Títulos --- */
+.page-title {
+  font-size: 1.8rem;
+  font-weight: 500;
+  color: #fff;
+  border-bottom: 1px solid #444;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+h2,
+h3,
+h4 {
+  color: #fff;
 }
 
 /* --- Cards --- */
 .card-dark {
   background-color: #1e1e1e;
-  color: white; /* para asegurar legibilidad */
+  color: white;
   border: 1px solid #333;
   border-radius: 12px;
   padding: 20px;
@@ -33,7 +51,7 @@ body {
   border: none;
   color: #888;
   font-size: 1rem;
-  margin-left: 10px; /* mantengo para separación */
+  margin-left: 10px;
 }
 
 .icon-btn:hover {
@@ -56,13 +74,44 @@ body {
   background-color: #16a34a;
 }
 
-.btn-outline-primary {
-  border: 1px solid #3b82f6;
-  color: #3b82f6;
+/* Botón Guardar personalizado */
+.btn-save {
+  font-size: 0.85rem;
+  padding: 0.35rem 1.2rem;
+  border-radius: 10px;
+  font-weight: 500;
 }
 
-.btn-outline-primary:hover {
-  background-color: #3b82f6;
+/* Botón Añadir producto */
+#btnAddLinea {
+  box-shadow: 0 4px 6px rgba(34, 197, 94, 0.4);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  font-weight: 600;
+}
+
+#btnAddLinea:hover {
+  background-color: #16a34a;
+  box-shadow: 0 6px 12px rgba(22, 163, 74, 0.6);
+}
+
+#btnAddLinea:focus {
+  box-shadow: 0 0 0 0.25rem rgba(34, 197, 94, 0.5);
+  outline: none;
+}
+
+/* Botón Eliminar personalizado */
+.btn-outline-danger-custom {
+  border: 1px solid #ef4444;
+  color: #ef4444;
+  font-size: 0.85rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 10px;
+  font-weight: 500;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-outline-danger-custom:hover {
+  background-color: #ef4444;
   color: #fff;
 }
 
@@ -74,7 +123,7 @@ body {
   border: 1px solid #444;
   border-radius: 12px;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  width: 100%; /* importante para que no queden apretados */
+  width: 100%;
 }
 
 .form-control::placeholder {
@@ -86,6 +135,11 @@ body {
   border-color: #3b82f6;
   box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
   outline: none;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
 }
 
 .form-control-sm {
@@ -101,13 +155,6 @@ label {
   margin-top: 12px;
   color: #fff;
   display: block;
-}
-
-/* Títulos */
-h2,
-h3,
-h4 {
-  color: #fff;
 }
 
 /* --- Accordion --- */
@@ -167,18 +214,24 @@ h4 {
   color: #ddd;
 }
 
-/* --- Ajustes específicos para tablas en móviles --- */
+#cliente-fecha-summary {
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+}
 
-/* Esto hace que la tabla pueda scroll horizontal en pantallas pequeñas */
+#cliente-fecha-summary strong {
+  color: #ddd;
+}
+
+/* --- Ajustes específicos para tablas en móviles --- */
 .table-responsive {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 
-/* Opcional: ajustar padding y fuente para tabla en móvil */
 @media (max-width: 576px) {
   body {
-    font-size: 1.1rem; /* un poco más grande para legibilidad */
+    font-size: 1.1rem;
   }
 
   .form-control-sm {
@@ -210,46 +263,21 @@ h4 {
     gap: 1rem !important;
   }
 
-  /* Tabla detalle ajustes */
   #tabla-detalle th,
   #tabla-detalle td {
     padding: 0.3rem 0.5rem;
     font-size: 0.9rem;
-    white-space: nowrap; /* evita quiebre extraño */
+    white-space: nowrap;
   }
 
   #tabla-detalle th:last-child,
   #tabla-detalle td:last-child {
-    width: 40px; /* espacio para botón eliminar */
+    width: 40px;
   }
 
-  /* Inputs y selects en formulario */
   .form-control,
   .form-select {
     font-size: 1rem;
     padding: 8px 12px;
   }
-}
-#btnAddLinea {
-  box-shadow: 0 4px 6px rgba(34, 197, 94, 0.4);
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-  font-weight: 600;
-}
-
-#btnAddLinea:hover {
-  background-color: #16a34a;
-  box-shadow: 0 6px 12px rgba(22, 163, 74, 0.6);
-}
-
-#btnAddLinea:focus {
-  box-shadow: 0 0 0 0.25rem rgba(34, 197, 94, 0.5);
-  outline: none;
-}
-#cliente-fecha-summary {
-  background-color: #2a2a2a;
-  border: 1px solid #444;
-}
-
-#cliente-fecha-summary strong {
-  color: #ddd;
 }

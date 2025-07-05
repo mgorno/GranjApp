@@ -2,17 +2,16 @@
 {% block title %}Clientes{% endblock %}
 
 {% block content %}
-<h1 class="mb-4 text-white border-bottom pb-2" style="font-weight: 500;">
-  <i class="bi bi-people-fill me-2 text-success"></i>Clientes
-</h1>
+<!-- Contenedor título + buscador + botón + -->
+<div class="d-flex align-items-center mb-3 gap-3 flex-wrap">
+  <h1 class="flex-grow-1">Clientes</h1>
+  <div class="flex-grow-1" style="min-width: 250px;">
+    <input type="search" id="buscarCliente" class="form-control form-control-lg" placeholder="Buscar clientes...">
+  </div>
 
-<!-- Buscador + Botón Nuevo -->
-<div class="d-flex mb-4 gap-3 flex-wrap align-items-center">
-  <input type="search" id="buscarCliente" class="form-control bg-dark text-light border-secondary flex-grow-1" placeholder="Buscar clientes...">
-  
   <!-- Botón + que abre offcanvas -->
-  <button class="btn btn-sm btn-outline-success flex-shrink-0" data-bs-toggle="offcanvas" data-bs-target="#offNuevoCliente" style="white-space: nowrap;">
-    <i class="bi bi-plus-lg me-1"></i>Nuevo Cliente
+  <button class="btn btn-primary btn-lg flex-shrink-0" data-bs-toggle="offcanvas" data-bs-target="#offNuevoCliente">
+    <i class="bi bi-plus-lg"></i>
   </button>
 </div>
 
@@ -20,83 +19,118 @@
 <div class="offcanvas offcanvas-end bg-dark text-light" tabindex="-1" id="offNuevoCliente">
   <div class="offcanvas-header border-bottom border-secondary">
     <h5 class="offcanvas-title">
-      <i class="bi bi-person-plus-fill me-2 text-success"></i>Nuevo Cliente
+      <i class="bi bi-person-plus-fill me-2"></i>Nuevo Cliente
     </h5>
     <button class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
   </div>
+
   <form action="{{ url_for('clientes.nuevo_cliente') }}" method="POST" class="offcanvas-body">
     <div class="mb-3">
       <label class="form-label">Nombre</label>
       <input type="text" name="nombre" class="form-control bg-dark text-light border-secondary" required>
     </div>
+
     <div class="mb-3">
       <label class="form-label">Teléfono</label>
       <input type="text" name="telefono" class="form-control bg-dark text-light border-secondary">
     </div>
+
     <div class="mb-3">
       <label class="form-label">Dirección</label>
       <input type="text" name="direccion" class="form-control bg-dark text-light border-secondary">
     </div>
+
     <div class="mb-4">
       <label class="form-label">Email</label>
       <input type="email" name="mail" class="form-control bg-dark text-light border-secondary">
     </div>
+
     <button class="btn btn-success w-100">
       <i class="bi bi-save2 me-1"></i>Guardar Cliente
     </button>
   </form>
 </div>
 
-<!-- Lista clientes -->
-<div class="list-group">
+<!-- Lista de clientes -->
+<div class="list-group clientes-lista">
   {% for c in clientes %}
-  <div class="list-group-item list-group-item-dark d-flex align-items-center rounded mb-2">
-
-    <!-- Botón flecha para abrir/cerrar collapse -->
-    <button class="btn btn-sm btn-toggle-arrow d-flex align-items-center text-white p-0 me-3" 
-      data-bs-toggle="collapse" data-bs-target="#collapse{{ c[0] }}" aria-expanded="false" aria-controls="collapse{{ c[0] }}" style="width: 32px; height: 32px; border: none; background: transparent; transition: transform 0.3s;">
-      <i class="bi bi-chevron-right fs-5"></i>
-    </button>
-
-    <div class="flex-grow-1 fw-semibold">{{ c[1] | title }}</div>
+  <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center bg-dark text-light px-3 py-2 rounded mb-1">
+    <div class="flex-grow-1">
+      <strong class="nombre-cliente">{{ c[1] | title }}</strong>
+    </div>
+    <div class="text-muted small ms-auto me-3">{{ c[5] or '' }}</div> <!-- Fecha a la derecha -->
+    <a href="#collapse{{ c[0] }}" data-bs-toggle="collapse" aria-expanded="false" aria-controls="collapse{{ c[0] }}" class="btn btn-sm btn-outline-primary ms-auto me-2 d-flex align-items-center" title="Mostrar / ocultar detalles">
+      <i class="bi bi-chevron-down"></i>
+    </a>
   </div>
 
-  <div class="collapse mb-3" id="collapse{{ c[0] }}">
-    <form action="{{ url_for('clientes.editar_cliente', id_cliente=c[0]) }}" method="POST" class="bg-dark border border-secondary rounded p-3 text-light">
-
+  <div id="collapse{{ c[0] }}" class="accordion-collapse collapse">
+    <form action="{{ url_for('clientes.editar_cliente', id_cliente=c[0]) }}" method="POST" class="accordion-body bg-dark text-light rounded mt-1 p-3">
+      
+      <!-- Nombre -->
       <div class="mb-3">
-        <label class="form-label">Nombre</label>
-        <input type="text" name="nombre" value="{{ c[1] }}" class="form-control bg-dark text-light border-secondary" readonly required>
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Teléfono</label>
-        <input type="text" name="telefono" value="{{ c[2] or '' }}" class="form-control bg-dark text-light border-secondary" readonly>
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Dirección</label>
-        <input type="text" name="direccion" value="{{ c[3] or '' }}" class="form-control bg-dark text-light border-secondary" readonly>
-      </div>
-      <div class="mb-4">
-        <label class="form-label">Email</label>
-        <input type="email" name="mail" value="{{ c[4] or '' }}" class="form-control bg-dark text-light border-secondary" readonly>
-      </div>
-
-      <div class="d-flex justify-content-between align-items-center">
-        <button type="button" class="btn btn-sm btn-outline-light btn-editar-campos">
-          <i class="bi bi-pencil-fill me-1"></i>Editar
-        </button>
-
-        <div>
-          <button type="submit" class="btn btn-sm btn-success d-none btn-guardar">
-            <i class="bi bi-save2 me-1"></i>Guardar
-          </button>
-          <button type="button" class="btn btn-sm btn-secondary d-none btn-cancelar">
-            Cancelar
-          </button>
-          <button type="button" class="btn btn-sm btn-danger ms-2" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ c[0] }}">
-            <i class="bi bi-trash me-1"></i>Borrar
+        <label class="form-label mb-1 text-secondary">
+          <i class="bi bi-person-fill me-1"></i><strong>Nombre:</strong>
+        </label>
+        <div class="d-flex align-items-center gap-2">
+          <span class="valor-campo flex-grow-1">{{ c[1] }}</span>
+          <input type="text" name="nombre" value="{{ c[1] }}" class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-1 d-none">
+          <button type="button" class="btn btn-outline-light btn-sm btn-editar-campo" title="Editar campo">
+            <i class="bi bi-pencil-fill"></i>
           </button>
         </div>
+      </div>
+
+      <!-- Teléfono -->
+      <div class="mb-3">
+        <label class="form-label mb-1 text-secondary">
+          <i class="bi bi-telephone-fill me-1"></i><strong>Teléfono:</strong>
+        </label>
+        <div class="d-flex align-items-center gap-2">
+          <span class="valor-campo flex-grow-1">{{ c[2] or "Sin teléfono" }}</span>
+          <input type="text" name="telefono" value="{{ c[2] or '' }}" class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-1 d-none">
+          <button type="button" class="btn btn-outline-light btn-sm btn-editar-campo" title="Editar campo">
+            <i class="bi bi-pencil-fill"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Dirección -->
+      <div class="mb-3">
+        <label class="form-label mb-1 text-secondary">
+          <i class="bi bi-geo-alt-fill me-1"></i><strong>Dirección:</strong>
+        </label>
+        <div class="d-flex align-items-center gap-2">
+          <span class="valor-campo flex-grow-1">{{ c[3] or "Sin dirección" }}</span>
+          <input type="text" name="direccion" value="{{ c[3] or '' }}" class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-1 d-none">
+          <button type="button" class="btn btn-outline-light btn-sm btn-editar-campo" title="Editar campo">
+            <i class="bi bi-pencil-fill"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="mb-4">
+        <label class="form-label mb-1 text-secondary">
+          <i class="bi bi-envelope-fill me-1"></i><strong>Email:</strong>
+        </label>
+        <div class="d-flex align-items-center gap-2">
+          <span class="valor-campo flex-grow-1">{{ c[4] or "Sin email" }}</span>
+          <input type="email" name="mail" value="{{ c[4] or '' }}" class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-1 d-none">
+          <button type="button" class="btn btn-outline-light btn-sm btn-editar-campo" title="Editar campo">
+            <i class="bi bi-pencil-fill"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between">
+        <button type="submit" class="btn btn-success btn-sm">
+          <i class="bi bi-save2 me-1"></i>Guardar
+        </button>
+
+        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ c[0] }}">
+          <i class="bi bi-trash"></i> Borrar
+        </button>
       </div>
     </form>
 
@@ -121,61 +155,4 @@
   </div>
   {% endfor %}
 </div>
-
-{% endblock %}
-
-{% block scripts %}
-{{ super() }}
-<script>
-  // Cambiar icono flecha al abrir/cerrar collapse con rotación suave
-  document.querySelectorAll('.btn-toggle-arrow').forEach(button => {
-    const icon = button.querySelector('i');
-    button.addEventListener('click', () => {
-      const collapseId = button.getAttribute('data-bs-target');
-      const collapseEl = document.querySelector(collapseId);
-      const isShown = collapseEl.classList.contains('show');
-
-      // La rotación la hago al botón entero para animación más suave
-      if (isShown) {
-        button.style.transform = 'rotate(0deg)';
-      } else {
-        button.style.transform = 'rotate(90deg)';
-      }
-    });
-  });
-
-  // Inicializar iconos rotados según estado inicial (por si alguno viene abierto)
-  document.querySelectorAll('.btn-toggle-arrow').forEach(button => {
-    const collapseId = button.getAttribute('data-bs-target');
-    const collapseEl = document.querySelector(collapseId);
-    if (collapseEl.classList.contains('show')) {
-      button.style.transform = 'rotate(90deg)';
-    }
-  });
-
-  // Botón para activar edición dentro del formulario
-  document.querySelectorAll('.btn-editar-campos').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const form = btn.closest('form');
-      // habilitar inputs
-      form.querySelectorAll('input').forEach(input => input.removeAttribute('readonly'));
-      // mostrar botones guardar y cancelar, ocultar editar
-      btn.classList.add('d-none');
-      form.querySelector('.btn-guardar').classList.remove('d-none');
-      form.querySelector('.btn-cancelar').classList.remove('d-none');
-    });
-  });
-
-  // Botón cancelar edición
-  document.querySelectorAll('.btn-cancelar').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const form = btn.closest('form');
-      form.reset();
-      form.querySelectorAll('input').forEach(input => input.setAttribute('readonly', ''));
-      form.querySelector('.btn-editar-campos').classList.remove('d-none');
-      form.querySelector('.btn-guardar').classList.add('d-none');
-      form.querySelector('.btn-cancelar').classList.add('d-none');
-    });
-  });
-</script>
 {% endblock %}

@@ -55,9 +55,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const precio  = parseFloat(pInp.value);
     const cant    = parseFloat(cInp.value);
 
-    if (!idProd)              return alert('Elegí un producto.');
-    if (!cant || cant <= 0)   return alert('Cantidad inválida.');
-    if (!precio || precio <= 0) return alert('Precio inválido.');
+    if (!idProd) {
+      alert('Elegí un producto.');
+      return;
+    }
+    if (!cant || cant <= 0) {
+      alert('Cantidad inválida. Debe ser mayor a 0.');
+      return;
+    }
+    if (!precio || precio <= 0) {
+      alert('Precio inválido. Debe ser mayor a 0.');
+      return;
+    }
 
     if ([...tabla.querySelectorAll('input[name="id_producto"]')]
         .some(input => input.value === idProd)) {
@@ -70,8 +79,8 @@ document.addEventListener('DOMContentLoaded', () => {
     fila.querySelector('input[name="id_producto"]').value = idProd;
     fila.querySelector('.nombre').textContent             = desc;
 
-    fila.querySelector('input[name="cantidad"]').value    = cant;
-    fila.querySelector('.cantidad').textContent           = cant;
+    fila.querySelector('input[name="cantidad"]').value    = cant.toFixed(3);
+    fila.querySelector('.cantidad').textContent           = cant.toFixed(3);
 
     fila.querySelector('input[name="unidad"]').value      = unidad;
     fila.querySelector('.unidad-base').textContent        = unidad;

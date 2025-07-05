@@ -50,3 +50,35 @@ def nuevo():
         return redirect(url_for("productos.productos"))
 
     return render_template("producto.html")
+@bp_productos.route("/editar/<id>", methods=["POST"])
+def editar(id):
+    descripcion = request.form.get("descripcion", "").strip()
+    unidad_base = request.form.get("unidad_base", "").strip()
+    precio = request.form.get("precio", "").strip()
+
+    errores = []
+    if not descripcion:
+        errores.append("La descripción es obligatoria.")
+    if not unidad_base:
+        errores.append("La unidad base es obligatoria.")
+    if not precio or not re.fullmatch(r"^\d+(\.\d{1,2})?$", precio):
+        errores.append("El precio debe ser un número válido.")
+
+    if errores:
+        for e in errores:
+            flash(e, "error")
+        return redirect(url_for("productos.productos"))
+
+    with get_conn() as conn, conn.cursor() as cur:
+        cur.execute("""
+            UPDATE productos
+            SET descripcion = %s,
+                unidad_base = %s,
+                precio = %s
+            WHERE id_producto = %s
+        """, (descripcion, unidad_base, float(precio), id))
+        conn.commit()
+
+    flash("Producto actualizado correctamente.", "success")
+    return redirect(url_for("productos.productos"))
+

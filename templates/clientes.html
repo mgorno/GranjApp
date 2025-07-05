@@ -144,12 +144,25 @@
     });
   });
 
-  // Inicializar iconos rotados según estado inicial (por si alguno viene abierto)
   document.querySelectorAll('.btn-toggle-arrow').forEach(button => {
-    const collapseId = button.getAttribute('data-bs-target');
-    const collapseEl = document.querySelector(collapseId);
+    const targetSelector = button.getAttribute('data-bs-target');
+    const collapseEl = document.querySelector(targetSelector);
+
+    // Al abrir
+    collapseEl.addEventListener('shown.bs.collapse', () => {
+      button.style.transform = 'rotate(90deg)';
+    });
+
+    // Al cerrar
+    collapseEl.addEventListener('hidden.bs.collapse', () => {
+      button.style.transform = 'rotate(0deg)';
+    });
+
+    // Seteamos estado inicial al cargar (por si algún collapse viene abierto)
     if (collapseEl.classList.contains('show')) {
       button.style.transform = 'rotate(90deg)';
+    } else {
+      button.style.transform = 'rotate(0deg)';
     }
   });
 

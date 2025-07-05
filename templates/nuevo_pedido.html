@@ -11,7 +11,6 @@
   <i class="bi bi-journal-plus me-2 text-success"></i>Nuevo Pedido
 </h1>
 
-
 <form method="POST" action="{{ url_for('pedidos.nuevo') }}">
 
   <!-- Cliente y Fecha -->
@@ -48,7 +47,6 @@
     </div>
   </div>
 
-
   <!-- Formulario de producto -->
   <div class="p-3 mb-4 bg-dark border rounded border-secondary">
     <div class="row g-2 align-items-end">
@@ -84,13 +82,12 @@
 
     <!-- Botón Añadir -->
     <div class="d-flex justify-content-end mt-3">
-      <button type="button" class="btn btn-sm btn-outline-danger eliminar"
-        style="font-size: 0.85rem; padding: 0.25rem 0.6rem;" title="Eliminar">
-        <i class="bi bi-x-lg"></i>
+      <button type="button" id="btnAddLinea" class="btn btn-sm btn-outline-success"
+        style="font-size: 0.85rem; padding: 0.3rem 0.8rem;">
+        <i class="bi bi-plus-lg me-1"></i>Añadir
       </button>
     </div>
   </div>
-
 
   <!-- Detalle del pedido -->
   <div class="table-responsive">
@@ -116,7 +113,6 @@
     <button type="submit" class="btn btn-sm btn-outline-light" style="font-size: 0.85rem; padding: 0.35rem 1.2rem;">
       <i class="bi bi-save2 me-1"></i>Guardar Pedido
     </button>
-
   </div>
 
   <!-- Fila plantilla -->
@@ -139,7 +135,7 @@
         <span class="precio"></span>
       </td>
       <td class="text-center">
-        <button type="button" class="btn btn-sm btn-outline-light eliminar" title="Eliminar"
+        <button type="button" class="btn btn-sm btn-outline-danger eliminar" title="Eliminar"
           style="font-size: 0.85rem; padding: 0.25rem 0.5rem;">
           <i class="bi bi-x-lg"></i>
         </button>

@@ -4,27 +4,22 @@
 {% block content %}
 <!-- Contenedor título + buscador + botón + -->
 <div class="d-flex align-items-center mb-3 gap-3 flex-wrap">
-  <h1 class="flex-grow-1">Clientes</h1>
+  <h1 class="flex-grow-1 text-white">Clientes</h1>
   <div class="flex-grow-1" style="min-width: 250px;">
-    <input type="search" id="buscarCliente" class="form-control form-control-lg" placeholder="Buscar clientes...">
+    <input type="search" id="buscarCliente" class="form-control form-control-lg bg-dark text-light border-secondary" placeholder="Buscar clientes...">
   </div>
-
 
   <!-- Botón + que abre offcanvas -->
   <button class="btn btn-primary btn-lg flex-shrink-0" data-bs-toggle="offcanvas" data-bs-target="#offNuevoCliente">
     <i class="bi bi-plus-lg"></i>
   </button>
-
-
-
-
 </div>
 
 <!-- OFFCANVAS: Nuevo Cliente -->
 <div class="offcanvas offcanvas-end bg-dark text-light" tabindex="-1" id="offNuevoCliente">
   <div class="offcanvas-header border-bottom border-secondary">
     <h5 class="offcanvas-title">
-      <i class="bi bi-person-plus-fill me-2"></i>Nuevo Cliente
+      <i class="bi bi-person-plus-fill me-2 text-success"></i>Nuevo Cliente
     </h5>
     <button class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
   </div>
@@ -56,10 +51,8 @@
   </form>
 </div>
 
-
 <div class="clientes-lista">
   {% for c in clientes %}
-
   <div class="cliente-item d-flex justify-content-between align-items-center bg-dark text-light px-3 py-2 rounded mb-1">
     <div class="nombre-cliente">{{ c[1] | title }}</div>
     <a href="#collapse{{ c[0] }}" data-bs-toggle="collapse" class="btn btn-sm btn-outline-primary text-secondary">
@@ -68,18 +61,16 @@
   </div>
 
   <div id="collapse{{ c[0] }}" class="accordion-collapse collapse">
-    <form action="{{ url_for('clientes.editar_cliente', id_cliente=c[0]) }}" method="POST"
-      class="accordion-body bg-dark text-light rounded mt-1 p-3">
+    <form action="{{ url_for('clientes.editar_cliente', id_cliente=c[0]) }}" method="POST" class="accordion-body bg-dark text-light rounded mt-1 p-3">
 
       <!-- Nombre -->
       <div class="mb-3">
         <label class="form-label mb-1 text-secondary">
-          <i class="bi bi-person-fill me-1"></i><strong>Nombre:</strong>
+          <i class="bi bi-person-fill me-1 text-info"></i><strong>Nombre:</strong>
         </label>
         <div class="d-flex align-items-center gap-2">
           <span class="valor-campo flex-grow-1">{{ c[1] }}</span>
-          <input type="text" name="nombre" value="{{ c[1] }}"
-            class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-1 d-none">
+          <input type="text" name="nombre" value="{{ c[1] }}" class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-1 d-none">
           <button type="button" class="btn btn-outline-light btn-sm btn-editar-campo">
             <i class="bi bi-pencil-fill"></i>
           </button>
@@ -89,12 +80,11 @@
       <!-- Teléfono -->
       <div class="mb-3">
         <label class="form-label mb-1 text-secondary">
-          <i class="bi bi-telephone-fill me-1"></i><strong>Teléfono:</strong>
+          <i class="bi bi-telephone-fill me-1 text-info"></i><strong>Teléfono:</strong>
         </label>
         <div class="d-flex align-items-center gap-2">
           <span class="valor-campo flex-grow-1">{{ c[2] or "Sin teléfono" }}</span>
-          <input type="text" name="telefono" value="{{ c[2] or '' }}"
-            class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-1 d-none">
+          <input type="text" name="telefono" value="{{ c[2] or '' }}" class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-1 d-none">
           <button type="button" class="btn btn-outline-light btn-sm btn-editar-campo">
             <i class="bi bi-pencil-fill"></i>
           </button>
@@ -104,12 +94,11 @@
       <!-- Dirección -->
       <div class="mb-3">
         <label class="form-label mb-1 text-secondary">
-          <i class="bi bi-geo-alt-fill me-1"></i><strong>Dirección:</strong>
+          <i class="bi bi-geo-alt-fill me-1 text-info"></i><strong>Dirección:</strong>
         </label>
         <div class="d-flex align-items-center gap-2">
           <span class="valor-campo flex-grow-1">{{ c[3] or "Sin dirección" }}</span>
-          <input type="text" name="direccion" value="{{ c[3] or '' }}"
-            class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-1 d-none">
+          <input type="text" name="direccion" value="{{ c[3] or '' }}" class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-1 d-none">
           <button type="button" class="btn btn-outline-light btn-sm btn-editar-campo">
             <i class="bi bi-pencil-fill"></i>
           </button>
@@ -119,40 +108,35 @@
       <!-- Email -->
       <div class="mb-4">
         <label class="form-label mb-1 text-secondary">
-          <i class="bi bi-envelope-fill me-1"></i><strong>Email:</strong>
+          <i class="bi bi-envelope-fill me-1 text-info"></i><strong>Email:</strong>
         </label>
         <div class="d-flex align-items-center gap-2">
           <span class="valor-campo flex-grow-1">{{ c[4] or "Sin email" }}</span>
-          <input type="email" name="mail" value="{{ c[4] or '' }}"
-            class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-1 d-none">
+          <input type="email" name="mail" value="{{ c[4] or '' }}" class="form-control form-control-sm bg-dark text-light border-secondary flex-grow-1 d-none">
           <button type="button" class="btn btn-outline-light btn-sm btn-editar-campo">
             <i class="bi bi-pencil-fill"></i>
           </button>
         </div>
       </div>
 
-
       <div class="d-flex justify-content-between">
         <button type="submit" class="btn btn-success btn-sm">
           <i class="bi bi-save2 me-1"></i>Guardar
         </button>
 
-        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-          data-bs-target="#confirmDeleteModal{{ c[0] }}">
+        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ c[0] }}">
           <i class="bi bi-trash"></i> Borrar
         </button>
       </div>
     </form>
 
     <!-- Modal confirmación borrar -->
-    <div class="modal fade" id="confirmDeleteModal{{ c[0] }}" tabindex="-1"
-      aria-labelledby="confirmDeleteLabel{{ c[0] }}" aria-hidden="true">
+    <div class="modal fade" id="confirmDeleteModal{{ c[0] }}" tabindex="-1" aria-labelledby="confirmDeleteLabel{{ c[0] }}" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content bg-dark text-light">
           <div class="modal-header p-2">
             <h5 class="modal-title fs-6" id="confirmDeleteLabel{{ c[0] }}">Confirmar eliminación</h5>
-            <button type="button" class="btn-close btn-close-white p-1" data-bs-dismiss="modal"
-              aria-label="Cerrar"></button>
+            <button type="button" class="btn-close btn-close-white p-1" data-bs-dismiss="modal" aria-label="Cerrar"></button>
           </div>
           <div class="modal-body p-3">
             ¿Seguro que querés borrar al cliente <strong>{{ c[1] }}</strong>?
@@ -167,5 +151,4 @@
   </div>
   {% endfor %}
 </div>
-
 {% endblock %}

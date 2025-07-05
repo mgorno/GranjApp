@@ -30,30 +30,30 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // --- Manejo productos ---
-  const sel   = document.getElementById('selProducto');
-  const cInp  = document.getElementById('inpCantidad');
+  const sel = document.getElementById('selProducto');
+  const cInp = document.getElementById('inpCantidad');
   const uSpan = document.getElementById('inpUnidad');
-  const pInp  = document.getElementById('inpPrecio');
+  const pInp = document.getElementById('inpPrecio');
   const tabla = document.querySelector('#tabla-detalle tbody');
-  const tpl   = document.getElementById('fila-template').content;
+  const tpl = document.getElementById('fila-template').content;
   const addBt = document.getElementById('btnAddLinea');
-  const tot   = document.getElementById('totalGeneral');
+  const tot = document.getElementById('totalGeneral');
 
   if (!sel || !cInp || !uSpan || !pInp || !tabla || !tpl || !addBt || !tot) return;
 
   sel.addEventListener('change', () => {
     const o = sel.selectedOptions[0];
     uSpan.textContent = o.dataset.unidad || '';
-    pInp.value        = o.dataset.precio || '';
+    pInp.value = o.dataset.precio || '';
   });
 
   addBt.addEventListener('click', () => {
-    const o       = sel.selectedOptions[0];
-    const idProd  = o?.value;
-    const desc    = o?.dataset?.desc;
-    const unidad  = o?.dataset?.unidad;
-    const precio  = parseFloat(pInp.value);
-    const cant    = parseFloat(cInp.value);
+    const o = sel.selectedOptions[0];
+    const idProd = o?.value;
+    const desc = o?.dataset?.desc;
+    const unidad = o?.dataset?.unidad;
+    const precio = parseFloat(pInp.value);
+    const cant = parseFloat(cInp.value);
 
     if (!idProd) {
       alert('Elegí un producto.');
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if ([...tabla.querySelectorAll('input[name="id_producto"]')]
-        .some(input => input.value === idProd)) {
+      .some(input => input.value === idProd)) {
       alert('Ese producto ya está en el detalle.');
       return;
     }
@@ -77,16 +77,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const fila = tpl.cloneNode(true);
 
     fila.querySelector('input[name="id_producto"]').value = idProd;
-    fila.querySelector('.nombre').textContent             = desc;
+    fila.querySelector('.nombre').textContent = desc;
+    fila.querySelector('input[name="cantidad"]').value = Number.isInteger(cant) ? cant : cant.toFixed(3).replace(/\.?0+$/, "");
+    fila.querySelector('.cantidad').textContent = Number.isInteger(cant) ? cant : cant.toFixed(3).replace(/\.?0+$/, "");
+    fila.querySelector('input[name="unidad"]').value = unidad;
+    fila.querySelector('.unidad-base').textContent = unidad;
+    fila.querySelector('input[name="precio"]').value = Math.round(precio);
+    fila.querySelector('.precio').textContent = Math.round(precio);
 
-    fila.querySelector('input[name="cantidad"]').value    = cant.toFixed(3);
-    fila.querySelector('.cantidad').textContent           = cant.toFixed(3);
 
-    fila.querySelector('input[name="unidad"]').value      = unidad;
-    fila.querySelector('.unidad-base').textContent        = unidad;
-
-    fila.querySelector('input[name="precio"]').value      = precio.toFixed(2);
-    fila.querySelector('.precio').textContent             = precio.toFixed(2);
 
     tabla.appendChild(fila);
 
@@ -115,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let suma = 0;
     tabla.querySelectorAll('tr').forEach(tr => {
       const c = parseFloat(tr.querySelector('input[name="cantidad"]').value) || 0;
-      const p = parseFloat(tr.querySelector('input[name="precio"]').value)   || 0;
+      const p = parseFloat(tr.querySelector('input[name="precio"]').value) || 0;
       suma += c * p;
     });
     tot.textContent = suma.toFixed(2);

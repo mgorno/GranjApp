@@ -50,18 +50,15 @@
 <!-- Lista clientes -->
 <div class="list-group">
   {% for c in clientes %}
-  <div class="list-group-item list-group-item-dark d-flex justify-content-between align-items-center rounded mb-2">
+  <div class="list-group-item list-group-item-dark d-flex align-items-center rounded mb-2">
 
+    <!-- Botón flecha para abrir/cerrar collapse -->
     <button class="btn btn-sm btn-toggle-arrow d-flex align-items-center text-white p-0 me-3" 
-      data-bs-toggle="collapse" data-bs-target="#collapse{{ c[0] }}" aria-expanded="false" aria-controls="collapse{{ c[0] }}" style="width: 30px; height: 30px; border: none; background: transparent;">
+      data-bs-toggle="collapse" data-bs-target="#collapse{{ c[0] }}" aria-expanded="false" aria-controls="collapse{{ c[0] }}" style="width: 32px; height: 32px; border: none; background: transparent; transition: transform 0.3s;">
       <i class="bi bi-chevron-right fs-5"></i>
     </button>
 
     <div class="flex-grow-1 fw-semibold">{{ c[1] | title }}</div>
-
-    <button class="btn btn-sm btn-outline-primary btn-toggle-editar flex-shrink-0">
-      Editar
-    </button>
   </div>
 
   <div class="collapse mb-3" id="collapse{{ c[0] }}">
@@ -84,7 +81,7 @@
         <input type="email" name="mail" value="{{ c[4] or '' }}" class="form-control bg-dark text-light border-secondary" readonly>
       </div>
 
-      <div class="d-flex justify-content-between">
+      <div class="d-flex justify-content-between align-items-center">
         <button type="button" class="btn btn-sm btn-outline-light btn-editar-campos">
           <i class="bi bi-pencil-fill me-1"></i>Editar
         </button>
@@ -95,6 +92,9 @@
           </button>
           <button type="button" class="btn btn-sm btn-secondary d-none btn-cancelar">
             Cancelar
+          </button>
+          <button type="button" class="btn btn-sm btn-danger ms-2" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ c[0] }}">
+            <i class="bi bi-trash me-1"></i>Borrar
           </button>
         </div>
       </div>
@@ -127,19 +127,30 @@
 {% block scripts %}
 {{ super() }}
 <script>
-  // Cambiar icono flecha al abrir/cerrar collapse
+  // Cambiar icono flecha al abrir/cerrar collapse con rotación suave
   document.querySelectorAll('.btn-toggle-arrow').forEach(button => {
+    const icon = button.querySelector('i');
     button.addEventListener('click', () => {
-      const icon = button.querySelector('i');
       const collapseId = button.getAttribute('data-bs-target');
       const collapseEl = document.querySelector(collapseId);
+      const isShown = collapseEl.classList.contains('show');
 
-      if (collapseEl.classList.contains('show')) {
-        icon.classList.replace('bi-chevron-down', 'bi-chevron-right');
+      // La rotación la hago al botón entero para animación más suave
+      if (isShown) {
+        button.style.transform = 'rotate(0deg)';
       } else {
-        icon.classList.replace('bi-chevron-right', 'bi-chevron-down');
+        button.style.transform = 'rotate(90deg)';
       }
     });
+  });
+
+  // Inicializar iconos rotados según estado inicial (por si alguno viene abierto)
+  document.querySelectorAll('.btn-toggle-arrow').forEach(button => {
+    const collapseId = button.getAttribute('data-bs-target');
+    const collapseEl = document.querySelector(collapseId);
+    if (collapseEl.classList.contains('show')) {
+      button.style.transform = 'rotate(90deg)';
+    }
   });
 
   // Botón para activar edición dentro del formulario
@@ -164,19 +175,6 @@
       form.querySelector('.btn-editar-campos').classList.remove('d-none');
       form.querySelector('.btn-guardar').classList.add('d-none');
       form.querySelector('.btn-cancelar').classList.add('d-none');
-    });
-  });
-
-  // Botón "Editar" al lado derecho que abre/cierra el collapse
-  document.querySelectorAll('.btn-toggle-editar').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const parent = btn.closest('.list-group-item');
-      const collapseId = parent.querySelector('.btn-toggle-arrow').getAttribute('data-bs-target');
-      const collapseEl = document.querySelector(collapseId);
-
-      // Usar Bootstrap collapse API para toggle
-      const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseEl);
-      bsCollapse.toggle();
     });
   });
 </script>

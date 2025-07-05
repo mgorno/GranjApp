@@ -82,3 +82,10 @@ def editar(id):
     flash("Producto actualizado correctamente.", "success")
     return redirect(url_for("productos.productos"))
 
+@bp_productos.route("/borrar/<id>")
+def borrar(id):
+    with get_conn() as conn, conn.cursor() as cur:
+        cur.execute("DELETE FROM productos WHERE id_producto = %s", (id,))
+        conn.commit()
+    flash("Producto borrado correctamente.", "success")
+    return redirect(url_for("productos.productos"))

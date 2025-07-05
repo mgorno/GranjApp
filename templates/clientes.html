@@ -16,7 +16,7 @@
   </button>
 </div>
 
-<!-- OFFCANVAS: Nuevo Cliente (igual que el tuyo, no modificado) -->
+<!-- OFFCANVAS: Nuevo Cliente -->
 <div class="offcanvas offcanvas-end bg-dark text-light" tabindex="-1" id="offNuevoCliente">
   <div class="offcanvas-header border-bottom border-secondary">
     <h5 class="offcanvas-title">
@@ -51,9 +51,16 @@
 <div class="list-group">
   {% for c in clientes %}
   <div class="list-group-item list-group-item-dark d-flex justify-content-between align-items-center rounded mb-2">
-    <div class="fw-semibold text-white">{{ c[1] | title }}</div>
-    <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ c[0] }}" aria-expanded="false" aria-controls="collapse{{ c[0] }}">
-      <i class="bi bi-chevron-down"></i>
+
+    <button class="btn btn-sm btn-toggle-arrow d-flex align-items-center text-white p-0 me-3" 
+      data-bs-toggle="collapse" data-bs-target="#collapse{{ c[0] }}" aria-expanded="false" aria-controls="collapse{{ c[0] }}" style="width: 30px; height: 30px; border: none; background: transparent;">
+      <i class="bi bi-chevron-right fs-5"></i>
+    </button>
+
+    <div class="flex-grow-1 fw-semibold">{{ c[1] | title }}</div>
+
+    <button class="btn btn-sm btn-outline-primary btn-toggle-editar flex-shrink-0">
+      Editar
     </button>
   </div>
 
@@ -62,28 +69,34 @@
 
       <div class="mb-3">
         <label class="form-label">Nombre</label>
-        <input type="text" name="nombre" value="{{ c[1] }}" class="form-control bg-dark text-light border-secondary" required>
+        <input type="text" name="nombre" value="{{ c[1] }}" class="form-control bg-dark text-light border-secondary" readonly required>
       </div>
       <div class="mb-3">
         <label class="form-label">Teléfono</label>
-        <input type="text" name="telefono" value="{{ c[2] or '' }}" class="form-control bg-dark text-light border-secondary">
+        <input type="text" name="telefono" value="{{ c[2] or '' }}" class="form-control bg-dark text-light border-secondary" readonly>
       </div>
       <div class="mb-3">
         <label class="form-label">Dirección</label>
-        <input type="text" name="direccion" value="{{ c[3] or '' }}" class="form-control bg-dark text-light border-secondary">
+        <input type="text" name="direccion" value="{{ c[3] or '' }}" class="form-control bg-dark text-light border-secondary" readonly>
       </div>
       <div class="mb-4">
         <label class="form-label">Email</label>
-        <input type="email" name="mail" value="{{ c[4] or '' }}" class="form-control bg-dark text-light border-secondary">
+        <input type="email" name="mail" value="{{ c[4] or '' }}" class="form-control bg-dark text-light border-secondary" readonly>
       </div>
 
       <div class="d-flex justify-content-between">
-        <button type="submit" class="btn btn-sm btn-success">
-          <i class="bi bi-save2 me-1"></i>Guardar
+        <button type="button" class="btn btn-sm btn-outline-light btn-editar-campos">
+          <i class="bi bi-pencil-fill me-1"></i>Editar
         </button>
-        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ c[0] }}">
-          <i class="bi bi-trash"></i> Borrar
-        </button>
+
+        <div>
+          <button type="submit" class="btn btn-sm btn-success d-none btn-guardar">
+            <i class="bi bi-save2 me-1"></i>Guardar
+          </button>
+          <button type="button" class="btn btn-sm btn-secondary d-none btn-cancelar">
+            Cancelar
+          </button>
+        </div>
       </div>
     </form>
 
@@ -109,4 +122,62 @@
   {% endfor %}
 </div>
 
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+  // Cambiar icono flecha al abrir/cerrar collapse
+  document.querySelectorAll('.btn-toggle-arrow').forEach(button => {
+    button.addEventListener('click', () => {
+      const icon = button.querySelector('i');
+      const collapseId = button.getAttribute('data-bs-target');
+      const collapseEl = document.querySelector(collapseId);
+
+      if (collapseEl.classList.contains('show')) {
+        icon.classList.replace('bi-chevron-down', 'bi-chevron-right');
+      } else {
+        icon.classList.replace('bi-chevron-right', 'bi-chevron-down');
+      }
+    });
+  });
+
+  // Botón para activar edición dentro del formulario
+  document.querySelectorAll('.btn-editar-campos').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const form = btn.closest('form');
+      // habilitar inputs
+      form.querySelectorAll('input').forEach(input => input.removeAttribute('readonly'));
+      // mostrar botones guardar y cancelar, ocultar editar
+      btn.classList.add('d-none');
+      form.querySelector('.btn-guardar').classList.remove('d-none');
+      form.querySelector('.btn-cancelar').classList.remove('d-none');
+    });
+  });
+
+  // Botón cancelar edición
+  document.querySelectorAll('.btn-cancelar').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const form = btn.closest('form');
+      form.reset();
+      form.querySelectorAll('input').forEach(input => input.setAttribute('readonly', ''));
+      form.querySelector('.btn-editar-campos').classList.remove('d-none');
+      form.querySelector('.btn-guardar').classList.add('d-none');
+      form.querySelector('.btn-cancelar').classList.add('d-none');
+    });
+  });
+
+  // Botón "Editar" al lado derecho que abre/cierra el collapse
+  document.querySelectorAll('.btn-toggle-editar').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const parent = btn.closest('.list-group-item');
+      const collapseId = parent.querySelector('.btn-toggle-arrow').getAttribute('data-bs-target');
+      const collapseEl = document.querySelector(collapseId);
+
+      // Usar Bootstrap collapse API para toggle
+      const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseEl);
+      bsCollapse.toggle();
+    });
+  });
+</script>
 {% endblock %}

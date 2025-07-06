@@ -4,7 +4,10 @@ import uuid
 
 bp_pedidos = Blueprint("pedidos", __name__, url_prefix="/pedidos")
 
-@bp_pedidos.route("/pendientes")
+@bp_pedidos.route("/")
+def index():
+    return redirect(url_for("pedidos.pendientes"))
+
 def pendientes():
     with get_conn() as conn, conn.cursor() as cur:
         cur.execute("""

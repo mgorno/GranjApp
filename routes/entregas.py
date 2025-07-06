@@ -5,6 +5,10 @@ from datetime import datetime
 from io import BytesIO
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
+from collections import defaultdict
+
+
+
 
 bp_entregas = Blueprint("entregas", __name__, url_prefix="/entregas")
 
@@ -50,8 +54,20 @@ def lista_entregas():
             GROUP BY p.id_pedido, c.nombre, p.fecha_entrega
             ORDER BY p.fecha_entrega
         """)
-        entregas = cur.fetchall()
-    return render_template("entregas_pendientes.html", entregas=entregas)
+        rows = cur.fetchall()
+
+    entregas_por_fecha = defaultdict(list)
+    for id_pedido, nombre, fecha_entrega, cantidad_items in rows:
+        fecha_str = fecha_entrega.strftime("%Y-%m-%d")
+        entregas_por_fecha[fecha_str].append({
+            'id_pedido': id_pedido,
+            'cliente': nombre,
+            'fecha_entrega': fecha_entrega,
+            'cantidad_items': cantidad_items
+        })
+
+    return render_template("entregas_pendientes.html", entregas=entregas_por_fecha)
+
 
 
 @bp_entregas.route("/<id_pedido>/remito", methods=['GET', 'POST'])

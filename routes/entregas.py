@@ -1,16 +1,48 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, send_file
 from models import get_conn
-import uuid, io
+import uuid
 from datetime import datetime
-# from utils import generar_pdf_remito  # cuando tengas lista la generación del PDF
+from io import BytesIO
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
 
 bp_entregas = Blueprint("entregas", __name__, url_prefix="/entregas")
+
+def generar_pdf_remito(cliente, direccion, fecha_entrega, detalles, total):
+    buffer = BytesIO()
+    pdf = canvas.Canvas(buffer, pagesize=A4)
+    pdf.setFont("Helvetica", 12)
+    pdf.drawString(50, 800, f"Remito - {datetime.now().strftime('%d/%m/%Y')}")
+    pdf.drawString(50, 780, f"Cliente: {cliente}")
+    pdf.drawString(50, 765, f"Dirección: {direccion}")
+    pdf.drawString(50, 750, f"Fecha Entrega: {fecha_entrega.strftime('%d/%m/%Y')}")
+
+    y = 720
+    pdf.drawString(50, y, "Producto")
+    pdf.drawString(250, y, "Cant.")
+    pdf.drawString(320, y, "Unidad")
+    pdf.drawString(400, y, "Precio")
+
+    for d in detalles:
+        y -= 20
+        pdf.drawString(50, y, d['descripcion'])
+        pdf.drawString(250, y, str(d['cantidad_real']))
+        pdf.drawString(320, y, d['unidad'])
+        pdf.drawString(400, y, f"${d['precio']:.2f}")
+
+    y -= 30
+    pdf.drawString(50, y, f"Total: ${total:.2f}")
+    pdf.showPage()
+    pdf.save()
+    buffer.seek(0)
+    return buffer
+
 
 @bp_entregas.route("/")
 def lista_entregas():
     with get_conn() as conn, conn.cursor() as cur:
         cur.execute("""
-            SELECT p.id_pedido, c.nombre, p.fecha_entrega, COUNT(dp.id_detalle)
+            SELECT p.id_pedido, c.nombre, p.fecha_entrega, COUNT(dp.id_detalle) as cantidad_items
             FROM pedidos p
             JOIN clientes c ON p.id_cliente = c.id_cliente
             JOIN detalle_pedido dp ON dp.id_pedido = p.id_pedido
@@ -19,7 +51,6 @@ def lista_entregas():
             ORDER BY p.fecha_entrega
         """)
         entregas = cur.fetchall()
-
     return render_template("entregas_pendientes.html", entregas=entregas)
 
 
@@ -27,15 +58,15 @@ def lista_entregas():
 def generar_remito(id_pedido):
     if request.method == 'POST':
         cantidades_reales = request.form.getlist("cantidad_real")
-        id_detalles       = request.form.getlist("id_detalle")
+        id_detalles = request.form.getlist("id_detalle")
 
-        if not cantidades_reales or not id_detalles:
+        if not cantidades_reales or not id_detalles or len(cantidades_reales) != len(id_detalles):
             flash("Faltan datos para registrar la entrega.", "error")
             return redirect(url_for("entregas.generar_remito", id_pedido=id_pedido))
 
         with get_conn() as conn:
             with conn.cursor() as cur:
-                # 1. Actualizar cantidades reales
+                # Actualizar cantidades reales
                 for id_det, real in zip(id_detalles, cantidades_reales):
                     cur.execute("""
                         UPDATE detalle_pedido
@@ -43,40 +74,69 @@ def generar_remito(id_pedido):
                         WHERE id_detalle = %s
                     """, (real, id_det))
 
-                # 2. Obtener cliente y total
+                # Obtener datos del pedido y cliente
                 cur.execute("""
-                    SELECT p.id_cliente, SUM(dp.cantidad_real * dp.precio)
+                    SELECT p.id_cliente, c.nombre, c.direccion, p.fecha_entrega
                     FROM pedidos p
-                    JOIN detalle_pedido dp ON dp.id_pedido = p.id_pedido
+                    JOIN clientes c ON p.id_cliente = c.id_cliente
                     WHERE p.id_pedido = %s
-                    GROUP BY p.id_cliente
                 """, (id_pedido,))
-                id_cliente, total = cur.fetchone()
+                pedido_info = cur.fetchone()
+                if not pedido_info:
+                    flash("Pedido no encontrado.", "error")
+                    return redirect(url_for("entregas.lista_entregas"))
 
-                # 3. Insertar en movimientos
+                id_cliente, cliente, direccion, fecha_entrega = pedido_info
+
+                # Obtener detalles con cantidades actualizadas
+                cur.execute("""
+                    SELECT pr.descripcion, dp.cantidad_real, pr.unidad_base, dp.precio
+                    FROM detalle_pedido dp
+                    JOIN productos pr ON dp.id_producto = pr.id_producto
+                    WHERE dp.id_pedido = %s
+                """, (id_pedido,))
+                detalles_raw = cur.fetchall()
+
+                detalles = []
+                total = 0
+                for desc, cant_real, unidad, precio in detalles_raw:
+                    cant_real = float(cant_real or 0)
+                    precio = float(precio or 0)
+                    total += cant_real * precio
+                    detalles.append({
+                        'descripcion': desc,
+                        'cantidad_real': cant_real,
+                        'unidad': unidad,
+                        'precio': precio
+                    })
+
+                # Insertar movimiento en cuenta corriente
                 cur.execute("""
                     INSERT INTO movimientos_cuenta_corriente (id_movimiento, id_cliente, fecha, tipo_mov, importe, forma_pago)
                     VALUES (%s, %s, %s, %s, %s, %s)
                 """, (str(uuid.uuid4()), id_cliente, datetime.now().date(), 'venta', total, 'remito'))
 
-                # 4. Actualizar saldo
+                # Actualizar saldo cliente
                 cur.execute("""
                     INSERT INTO clientes_cuenta_corriente (id_cliente, saldo)
                     VALUES (%s, %s)
                     ON CONFLICT (id_cliente) DO UPDATE SET saldo = clientes_cuenta_corriente.saldo + %s
                 """, (id_cliente, total, total))
 
-                # 5. Cambiar estado del pedido
+                # Cambiar estado pedido a entregado
                 cur.execute("UPDATE pedidos SET estado = 'entregado' WHERE id_pedido = %s", (id_pedido,))
-            conn.commit()
 
-        flash("Remito generado y entrega confirmada.", "success")
-        return redirect(url_for("entregas.lista_entregas"))
+                conn.commit()
 
-    # Si es GET, mostrar form para confirmar cantidades reales
+                # Generar PDF y enviar
+                pdf_buffer = generar_pdf_remito(cliente, direccion, fecha_entrega, detalles, total)
+                return send_file(pdf_buffer, mimetype='application/pdf', as_attachment=True,
+                                 download_name=f"Remito_{cliente}_{id_pedido}.pdf")
+
+    # GET: Mostrar formulario para confirmar cantidades reales
     with get_conn() as conn, conn.cursor() as cur:
         cur.execute("""
-            SELECT dp.id_detalle, pr.descripcion, dp.cantidad, dp.precio, pr.unidad_base
+            SELECT dp.id_detalle, pr.descripcion, dp.cantidad, dp.cantidad_real, pr.unidad_base, dp.precio
             FROM detalle_pedido dp
             JOIN productos pr ON dp.id_producto = pr.id_producto
             WHERE dp.id_pedido = %s

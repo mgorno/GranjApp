@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Entregas Pendientes{% endblock %}
+
+{% block content %}
+<h1 class="mb-4 text-white border-bottom pb-2">
+  <i class="bi bi-truck me-2 text-warning"></i>Entregas Pendientes
+</h1>
+
+{% if entregas %}
+  {% for fecha, pedidos in entregas.items() %}
+    <div class="mb-4">
+      <h5 class="text-light border-bottom pb-1">Entrega: {{ fecha }}</h5>
+      <div class="list-group">
+        {% for p in pedidos %}
+          <a href="{{ url_for('entregas.remito', id_pedido=p.id_pedido) }}" class="list-group-item list-group-item-action bg-dark text-light d-flex justify-content-between align-items-center">
+            <span><strong>{{ p.cliente }}</strong> - {{ p.total|round(2) }} $</span>
+            <span class="badge bg-warning text-dark">Ver remito</span>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <div class="alert alert-info text-center">No hay entregas pendientes.</div>
+{% endif %}
+{% endblock %}

@@ -12,7 +12,7 @@ def get_conn():
 
 
 DDL = """
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";                                -- UUID opcionales
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE IF NOT EXISTS clientes (
     id_cliente   TEXT PRIMARY KEY,
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS detalle_pedido (
     cantidad        NUMERIC(10,3) NOT NULL CHECK (cantidad > 0),
     precio          NUMERIC(10,0) NOT NULL,
     unidad          TEXT NOT NULL,
-    cantidad_real   NUMERIC(10,3) NOT NULL CHECK (cantidad_real > 0) 
+    cantidad_real   NUMERIC(10,3) NOT NULL CHECK (cantidad_real > 0)
 );
 
 CREATE TABLE IF NOT EXISTS pagos (
@@ -55,7 +55,22 @@ CREATE TABLE IF NOT EXISTS pagos (
     medio_pago    TEXT,
     observaciones TEXT
 );
+
+CREATE TABLE IF NOT EXISTS movimientos_cuenta_corriente (
+    id_movimiento TEXT PRIMARY KEY,
+    id_cliente    TEXT REFERENCES clientes(id_cliente),
+    fecha         DATE NOT NULL,
+    tipo_mov      TEXT NOT NULL,
+    importe       NUMERIC(10,0) NOT NULL,
+    forma_pago    TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS clientes_cuenta_corriente (
+    id_cliente TEXT PRIMARY KEY,
+    saldo      NUMERIC(10,2) NOT NULL DEFAULT 0
+);
 """
+
 
 def init_db():
     """

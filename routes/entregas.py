@@ -45,7 +45,7 @@ def remito(id_entrega):
                 # Actualizar cantidades reales por detalle
                 for id_det, real in zip(id_detalles, cantidades_reales):
                     cur.execute(
-                        "UPDATE detalle_pedidoSET cantidad_real = %s WHERE id_detalle = %s",
+                        "UPDATE detalle_pedido SET cantidad_real = %s WHERE id_detalle = %s",
                         (real, id_det)
                     )
 
@@ -67,7 +67,7 @@ def remito(id_entrega):
                            pd.cantidad_real,
                            pr.unidad,
                            pd.precio
-                    FROM detalle_pedidopd
+                    FROM detalle_pedido pd
                     JOIN productos pr ON pd.producto_id = pr.id
                     WHERE pd.pedido_id = %s
                 """, (pedido_id,))
@@ -117,7 +117,7 @@ def remito(id_entrega):
                        pd.cantidad_real,
                        pr.unidad,
                        pd.precio
-                FROM detalle_pedidopd
+                FROM detalle_pedido pd
                 JOIN productos pr ON pd.producto_id = pr.id
                 WHERE pd.pedido_id = %s
             """, (pedido_id,))
@@ -145,7 +145,7 @@ def lista_entregas():
                    COUNT(pd.id_detalle) AS cantidad_items
             FROM pedidos p
             JOIN clientes c     ON p.id_cliente  = c.id_cliente
-            JOIN detalle_pedidopd ON pd.pedido_id = p.id_pedido
+            JOIN detalle_pedido pd ON pd.pedido_id = p.id_pedido
             WHERE p.estado = 'pendiente'
             GROUP BY p.id_pedido, c.nombre, p.fecha_entrega
             ORDER BY p.fecha_entrega

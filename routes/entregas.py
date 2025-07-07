@@ -159,4 +159,5 @@ def generar_remito(id_pedido):
         """, (id_pedido,))
         detalles = cur.fetchall()
 
-    return render_template("remito_confirmar.html", detalles=detalles, id_pedido=id_pedido)
+    return render_template("remito_confirmar.html", detalles=detalles, id_pedido=id_pedido, remito_id=remito.id)
+

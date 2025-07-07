@@ -16,7 +16,7 @@
 {% block content %}
 <h1 class="mb-4">Confirmar Cantidades Reales</h1>
 
-<form action="{{ url_for('remitos.confirmar_cantidades_reales', remito_id=remito_id) }}"
+<form action="{{ url_for('entregas.confirmar_cantidades_reales', remito_id=remito_id) }}"
       method="POST"
       id="form-remito"
       data-saldo-anterior="{{ '%.2f'|format(saldo_anterior) }}">

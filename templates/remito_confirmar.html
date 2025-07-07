@@ -10,6 +10,9 @@
   .table-input {
     max-width: 90px;
   }
+  input[type="number"] {
+    text-align: right;
+  }
 </style>
 {% endblock %}
 
@@ -29,7 +32,7 @@
           <th style="width: 30%">Producto</th>
           <th style="width: 10%" class="text-end">Cant. Pedida</th>
           <th style="width: 10%" class="text-end">Precio</th>
-          <th style="width: 10%" class="text-end">Cantidad Real</th>
+          <th style="width: 10%" class="text-end">Cant. Real</th>
           <th style="width: 10%" class="text-end">Subtotal</th>
           <th style="width: 5%"></th>
         </tr>
@@ -71,27 +74,27 @@
     </table>
   </div>
 
-<!-- Resumen de totales -->
-<div class="row g-3 mb-4">
-  <div class="col-md-4 ms-auto">
-    <div class="card bg-dark text-white border-secondary">
-      <div class="card-body">
-        <p class="d-flex justify-content-between mb-2">
-          <span>Total remito:</span>
-          <strong id="total-remito">0.00</strong>
-        </p>
-        <p class="d-flex justify-content-between mb-2">
-          <span>Saldo anterior:</span>
-          <strong>{{ '%.2f'|format(saldo_anterior) }}</strong>
-        </p>
-        <p class="d-flex justify-content-between mb-2">
-          <span>Saldo total:</span>
-          <strong id="saldo-total">0.00</strong>
-        </p>
+  <!-- Resumen de totales -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-4 ms-auto">
+      <div class="card bg-dark text-white border-secondary">
+        <div class="card-body">
+          <p class="d-flex justify-content-between mb-2">
+            <span>Total remito:</span>
+            <strong id="total-remito">0.00</strong>
+          </p>
+          <p class="d-flex justify-content-between mb-2">
+            <span>Saldo anterior:</span>
+            <strong>{{ '%.2f'|format(saldo_anterior) }}</strong>
+          </p>
+          <p class="d-flex justify-content-between mb-2">
+            <span>Saldo total:</span>
+            <strong id="saldo-total">0.00</strong>
+          </p>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
 
   <!-- Botones -->

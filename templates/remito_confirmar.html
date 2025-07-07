@@ -38,54 +38,29 @@
         {% for item in detalles %}
         <tr>
           <input type="hidden" name="id_detalle" value="{{ item.id_detalle }}">
-          <td>
-            <select name="id_producto" class="form-select bg-dark text-light border-secondary producto-select" required>
-              <option value="" disabled>Seleccione…</option>
-              {% for p in productos %}
-              <option value="{{ p.id_producto }}"
-                data-precio="{{ '%.2f'|format(p.precio) }}"
-                data-unidad="{{ p.unidad_base }}"
-                {{ 'selected' if p.id_producto==item.id_producto }}>
-                {{ p.descripcion }} ({{ p.unidad_base }})
-              </option>
-              {% endfor %}
-            </select>
-          </td>
+          <input type="hidden" name="id_producto" value="{{ item.id_producto }}">
+          <td>{{ item.descripcion }} ({{ item.unidad }})</td>
           <td class="text-end">{{ '%.2f'|format(item.cantidad or 0) }}</td>
           <td class="text-end">
-            <input type="number" step="0.01" name="precio"
-              value="{{ '%.2f'|format(item.precio or 0) }}"
-              class="form-control text-end bg-dark text-light border-secondary table-input precio-input" required>
+            <input type="number" step="0.01" name="precio" value="{{ '%.2f'|format(item.precio or 0) }}"
+              class="form-control text-end table-input precio-input" required>
           </td>
           <td class="text-end">
             <input type="number" step="0.01" name="cantidad_real"
-              value="{{ '%.2f'|format(item.cantidad_real or 0) }}"
-              class="form-control text-end bg-dark text-light border-secondary table-input cantidad-input" required>
+              value="{{ '%.2f'|format(item.cantidad_real if item.cantidad_real is not none else item.cantidad) }}"
+              class="form-control text-end table-input cantidad-input" required>
           </td>
           <td class="text-end subtotal-cell">
-            {{ '%.2f'|format((item.precio or 0) * (item.cantidad_real or 0)) }}
+            {{ '%.2f'|format((item.precio or 0) * (item.cantidad_real if item.cantidad_real is not none else
+            item.cantidad or 0)) }}
           </td>
           <td class="text-center">
-            {% if item.id_detalle|string == "0" %}
-            <button type="button" class="btn btn-outline-danger btn-sm eliminar-fila">
-              <i class="bi bi-trash"></i>
-            </button>
-            {% else %}
             <i class="bi bi-lock-fill text-secondary" title="No se puede eliminar"></i>
-            {% endif %}
           </td>
         </tr>
         {% endfor %}
       </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="6" class="text-center">
-            <button type="button" class="btn btn-outline-success btn-sm" id="agregar-fila">
-              <i class="bi bi-plus-circle me-1"></i>Agregar producto
-            </button>
-          </td>
-        </tr>
-      </tfoot>
+
     </table>
   </div>
 

@@ -4,21 +4,7 @@ import uuid
 
 bp_pedidos = Blueprint("pedidos", __name__, url_prefix="/pedidos")
 
-@bp_pedidos.route("/")
-def index():
-    return redirect(url_for("pedidos.pendientes"))
 
-def pendientes():
-    with get_conn() as conn, conn.cursor() as cur:
-        cur.execute("""
-            SELECT p.id_pedido, c.nombre, p.fecha_pedido 
-            FROM pedidos p 
-            JOIN clientes c ON c.id_cliente = p.id_cliente 
-            WHERE p.estado = 'pendiente' 
-            ORDER BY p.fecha_pedido DESC
-        """)
-        pedidos = cur.fetchall()
-    return render_template("pendientes.html", pedidos=pedidos)
 
 @bp_pedidos.route("/nuevo", methods=["GET", "POST"])
 def nuevo():
@@ -61,7 +47,7 @@ def nuevo():
 
             conn.commit()
             flash("Pedido creado correctamente.", "success")
-            return redirect(url_for("pedidos.pendientes"))
+            return redirect(url_for("pedidos.nuevo"))
 
         # Si es GET
         with get_conn() as conn, conn.cursor() as cur:
@@ -75,16 +61,6 @@ def obtener_clientes_productos(cur):
     productos = cur.fetchall()
     return clientes, productos
     
-
-@bp_pedidos.route("/marcar_entregado/<id_pedido>")
-def marcar_entregado(id_pedido):
-    with get_conn() as conn, conn.cursor() as cur:
-        cur.execute("""
-            UPDATE pedidos SET estado = 'entregado' WHERE id_pedido = %s
-        """, (id_pedido,))
-        conn.commit()
-    flash("Pedido marcado como entregado.", "success")
-    return redirect(url_for('pedidos.pendientes'))
 
 @bp_pedidos.route("/eliminar/<id_pedido>", methods=["POST", "GET"])
 def eliminar(id_pedido):
@@ -101,4 +77,4 @@ def eliminar(id_pedido):
         conn.commit()
 
     flash("Pedido eliminado correctamente.", "success")
-    return redirect(url_for("pedidos.pendientes"))
+    return redirect(url_for("pedidos.nuevo"))

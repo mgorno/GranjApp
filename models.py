@@ -62,12 +62,12 @@ CREATE TABLE IF NOT EXISTS movimientos_cuenta_corriente (
     fecha         DATE NOT NULL,
     tipo_mov      TEXT NOT NULL,
     importe       NUMERIC(10,0) NOT NULL,
-    forma_pago    TEXT NOT NULL
+    forma_pago    TEXT
 );
 
 CREATE TABLE IF NOT EXISTS clientes_cuenta_corriente (
     id_cliente TEXT PRIMARY KEY,
-    saldo      NUMERIC(10,2) NOT NULL DEFAULT 0
+    saldo      NUMERIC(10,0) NOT NULL DEFAULT 0
 );
 """
 

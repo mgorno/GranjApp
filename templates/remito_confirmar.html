@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Confirmar Cantidades Reales{% endblock %}
+{% block title %}Confirmar Cantidades{% endblock %}
 
 {% block head_extra %}
 {{ super() }}
@@ -71,27 +71,28 @@
     </table>
   </div>
 
-  <!-- Resumen de totales -->
-  <div class="row g-3 mb-4">
-    <div class="col-md-4 ms-auto">
-      <div class="card bg-dark text-white border-secondary">
-        <div class="card-body">
-          <p class="d-flex justify-content-between mb-2">
-            <span>Total remito:</span>
-            <strong id="total-remito">0.00</strong>
-          </p>
-          <p class="d-flex justify-content-between mb-2">
-            <span>Saldo anterior:</span>
-            <strong>{{ '%.2f'|format(saldo_anterior) }}</strong>
-          </p>
-          <p class="d-flex justify-content-between fs-5">
-            <span>Saldo total:</span>
-            <strong id="saldo-total">0.00</strong>
-          </p>
-        </div>
+<!-- Resumen de totales -->
+<div class="row g-3 mb-4">
+  <div class="col-md-4 ms-auto">
+    <div class="card bg-dark text-white border-secondary">
+      <div class="card-body">
+        <p class="d-flex justify-content-between mb-2">
+          <span>Total remito:</span>
+          <strong id="total-remito">0.00</strong>
+        </p>
+        <p class="d-flex justify-content-between mb-2">
+          <span>Saldo anterior:</span>
+          <strong>{{ '%.2f'|format(saldo_anterior) }}</strong>
+        </p>
+        <p class="d-flex justify-content-between mb-2">
+          <span>Saldo total:</span>
+          <strong id="saldo-total">0.00</strong>
+        </p>
       </div>
     </div>
   </div>
+</div>
+
 
   <!-- Botones -->
   <div class="d-flex gap-2">

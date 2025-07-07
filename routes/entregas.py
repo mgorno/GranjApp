@@ -41,6 +41,7 @@ def lista_entregas():
         })
 
     return render_template("entregas_pendientes.html", entregas=entregas_por_fecha)
+
 def obtener_productos():
     with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
         cur.execute("SELECT id_producto, descripcion, unidad_base, precio FROM productos ORDER BY descripcion")
@@ -66,8 +67,17 @@ def remito(id_pedido):
                 flash("Faltan datos para registrar la entrega.", "error")
                 return redirect(url_for("entregas.remito", id_pedido=id_pedido))
 
-            # Actualizar detalles
-            for id_det, real, precio, id_prod in zip(id_detalles, cantidades_reales, precios, id_productos):
+            # Actualizar detalles: parsear a float cantidades y precios para evitar errores
+            for id_det, real_str, precio_str, id_prod in zip(id_detalles, cantidades_reales, precios, id_productos):
+                try:
+                    real = float(real_str.replace(',', '.'))  # aceptar coma decimal si llega
+                except Exception:
+                    real = 0
+                try:
+                    precio = float(precio_str.replace(',', '.'))
+                except Exception:
+                    precio = 0
+
                 cur.execute("""
                     UPDATE detalle_pedido
                     SET cantidad_real = %s,
@@ -91,6 +101,7 @@ def remito(id_pedido):
             # Obtener detalles actualizados
             cur.execute("""
                 SELECT pr.descripcion,
+                       pd.cantidad,
                        pd.cantidad_real,
                        pd.unidad,
                        pd.precio,
@@ -104,7 +115,12 @@ def remito(id_pedido):
             total = 0
             detalles = []
             for row in detalles_raw:
-                cant_real = float(row["cantidad_real"] or 0)
+                # Si cantidad_real es None, usar cantidad original
+                cant_real = row["cantidad_real"]
+                if cant_real is None:
+                    cant_real = row["cantidad"]
+                # parsear a float para evitar errores en plantilla
+                cant_real = float(cant_real)
                 precio = float(row["precio"] or 0)
                 total += cant_real * precio
                 detalles.append({**row, "cantidad_real": cant_real, "precio": precio})
@@ -147,7 +163,16 @@ def remito(id_pedido):
             JOIN productos pr ON pd.id_producto = pr.id_producto
             WHERE pd.id_pedido = %s
         """, (id_pedido,))
-        detalles = cur.fetchall()
+        detalles_raw = cur.fetchall()
+
+        detalles = []
+        for row in detalles_raw:
+            cant_real = row["cantidad_real"]
+            if cant_real is None:
+                cant_real = row["cantidad"]  # aseguramos que no sea None
+            cant_real = float(cant_real)
+            precio = float(row["precio"] or 0)
+            detalles.append({**row, "cantidad_real": cant_real, "precio": precio})
 
         cur.execute("SELECT id_cliente FROM pedidos WHERE id_pedido = %s", (id_pedido,))
         row = cur.fetchone()
@@ -162,7 +187,7 @@ def remito(id_pedido):
     return render_template(
         "remito_confirmar.html",
         detalles=detalles,
-        productos=obtener_productos(),  # Debes definir esta función para traer productos para el select
+        productos=obtener_productos(),
         id_pedido=id_pedido,
         saldo_anterior=saldo_anterior
     )

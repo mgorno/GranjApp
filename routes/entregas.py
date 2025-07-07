@@ -10,36 +10,34 @@ from collections import defaultdict
 
 
 
-bp_entregas = Blueprint("entregas", __name__, url_prefix="/entregas")
+@bp_entregas.get("/<uuid:id_entrega>/remito")
+def generar_remito(id_entrega):
+    with psycopg2.connect(DATABASE_URL) as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            # Buscar la entrega por ID
+            cur.execute("SELECT * FROM entregas WHERE id = %s", (str(id_entrega),))
+            entrega = cur.fetchone()
 
-def generar_pdf_remito(cliente, direccion, fecha_entrega, detalles, total):
-    buffer = BytesIO()
-    pdf = canvas.Canvas(buffer, pagesize=A4)
-    pdf.setFont("Helvetica", 12)
-    pdf.drawString(50, 800, f"Remito - {datetime.now().strftime('%d/%m/%Y')}")
-    pdf.drawString(50, 780, f"Cliente: {cliente}")
-    pdf.drawString(50, 765, f"Dirección: {direccion}")
-    pdf.drawString(50, 750, f"Fecha Entrega: {fecha_entrega.strftime('%d/%m/%Y')}")
+            if not entrega:
+                abort(404, description="Entrega no encontrada")
 
-    y = 720
-    pdf.drawString(50, y, "Producto")
-    pdf.drawString(250, y, "Cant.")
-    pdf.drawString(320, y, "Unidad")
-    pdf.drawString(400, y, "Precio")
+            # Buscar los detalles del pedido relacionado
+            cur.execute("""
+                SELECT p.id AS producto_id, p.nombre AS descripcion,
+                       pd.cantidad AS cantidad_real,
+                       p.unidad, p.precio
+                FROM pedido_detalle pd
+                JOIN productos p ON pd.producto_id = p.id
+                WHERE pd.pedido_id = %s
+            """, (entrega["pedido_id"],))
+            detalles = cur.fetchall()
 
-    for d in detalles:
-        y -= 20
-        pdf.drawString(50, y, d['descripcion'])
-        pdf.drawString(250, y, str(d['cantidad_real']))
-        pdf.drawString(320, y, d['unidad'])
-        pdf.drawString(400, y, f"${d['precio']:.2f}")
+    # Renderizar el HTML con los datos
+    return render_template("remito_confirmar.html",
+                           detalles=detalles,
+                           id_pedido=entrega["pedido_id"],
+                           remito_id=id_entrega)
 
-    y -= 30
-    pdf.drawString(50, y, f"Total: ${total:.2f}")
-    pdf.showPage()
-    pdf.save()
-    buffer.seek(0)
-    return buffer
 
 
 @bp_entregas.route("/")

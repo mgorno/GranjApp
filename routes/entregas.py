@@ -1,7 +1,7 @@
 # routes/entregas.py
 from flask import (
     Blueprint, render_template, request, redirect,
-    url_for, flash, send_file, abort, current_app
+    url_for, flash, send_file, abort
 )
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -9,13 +9,11 @@ from datetime import datetime
 from io import BytesIO
 import uuid
 from collections import defaultdict
-from models import get_conn           # tu helper de conexión
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 
 # ─────────────────────────────────────────────────────────
 bp_entregas = Blueprint("entregas", __name__, url_prefix="/entregas")
-DATABASE_URL = current_app.config["DATABASE_URL"]
 # ─────────────────────────────────────────────────────────
 
 

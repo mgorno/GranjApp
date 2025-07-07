@@ -281,3 +281,6 @@ label {
     padding: 8px 12px;
   }
 }
+input.precio-input, input.cantidad-input {
+  text-align: right;
+}

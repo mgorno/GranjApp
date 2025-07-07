@@ -14,13 +14,17 @@
 {% endblock %}
 
 {% block content %}
-<h1 class="mb-4">Confirmar Cantidades Reales</h1>
+<h1 class="mb-4 text-white border-bottom pb-2" style="font-weight: 500;">
+  <i class="bi bi-clipboard-check me-2 text-warning"></i>Confirmar Cantidades Reales
+</h1>
 
 <form action="{{ url_for('entregas.remito', id_pedido=id_pedido) }}" method="POST" id="form-remito"
   data-saldo-anterior="{{ '%.2f'|format(saldo_anterior) }}">
-  <div class="table-responsive mb-3">
-    <table class="table align-middle" id="tabla-remito">
-      <thead class="table-light">
+
+  <!-- Tabla de productos -->
+  <div class="table-responsive mb-4">
+    <table class="table table-dark table-bordered align-middle" id="tabla-remito">
+      <thead class="table-secondary text-dark">
         <tr>
           <th style="width: 30%">Producto</th>
           <th style="width: 10%" class="text-end">Cant. Pedida</th>
@@ -35,11 +39,13 @@
         <tr>
           <input type="hidden" name="id_detalle" value="{{ item.id_detalle }}">
           <td>
-            <select name="id_producto" class="form-select producto-select" required>
+            <select name="id_producto" class="form-select bg-dark text-light border-secondary producto-select" required>
               <option value="" disabled>Seleccione…</option>
               {% for p in productos %}
-              <option value="{{ p.id_producto }}" data-precio="{{ '%.2f'|format(p.precio) }}"
-                data-unidad="{{ p.unidad_base }}" {{ 'selected' if p.id_producto==item.id_producto }}>
+              <option value="{{ p.id_producto }}"
+                data-precio="{{ '%.2f'|format(p.precio) }}"
+                data-unidad="{{ p.unidad_base }}"
+                {{ 'selected' if p.id_producto==item.id_producto }}>
                 {{ p.descripcion }} ({{ p.unidad_base }})
               </option>
               {% endfor %}
@@ -47,12 +53,14 @@
           </td>
           <td class="text-end">{{ '%.2f'|format(item.cantidad or 0) }}</td>
           <td class="text-end">
-            <input type="number" step="0.01" name="precio" value="{{ '%.2f'|format(item.precio or 0) }}"
-              class="form-control text-end table-input precio-input" required>
+            <input type="number" step="0.01" name="precio"
+              value="{{ '%.2f'|format(item.precio or 0) }}"
+              class="form-control text-end bg-dark text-light border-secondary table-input precio-input" required>
           </td>
           <td class="text-end">
-            <input type="number" step="0.01" name="cantidad_real" value="{{ '%.2f'|format(item.cantidad_real or 0) }}"
-              class="form-control text-end table-input cantidad-input" required>
+            <input type="number" step="0.01" name="cantidad_real"
+              value="{{ '%.2f'|format(item.cantidad_real or 0) }}"
+              class="form-control text-end bg-dark text-light border-secondary table-input cantidad-input" required>
           </td>
           <td class="text-end subtotal-cell">
             {{ '%.2f'|format((item.precio or 0) * (item.cantidad_real or 0)) }}
@@ -69,12 +77,11 @@
         </tr>
         {% endfor %}
       </tbody>
-
       <tfoot>
         <tr>
-          <td colspan="5" class="text-center">
-            <button type="button" class="btn btn-primary" id="agregar-fila">
-              <i class="bi bi-plus-circle"></i> Agregar producto
+          <td colspan="6" class="text-center">
+            <button type="button" class="btn btn-outline-success btn-sm" id="agregar-fila">
+              <i class="bi bi-plus-circle me-1"></i>Agregar producto
             </button>
           </td>
         </tr>
@@ -82,27 +89,36 @@
     </table>
   </div>
 
+  <!-- Resumen de totales -->
   <div class="row g-3 mb-4">
     <div class="col-md-4 ms-auto">
-      <div class="card shadow-sm">
+      <div class="card bg-dark text-white border-secondary">
         <div class="card-body">
           <p class="d-flex justify-content-between mb-2">
-            <span>Total remito:</span> <strong id="total-remito">0.00</strong>
+            <span>Total remito:</span>
+            <strong id="total-remito">0.00</strong>
           </p>
           <p class="d-flex justify-content-between mb-2">
-            <span>Saldo anterior:</span> <strong>{{ '%.2f'|format(saldo_anterior) }}</strong>
+            <span>Saldo anterior:</span>
+            <strong>{{ '%.2f'|format(saldo_anterior) }}</strong>
           </p>
           <p class="d-flex justify-content-between fs-5">
-            <span>Saldo total:</span> <strong id="saldo-total">0.00</strong>
+            <span>Saldo total:</span>
+            <strong id="saldo-total">0.00</strong>
           </p>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Botones -->
   <div class="d-flex gap-2">
-    <a href="{{ url_for('entregas.lista_entregas') }}" class="btn btn-secondary">Cancelar</a>
-    <button type="submit" class="btn btn-success">Confirmar</button>
+    <a href="{{ url_for('entregas.lista_entregas') }}" class="btn btn-secondary">
+      <i class="bi bi-arrow-left me-1"></i>Cancelar
+    </a>
+    <button type="submit" class="btn btn-success">
+      <i class="bi bi-check2-circle me-1"></i>Confirmar
+    </button>
   </div>
 </form>
 {% endblock %}

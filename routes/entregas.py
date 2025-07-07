@@ -117,12 +117,22 @@ def remito(id_pedido):
                 WHERE pd.id_pedido = %s
             """, (str(id_pedido),))
             detalles = cur.fetchall()
+    cur.execute("SELECT id_cliente FROM pedidos WHERE id_pedido = %s", (str(id_pedido),))
+    row = cur.fetchone()
+    id_cliente = row["id_cliente"] if row else None
 
+    if id_cliente:
+        cur.execute("SELECT saldo FROM clientes_cuenta_corriente WHERE id_cliente = %s", (id_cliente,))
+        row_saldo = cur.fetchone()
+        saldo_anterior = row_saldo["saldo"] if row_saldo else 0
+    else:
+        saldo_anterior = 0
     return render_template(
         "remito_confirmar.html",
         detalles=detalles,
         id_pedido=id_pedido,
-        remito_id=id_pedido
+        remito_id=id_pedido,
+        saldo_anterior=saldo_anterior
     )
 
 

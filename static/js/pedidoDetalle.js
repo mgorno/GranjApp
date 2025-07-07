@@ -133,6 +133,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const p = parseFloat(tr.querySelector('input[name="precio"]').value) || 0;
       suma += c * p;
     });
-    tot.textContent = `$ ${Math.round(suma).toLocaleString("es-AR")}`;
+    tot.textContent = Math.round(suma).toLocaleString("es-AR");
   }
 });

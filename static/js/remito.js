@@ -1,13 +1,12 @@
-// static/js/confirmar_remito.js
-// Maneja la lógica de la pantalla "Confirmar Cantidades Reales"
 (() => {
   const tabla = document.getElementById("tabla-remito");
   if (!tabla) return; // por si el script se carga en otra vista
 
+  const form = document.getElementById("form-remito");
   const tbody = tabla.querySelector("tbody");
   const totalRemitoEl = document.getElementById("total-remito");
-  const saldoAnterior = parseFloat(window.SALDO_ANTERIOR || 0);
   const saldoTotalEl = document.getElementById("saldo-total");
+  const saldoAnterior = parseFloat(form?.dataset?.saldoAnterior || window.SALDO_ANTERIOR || 0);
 
   // ---- Helpers ----
   const actualizarSubtotalFila = (fila) => {
@@ -28,7 +27,6 @@
 
   const crearFilaVacia = () => {
     const tr = document.createElement("tr");
-    // Utilizo las opciones del primer select existente para asegurar coherencia
     const opciones = document.querySelector(".producto-select")?.innerHTML || "";
 
     tr.innerHTML = `
@@ -49,11 +47,8 @@
       </td>
     `;
 
-    // Dejo el select sin opción elegida
     const select = tr.querySelector(".producto-select");
-    if (select) {
-      select.value = "";
-    }
+    if (select) select.value = "";
     return tr;
   };
 

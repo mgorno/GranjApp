@@ -4,6 +4,7 @@
 
 {% block head_extra %}
 {{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/confirmar_remito.css') }}">
 <script src="{{ url_for('static', filename='js/remito.js') }}" defer></script>
 <style>
   .table-input {
@@ -15,7 +16,10 @@
 {% block content %}
 <h1 class="mb-4">Confirmar Cantidades Reales</h1>
 
-<form action="{{ url_for('remitos.confirmar_cantidades_reales', remito_id=remito_id) }}" method="POST" id="form-remito">
+<form action="{{ url_for('remitos.confirmar_cantidades_reales', remito_id=remito_id) }}"
+      method="POST"
+      id="form-remito"
+      data-saldo-anterior="{{ '%.2f'|format(saldo_anterior) }}">
   <div class="table-responsive mb-3">
     <table class="table align-middle" id="tabla-remito">
       <thead class="table-light">
@@ -28,7 +32,6 @@
         </tr>
       </thead>
       <tbody>
-        {#‑‑ FILAS EXISTENTES DEL REMITO ‑‑#}
         {% for item in items %}
         <tr>
           <td>
@@ -81,8 +84,8 @@
     <button type="submit" class="btn btn-success">Confirmar</button>
   </div>
 </form>
-
 {% endblock %}
 
 {% block scripts %}
 {{ super() }}
+{% endblock %}

@@ -13,7 +13,6 @@ from reportlab.pdfgen import canvas
 
 bp_entregas = Blueprint("entregas", __name__, url_prefix="/entregas")
 
-
 @bp_entregas.route("/<uuid:id_pedido>/remito", methods=["GET", "POST"])
 def remito(id_pedido):
     """

@@ -42,8 +42,11 @@
           <td>{{ item.descripcion }} ({{ item.unidad }})</td>
 
           <td class="text-end">
-            {{ item.cantidad|int if item.cantidad == item.cantidad|int else '%.3f'|format(item.cantidad).replace('.',
-            ',') }}
+            {% if item.cantidad == item.cantidad|int %}
+            {{ item.cantidad|int }}
+            {% else %}
+            {{ '%.3f'|format(item.cantidad).replace('.', ',') }}
+            {% endif %}
           </td>
 
           <td class="text-end">

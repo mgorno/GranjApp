@@ -34,13 +34,16 @@
       <tbody>
         {% for item in detalles %}
         <tr>
+          <!-- Importante: campo oculto con id_detalle -->
+          <input type="hidden" name="id_detalle" value="{{ item.id_detalle }}">
+
           <td>
             <select name="id_producto" class="form-select producto-select" required>
               <option value="" disabled>Seleccione…</option>
               {% for p in productos %}
-              <option value="{{ p.id }}" data-precio="{{ '%.2f'|format(p.precio) }}" data-unidad="{{ p.unidad }}"
-                {{ 'selected' if p.id == item.id_producto }}>
-                {{ p.descripcion }} ({{ p.unidad }})
+              <option value="{{ p.id_producto }}" data-precio="{{ '%.2f'|format(p.precio) }}" data-unidad="{{ p.unidad_base }}"
+                {{ 'selected' if p.id_producto == item.id_producto }}>
+                {{ p.descripcion }} ({{ p.unidad_base }})
               </option>
               {% endfor %}
             </select>
@@ -101,8 +104,4 @@
     <button type="submit" class="btn btn-success">Confirmar</button>
   </div>
 </form>
-{% endblock %}
-
-{% block scripts %}
-{{ super() }}
 {% endblock %}

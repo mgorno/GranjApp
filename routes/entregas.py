@@ -15,10 +15,6 @@ bp_entregas = Blueprint("entregas", __name__, url_prefix="/entregas")
 
 @bp_entregas.route("/<uuid:id_pedido>/remito", methods=["GET", "POST"])
 def remito(id_pedido):
-    """
-    GET  → muestra el formulario para confirmar cantidades reales
-    POST → actualiza cantidades, impacta en cuentas y genera el PDF
-    """
     with get_conn() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             # Traer pedido y cliente asociado
@@ -27,7 +23,6 @@ def remito(id_pedido):
             if not pedido:
                 abort(404, "Pedido no encontrado")
 
-            # POST: procesar formulario y generar PDF
             if request.method == "POST":
                 cantidades_reales = request.form.getlist("cantidad_real")
                 id_detalles       = request.form.getlist("id_detalle")
@@ -36,26 +31,23 @@ def remito(id_pedido):
                     flash("Faltan datos para registrar la entrega.", "error")
                     return redirect(url_for("entregas.remito", id_pedido=id_pedido))
 
-                # Actualizar cantidades reales
                 for id_det, real in zip(id_detalles, cantidades_reales):
                     cur.execute(
                         "UPDATE detalle_pedido SET cantidad_real = %s WHERE id_detalle = %s",
                         (real, id_det)
                     )
 
-                # Datos cliente y pedido
                 cur.execute("""
                     SELECT c.id_cliente, c.nombre, c.direccion, p.fecha_entrega
                     FROM pedidos p
                     JOIN clientes c ON p.id_cliente = c.id_cliente
                     WHERE p.id_pedido = %s
-                """, (id_pedido,))
+                """, (str(id_pedido),))
                 cli = cur.fetchone()
                 if not cli:
                     flash("Cliente no encontrado.", "error")
                     return redirect(url_for("entregas.lista_entregas"))
 
-                # Detalles actualizados
                 cur.execute("""
                     SELECT pr.descripcion AS descripcion,
                            pd.cantidad_real,
@@ -76,7 +68,6 @@ def remito(id_pedido):
                     total    += cant_real * precio
                     detalles.append({**row, "cantidad_real": cant_real, "precio": precio})
 
-                # Insertar movimiento y actualizar saldo
                 mov_id = str(uuid.uuid4())
                 cur.execute("""
                     INSERT INTO movimientos_cuenta_corriente
@@ -91,12 +82,10 @@ def remito(id_pedido):
                     DO UPDATE SET saldo = clientes_cuenta_corriente.saldo + EXCLUDED.saldo
                 """, (cli["id_cliente"], total))
 
-                # Actualizar estado pedido a entregado
-                cur.execute("UPDATE pedidos SET estado = 'entregado' WHERE id_pedido = %s", (id_pedido,))
+                cur.execute("UPDATE pedidos SET estado = 'entregado' WHERE id_pedido = %s", (str(id_pedido),))
 
                 conn.commit()
 
-                # Generar PDF
                 pdf_buffer = generar_pdf_remito(
                     cli["nombre"], cli["direccion"], cli["fecha_entrega"], detalles, total
                 )
@@ -104,7 +93,8 @@ def remito(id_pedido):
                 return send_file(pdf_buffer, mimetype="application/pdf",
                                  as_attachment=True, download_name=filename)
 
-            # GET: mostrar formulario con cantidades actuales
+            # --- Aquí termina el POST y empieza el GET ---
+
             cur.execute("""
                 SELECT pd.id_detalle,
                        pr.descripcion AS descripcion,
@@ -117,16 +107,18 @@ def remito(id_pedido):
                 WHERE pd.id_pedido = %s
             """, (str(id_pedido),))
             detalles = cur.fetchall()
-    cur.execute("SELECT id_cliente FROM pedidos WHERE id_pedido = %s", (str(id_pedido),))
-    row = cur.fetchone()
-    id_cliente = row["id_cliente"] if row else None
 
-    if id_cliente:
-        cur.execute("SELECT saldo FROM clientes_cuenta_corriente WHERE id_cliente = %s", (id_cliente,))
-        row_saldo = cur.fetchone()
-        saldo_anterior = row_saldo["saldo"] if row_saldo else 0
-    else:
-        saldo_anterior = 0
+            cur.execute("SELECT id_cliente FROM pedidos WHERE id_pedido = %s", (str(id_pedido),))
+            row = cur.fetchone()
+            id_cliente = row["id_cliente"] if row else None
+
+            if id_cliente:
+                cur.execute("SELECT saldo FROM clientes_cuenta_corriente WHERE id_cliente = %s", (id_cliente,))
+                row_saldo = cur.fetchone()
+                saldo_anterior = row_saldo["saldo"] if row_saldo else 0
+            else:
+                saldo_anterior = 0
+
     return render_template(
         "remito_confirmar.html",
         detalles=detalles,
@@ -134,6 +126,7 @@ def remito(id_pedido):
         remito_id=id_pedido,
         saldo_anterior=saldo_anterior
     )
+
 
 
 @bp_entregas.route("/")

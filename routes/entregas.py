@@ -2,7 +2,7 @@ from flask import (
     Blueprint, render_template, request, redirect,
     url_for, flash, send_file, abort
 )
-from models import get_conn  # ✅ IMPORT CORRECTO
+from models import get_conn  # tu función para conexión
 from psycopg2.extras import RealDictCursor
 from datetime import datetime
 from io import BytesIO
@@ -11,45 +11,40 @@ from collections import defaultdict
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 
-# ─────────────────────────────────────────────────────────
 bp_entregas = Blueprint("entregas", __name__, url_prefix="/entregas")
-# ─────────────────────────────────────────────────────────
 
 
-# ------------------------------------------------------------------
-@bp_entregas.route("/<uuid:id_entrega>/remito", methods=["GET", "POST"])
-def remito(id_entrega):
+@bp_entregas.route("/<uuid:id_pedido>/remito", methods=["GET", "POST"])
+def remito(id_pedido):
     """
     GET  → muestra el formulario para confirmar cantidades reales
     POST → actualiza cantidades, impacta en cuentas y genera el PDF
     """
     with get_conn() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            # ▸ Traer la entrega y el pedido asociado
-            cur.execute("SELECT * FROM entregas WHERE id = %s", (str(id_entrega),))
-            entrega = cur.fetchone()
-            if not entrega:
-                abort(404, "Entrega no encontrada")
+            # Traer pedido y cliente asociado
+            cur.execute("SELECT * FROM pedidos WHERE id_pedido = %s", (str(id_pedido),))
+            pedido = cur.fetchone()
+            if not pedido:
+                abort(404, "Pedido no encontrado")
 
-            id_pedido = entrega["id_pedido"]
-
-            # ───── POST: procesa y genera PDF ───────────────────────
+            # POST: procesar formulario y generar PDF
             if request.method == "POST":
                 cantidades_reales = request.form.getlist("cantidad_real")
                 id_detalles       = request.form.getlist("id_detalle")
 
                 if len(cantidades_reales) != len(id_detalles):
                     flash("Faltan datos para registrar la entrega.", "error")
-                    return redirect(url_for("entregas.remito", id_entrega=id_entrega))
+                    return redirect(url_for("entregas.remito", id_pedido=id_pedido))
 
-                # Actualizar cantidades reales por detalle
+                # Actualizar cantidades reales
                 for id_det, real in zip(id_detalles, cantidades_reales):
                     cur.execute(
                         "UPDATE detalle_pedido SET cantidad_real = %s WHERE id_detalle = %s",
                         (real, id_det)
                     )
 
-                # Datos de cliente y totales
+                # Datos cliente y pedido
                 cur.execute("""
                     SELECT c.id_cliente, c.nombre, c.direccion, p.fecha_entrega
                     FROM pedidos p
@@ -58,17 +53,18 @@ def remito(id_entrega):
                 """, (id_pedido,))
                 cli = cur.fetchone()
                 if not cli:
-                    flash("Pedido no encontrado.", "error")
+                    flash("Cliente no encontrado.", "error")
                     return redirect(url_for("entregas.lista_entregas"))
 
                 # Detalles actualizados
                 cur.execute("""
-                    SELECT pr.nombre AS descripcion,
+                    SELECT pr.descripcion AS descripcion,
                            pd.cantidad_real,
-                           pr.unidad,
-                           pd.precio
+                           pd.unidad,
+                           pd.precio,
+                           pd.id_detalle
                     FROM detalle_pedido pd
-                    JOIN productos pr ON pd.producto_id = pr.id
+                    JOIN productos pr ON pd.id_producto = pr.id_producto
                     WHERE pd.id_pedido = %s
                 """, (id_pedido,))
                 detalles_raw = cur.fetchall()
@@ -77,11 +73,11 @@ def remito(id_entrega):
                 detalles = []
                 for row in detalles_raw:
                     cant_real = float(row["cantidad_real"] or 0)
-                    precio    = float(row["precio"]        or 0)
+                    precio    = float(row["precio"] or 0)
                     total    += cant_real * precio
                     detalles.append({**row, "cantidad_real": cant_real, "precio": precio})
 
-                # Movimientos en cuenta corriente y actualización de saldo
+                # Insertar movimiento y actualizar saldo
                 mov_id = str(uuid.uuid4())
                 cur.execute("""
                     INSERT INTO movimientos_cuenta_corriente
@@ -96,7 +92,7 @@ def remito(id_entrega):
                     DO UPDATE SET saldo = clientes_cuenta_corriente.saldo + EXCLUDED.saldo
                 """, (cli["id_cliente"], total))
 
-                # Estado del pedido → entregado
+                # Actualizar estado pedido a entregado
                 cur.execute("UPDATE pedidos SET estado = 'entregado' WHERE id_pedido = %s", (id_pedido,))
 
                 conn.commit()
@@ -109,16 +105,16 @@ def remito(id_entrega):
                 return send_file(pdf_buffer, mimetype="application/pdf",
                                  as_attachment=True, download_name=filename)
 
-            # ───── GET: mostrar formulario con cantidades actuales ──
+            # GET: mostrar formulario con cantidades actuales
             cur.execute("""
                 SELECT pd.id_detalle,
-                       pr.nombre AS descripcion,
+                       pr.descripcion AS descripcion,
                        pd.cantidad,
                        pd.cantidad_real,
-                       pr.unidad,
+                       pd.unidad,
                        pd.precio
                 FROM detalle_pedido pd
-                JOIN productos pr ON pd.producto_id = pr.id
+                JOIN productos pr ON pd.id_producto = pr.id_producto
                 WHERE pd.id_pedido = %s
             """, (id_pedido,))
             detalles = cur.fetchall()
@@ -127,9 +123,8 @@ def remito(id_entrega):
         "remito_confirmar.html",
         detalles=detalles,
         id_pedido=id_pedido,
-        remito_id=id_entrega
+        remito_id=id_pedido
     )
-# ------------------------------------------------------------------
 
 
 @bp_entregas.route("/")

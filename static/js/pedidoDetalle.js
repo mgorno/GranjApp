@@ -41,6 +41,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!sel || !cInp || !uSpan || !pInp || !tabla || !tpl || !addBt || !tot) return;
 
+  // --- Función de formato de cantidad ---
+  function formatearCantidad(valor) {
+    const esEntero = Number.isInteger(valor);
+    if (esEntero) {
+      return valor.toLocaleString("es-AR");
+    } else {
+      const partes = valor.toFixed(3).split(".");
+      const parteEntera = parseInt(partes[0]).toLocaleString("es-AR");
+      const parteDecimal = partes[1];
+      return `${parteEntera},${parteDecimal}`;
+    }
+  }
+
   sel.addEventListener("change", () => {
     const o = sel.selectedOptions[0];
     uSpan.textContent = o.dataset.unidad || "";
@@ -52,8 +65,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const idProd = o?.value;
     const desc = o?.dataset?.desc;
     const unidad = o?.dataset?.unidad;
-    const precio = parseFloat(pInp.value);
-    const cant = parseFloat(cInp.value);
+    const precio = parseFloat(pInp.value.replace(",", "."));
+    const cant = parseFloat(cInp.value.replace(",", "."));
 
     if (!idProd) {
       alert("Elegí un producto.");
@@ -75,40 +88,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const fila = tpl.cloneNode(true);
 
-    // Formatos
-    const cantidadFormateada = new Intl.NumberFormat('es-AR', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(cant);
-
-    const precioFormateado = new Intl.NumberFormat('es-AR', {
-      maximumFractionDigits: 0
-    }).format(precio);
-
+    const cantidadTexto = formatearCantidad(cant);
+    const precioTexto = `$ ${Math.round(precio).toLocaleString("es-AR")}`;
     const subtotal = Math.round(precio * cant);
-    const subtotalFormateado = new Intl.NumberFormat('es-AR', {
-      maximumFractionDigits: 0
-    }).format(subtotal);
+    const subtotalTexto = `$ ${subtotal.toLocaleString("es-AR")}`;
 
-    // Seteo de valores
     fila.querySelector('input[name="id_producto"]').value = idProd;
     fila.querySelector(".nombre").textContent = desc;
-
-    fila.querySelector('input[name="cantidad"]').value = cant.toFixed(3).replace(/\.?0+$/, "");
-    fila.querySelector(".cantidad").textContent = cantidadFormateada;
-
+    fila.querySelector('input[name="cantidad"]').value = cant;
+    fila.querySelector(".cantidad").textContent = cantidadTexto;
     fila.querySelector('input[name="unidad"]').value = unidad;
     fila.querySelector(".unidad-base").textContent = unidad;
-
     fila.querySelector('input[name="precio"]').value = Math.round(precio);
-    fila.querySelector(".precio").textContent = precioFormateado;
-
+    fila.querySelector(".precio").textContent = precioTexto;
     fila.querySelector('input[name="subtotal"]').value = subtotal;
-    fila.querySelector(".subtotal").textContent = subtotalFormateado;
+    fila.querySelector(".subtotal").textContent = subtotalTexto;
 
     tabla.appendChild(fila);
 
-    // Limpieza
     sel.required = cInp.required = pInp.required = false;
     sel.selectedIndex = 0;
     cInp.value = "";
@@ -136,7 +133,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const p = parseFloat(tr.querySelector('input[name="precio"]').value) || 0;
       suma += c * p;
     });
-
-    tot.textContent = Math.round(suma).toLocaleString("es-AR");
+    tot.textContent = `$ ${Math.round(suma).toLocaleString("es-AR")}`;
   }
 });

@@ -31,7 +31,7 @@ def remito(id_entrega):
             if not entrega:
                 abort(404, "Entrega no encontrada")
 
-            pedido_id = entrega["pedido_id"]
+            id_pedido = entrega["id_pedido"]
 
             # ───── POST: procesa y genera PDF ───────────────────────
             if request.method == "POST":
@@ -55,7 +55,7 @@ def remito(id_entrega):
                     FROM pedidos p
                     JOIN clientes c ON p.id_cliente = c.id_cliente
                     WHERE p.id_pedido = %s
-                """, (pedido_id,))
+                """, (id_pedido,))
                 cli = cur.fetchone()
                 if not cli:
                     flash("Pedido no encontrado.", "error")
@@ -69,8 +69,8 @@ def remito(id_entrega):
                            pd.precio
                     FROM detalle_pedido pd
                     JOIN productos pr ON pd.producto_id = pr.id
-                    WHERE pd.pedido_id = %s
-                """, (pedido_id,))
+                    WHERE pd.id_pedido = %s
+                """, (id_pedido,))
                 detalles_raw = cur.fetchall()
 
                 total = 0
@@ -97,7 +97,7 @@ def remito(id_entrega):
                 """, (cli["id_cliente"], total))
 
                 # Estado del pedido → entregado
-                cur.execute("UPDATE pedidos SET estado = 'entregado' WHERE id_pedido = %s", (pedido_id,))
+                cur.execute("UPDATE pedidos SET estado = 'entregado' WHERE id_pedido = %s", (id_pedido,))
 
                 conn.commit()
 
@@ -105,7 +105,7 @@ def remito(id_entrega):
                 pdf_buffer = generar_pdf_remito(
                     cli["nombre"], cli["direccion"], cli["fecha_entrega"], detalles, total
                 )
-                filename = f"Remito_{cli['nombre']}_{pedido_id}.pdf"
+                filename = f"Remito_{cli['nombre']}_{id_pedido}.pdf"
                 return send_file(pdf_buffer, mimetype="application/pdf",
                                  as_attachment=True, download_name=filename)
 
@@ -119,14 +119,14 @@ def remito(id_entrega):
                        pd.precio
                 FROM detalle_pedido pd
                 JOIN productos pr ON pd.producto_id = pr.id
-                WHERE pd.pedido_id = %s
-            """, (pedido_id,))
+                WHERE pd.id_pedido = %s
+            """, (id_pedido,))
             detalles = cur.fetchall()
 
     return render_template(
         "remito_confirmar.html",
         detalles=detalles,
-        id_pedido=pedido_id,
+        id_pedido=id_pedido,
         remito_id=id_entrega
     )
 # ------------------------------------------------------------------
@@ -145,7 +145,7 @@ def lista_entregas():
                    COUNT(pd.id_detalle) AS cantidad_items
             FROM pedidos p
             JOIN clientes c     ON p.id_cliente  = c.id_cliente
-            JOIN detalle_pedido pd ON pd.pedido_id = p.id_pedido
+            JOIN detalle_pedido pd ON pd.id_pedido = p.id_pedido
             WHERE p.estado = 'pendiente'
             GROUP BY p.id_pedido, c.nombre, p.fecha_entrega
             ORDER BY p.fecha_entrega

@@ -43,26 +43,26 @@
 
           <td class="text-end">
             {% if item.cantidad == item.cantidad|int %}
-            {{ item.cantidad|int }}
+              {{ item.cantidad|int }}
             {% else %}
-            {{ '%.3f'|format(item.cantidad)|replace('.', ',') }}
+              {{ '%.3f'|format(item.cantidad)|replace('.', ',') }}
             {% endif %}
           </td>
 
           <td class="text-end">
-            <input type="number" step="1" name="precio" value="{{ item.precio|int | string | replace('.', '.') }}"
+            <input type="number" step="0.01" name="precio"
+              value="{{ '%.2f'|format(item.precio) }}"
               class="form-control text-end table-input precio-input" required>
           </td>
 
-          {% if item.cantidad_real == item.cantidad_real|int %}
-          {{ item.cantidad_real|int }}
-          {% else %}
-          {{ '%.3f'|format(item.cantidad_real).replace('.', ',') }}
-          {% endif %}
+          <td class="text-end">
+            <input type="number" step="0.01" name="cantidad_real"
+              value="{{ '%.2f'|format(item.cantidad_real) }}"
+              class="form-control text-end table-input cantidad-input" required>
+          </td>
 
           <td class="text-end subtotal-cell">
-            {{ (item.precio * item.cantidad_real)|int | string | replace('.', '.') }}
-
+            {{ '%.2f'|format(item.precio * item.cantidad_real) }}
           </td>
 
           <td class="text-center">
@@ -71,8 +71,6 @@
         </tr>
         {% endfor %}
       </tbody>
-
-
     </table>
   </div>
 
@@ -86,7 +84,7 @@
         </p>
         <p class="d-flex justify-content-between mb-2">
           <span>Saldo anterior:</span>
-          <strong>{{ saldo_anterior|int | string | replace('.', '.') }}</strong>
+          <strong>{{ '%.2f'|format(saldo_anterior) }}</strong>
         </p>
         <p class="d-flex justify-content-between">
           <span>Saldo total:</span>

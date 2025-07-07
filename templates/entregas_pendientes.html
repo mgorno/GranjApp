@@ -67,11 +67,12 @@
           <td>{{ pedido.cliente }}</td>
           <td>{{ pedido.cantidad_items }}</td>
           <td>
-            <a href="{{ url_for('entregas.remito', id_pedido=id_pedido) }}"
+            <a href="{{ url_for('entregas.remito', id_pedido=pedido.id_pedido) }}"
               class="btn btn-sm btn-outline-success d-inline-flex align-items-center"
               style="font-size: 0.85rem; padding: 0.3rem 0.8rem;">
-              Generar Remito
+              <i class="bi bi-file-earmark-text me-1"></i> Generar Remito
             </a>
+
 
           </td>
         </tr>

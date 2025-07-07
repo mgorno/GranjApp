@@ -15,6 +15,7 @@ def lista_entregas():
     """
     Lista los pedidos pendientes agrupados por fecha de entrega
     """
+    
     with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
         cur.execute("""
             SELECT p.id_pedido,
@@ -41,15 +42,13 @@ def lista_entregas():
 
     return render_template("entregas_pendientes.html", entregas=entregas_por_fecha)
 
-@bp_entregas.route("/<uuid:id_pedido>/remito", methods=["GET", "POST"])
+@bp_entregas.route("/<id_pedido>/remito", methods=["GET", "POST"])
 def remito(id_pedido):
     with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
-        # Verificar que exista el pedido
-        cur.execute("SELECT * FROM pedidos WHERE id_pedido = %s", (str(id_pedido),))
+        cur.execute("SELECT * FROM pedidos WHERE id_pedido = %s", (id_pedido,))
         pedido = cur.fetchone()
         if not pedido:
             abort(404, "Pedido no encontrado")
-
         if request.method == "POST":
             cantidades_reales = request.form.getlist("cantidad_real")
             id_detalles = request.form.getlist("id_detalle")
@@ -70,7 +69,7 @@ def remito(id_pedido):
                 FROM pedidos p
                 JOIN clientes c ON p.id_cliente = c.id_cliente
                 WHERE p.id_pedido = %s
-            """, (str(id_pedido),))
+            """, (id_pedido))
             cli = cur.fetchone()
             if not cli:
                 flash("Cliente no encontrado.", "error")
@@ -86,7 +85,7 @@ def remito(id_pedido):
                 FROM detalle_pedido pd
                 JOIN productos pr ON pd.id_producto = pr.id_producto
                 WHERE pd.id_pedido = %s
-            """, (str(id_pedido),))
+            """, (id_pedido))
             detalles_raw = cur.fetchall()
 
             total = 0

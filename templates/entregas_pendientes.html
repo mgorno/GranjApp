@@ -9,14 +9,17 @@
   .entrega-fecha-header {
     padding: 1rem;
     margin-bottom: 0;
-    background-color: #212529; /* mismo bg-dark */
-    border: 1px solid #6c757d;  /* mismo border-secondary */
+    background-color: #212529;
+    /* mismo bg-dark */
+    border: 1px solid #6c757d;
+    /* mismo border-secondary */
     border-bottom: none;
     border-top-left-radius: .375rem;
     border-top-right-radius: .375rem;
     color: #fff;
     font-weight: 500;
   }
+
   .entrega-table-wrapper {
     margin-top: 0;
     border: 1px solid #6c757d;
@@ -35,49 +38,50 @@
 
 <div class="container px-0">
   {% if entregas %}
-    {% for fecha, pedidos in entregas.items() %}
-      <!-- Cabecera de fecha en estilo "tarjeta" -->
-      <div class="entrega-fecha-header">
-        <i class="bi bi-calendar-event me-2 text-primary"></i>
-        Fecha de Entrega: {{ fecha }}
-      </div>
+  {% for fecha, pedidos in entregas.items() %}
+  <!-- Cabecera de fecha en estilo "tarjeta" -->
+  <div class="entrega-fecha-header">
+    <i class="bi bi-calendar-event me-2 text-primary"></i>
+    Fecha de Entrega: {{ fecha }}
+  </div>
 
-      <!-- Tabla dentro de wrapper con bordes igual al resumen -->
-      <div class="table-responsive entrega-table-wrapper mb-4">
-        <table class="table table-dark table-bordered align-middle mb-0">
-          <!-- Fijamos anchos para que no se mueva -->
-          <colgroup>
-            <col style="width:60%">
-            <col style="width:15%">
-            <col style="width:25%">
-          </colgroup>
-          <thead class="table-secondary text-dark">
-            <tr>
-              <th>Cliente</th>
-              <th>Items</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for pedido in pedidos %}
-            <tr>
-              <td>{{ pedido.cliente }}</td>
-              <td>{{ pedido.cantidad_items }}</td>
-              <td>
-                <a href="{{ url_for('entregas.remito', id_pedido=pedido.id_pedido) }}">
-                   class="btn btn-sm btn-outline-success d-inline-flex align-items-center"
-                   style="font-size: 0.85rem; padding: 0.3rem 0.8rem;">
-                  <i class="bi bi-file-earmark-text me-1"></i> Generar Remito
-                </a>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    {% endfor %}
+  <!-- Tabla dentro de wrapper con bordes igual al resumen -->
+  <div class="table-responsive entrega-table-wrapper mb-4">
+    <table class="table table-dark table-bordered align-middle mb-0">
+      <!-- Fijamos anchos para que no se mueva -->
+      <colgroup>
+        <col style="width:60%">
+        <col style="width:15%">
+        <col style="width:25%">
+      </colgroup>
+      <thead class="table-secondary text-dark">
+        <tr>
+          <th>Cliente</th>
+          <th>Items</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pedido in pedidos %}
+        <tr>
+          <td>{{ pedido.cliente }}</td>
+          <td>{{ pedido.cantidad_items }}</td>
+          <td>
+            <a href="{{ url_for('entregas.remito', id_pedido=id_pedido) }}"
+              class="btn btn-sm btn-outline-success d-inline-flex align-items-center"
+              style="font-size: 0.85rem; padding: 0.3rem 0.8rem;">
+              Generar Remito
+            </a>
+
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endfor %}
   {% else %}
-    <p class="alert alert-info">No hay entregas pendientes.</p>
+  <p class="alert alert-info">No hay entregas pendientes.</p>
   {% endif %}
 </div>
 {% endblock %}

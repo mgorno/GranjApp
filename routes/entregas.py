@@ -115,7 +115,7 @@ def remito(id_pedido):
                 FROM detalle_pedido pd
                 JOIN productos pr ON pd.id_producto = pr.id_producto
                 WHERE pd.id_pedido = %s
-            """, (id_pedido,))
+            """, (str(id_pedido),))
             detalles = cur.fetchall()
 
     return render_template(

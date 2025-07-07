@@ -16,59 +16,60 @@
 {% block content %}
 <h1 class="mb-4">Confirmar Cantidades Reales</h1>
 
-<form action="{{ url_for('entregas.remito', id_pedido=id_pedido) }}"
-      method="POST"
-      id="form-remito"
-      data-saldo-anterior="{{ '%.2f'|format(saldo_anterior) }}">
+<form action="{{ url_for('entregas.remito', id_pedido=id_pedido) }}" method="POST" id="form-remito"
+  data-saldo-anterior="{{ '%.2f'|format(saldo_anterior) }}">
   <div class="table-responsive mb-3">
     <table class="table align-middle" id="tabla-remito">
       <thead class="table-light">
         <tr>
-          <th style="width: 35%">Producto</th>
-          <th style="width: 15%" class="text-end">Precio</th>
-          <th style="width: 15%" class="text-end">Cantidad&nbsp;Real</th>
-          <th style="width: 15%" class="text-end">Subtotal</th>
-          <th style="width: 10%"></th>
+          <th style="width: 30%">Producto</th>
+          <th style="width: 10%" class="text-end">Cant. Pedida</th>
+          <th style="width: 10%" class="text-end">Precio</th>
+          <th style="width: 10%" class="text-end">Cantidad Real</th>
+          <th style="width: 10%" class="text-end">Subtotal</th>
+          <th style="width: 5%"></th>
         </tr>
       </thead>
       <tbody>
         {% for item in detalles %}
         <tr>
-          <!-- Importante: campo oculto con id_detalle -->
           <input type="hidden" name="id_detalle" value="{{ item.id_detalle }}">
-
           <td>
             <select name="id_producto" class="form-select producto-select" required>
               <option value="" disabled>Seleccione…</option>
               {% for p in productos %}
-              <option value="{{ p.id_producto }}" data-precio="{{ '%.2f'|format(p.precio) }}" data-unidad="{{ p.unidad_base }}"
-                {{ 'selected' if p.id_producto == item.id_producto }}>
+              <option value="{{ p.id_producto }}" data-precio="{{ '%.2f'|format(p.precio) }}"
+                data-unidad="{{ p.unidad_base }}" {{ 'selected' if p.id_producto==item.id_producto }}>
                 {{ p.descripcion }} ({{ p.unidad_base }})
               </option>
               {% endfor %}
             </select>
           </td>
+          <td class="text-end">{{ '%.2f'|format(item.cantidad or 0) }}</td>
           <td class="text-end">
-            <input type="number" step="0.01" name="precio"
-                   value="{{ '%.2f'|format(item.precio or 0) }}"
-                   class="form-control text-end table-input precio-input" required>
+            <input type="number" step="0.01" name="precio" value="{{ '%.2f'|format(item.precio or 0) }}"
+              class="form-control text-end table-input precio-input" required>
           </td>
           <td class="text-end">
-            <input type="number" step="0.01" name="cantidad_real"
-                   value="{{ '%.2f'|format(item.cantidad_real or 0) }}"
-                   class="form-control text-end table-input cantidad-input" required>
+            <input type="number" step="0.01" name="cantidad_real" value="{{ '%.2f'|format(item.cantidad_real or 0) }}"
+              class="form-control text-end table-input cantidad-input" required>
           </td>
           <td class="text-end subtotal-cell">
             {{ '%.2f'|format((item.precio or 0) * (item.cantidad_real or 0)) }}
           </td>
           <td class="text-center">
+            {% if item.id_detalle|string == "0" %}
             <button type="button" class="btn btn-outline-danger btn-sm eliminar-fila">
               <i class="bi bi-trash"></i>
             </button>
+            {% else %}
+            <i class="bi bi-lock-fill text-secondary" title="No se puede eliminar"></i>
+            {% endif %}
           </td>
         </tr>
         {% endfor %}
       </tbody>
+
       <tfoot>
         <tr>
           <td colspan="5" class="text-center">

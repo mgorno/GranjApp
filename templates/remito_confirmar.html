@@ -4,6 +4,8 @@
 
 {% block head_extra %}
 {{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/confirmar_remito.css') }}">
+<script src="{{ url_for('static', filename='js/remito.js') }}" defer></script>
 <style>
   .table-input {
     max-width: 90px;
@@ -14,7 +16,10 @@
 {% block content %}
 <h1 class="mb-4">Confirmar Cantidades Reales</h1>
 
-<form action="{{ url_for('entregas.remito', id_pedido=id_pedido) }}" method="POST" id="form-remito">
+<form action="{{ url_for('entregas.remito', id_pedido=id_pedido) }}"
+      method="POST"
+      id="form-remito"
+      data-saldo-anterior="{{ '%.2f'|format(saldo_anterior) }}">
   <div class="table-responsive mb-3">
     <table class="table align-middle" id="tabla-remito">
       <thead class="table-light">
@@ -22,40 +27,64 @@
           <th style="width: 35%">Producto</th>
           <th style="width: 15%" class="text-end">Cantidad Original</th>
           <th style="width: 15%" class="text-end">Precio</th>
-          <th style="width: 15%" class="text-end">Cantidad Real</th>
+          <th style="width: 15%" class="text-end">Cantidad&nbsp;Real</th>
           <th style="width: 15%" class="text-end">Subtotal</th>
+          <th style="width: 10%"></th>
         </tr>
       </thead>
       <tbody>
         {% for item in detalles %}
         <tr>
+          <!-- campo oculto con id_detalle -->
           <input type="hidden" name="id_detalle" value="{{ item.id_detalle }}">
+          
           <td>
-            <select name="id_producto" class="form-select" required>
+            <select name="id_producto" class="form-select producto-select" required>
+              <option value="" disabled>Seleccione…</option>
               {% for p in productos %}
-                <option value="{{ p.id_producto }}" {% if p.id_producto == item.id_producto %}selected{% endif %}>
-                  {{ p.descripcion }} ({{ p.unidad_base }})
-                </option>
+              <option value="{{ p.id_producto }}" data-precio="{{ '%.2f'|format(p.precio) }}" data-unidad="{{ p.unidad_base }}"
+                {{ 'selected' if p.id_producto == item.id_producto }}>
+                {{ p.descripcion }} ({{ p.unidad_base }})
+              </option>
               {% endfor %}
             </select>
           </td>
+
           <td class="text-end">
             {{ (item.cantidad|string).replace('.', ',') if (item.cantidad|string).find('.') != -1 else item.cantidad|int }}
           </td>
+
           <td class="text-end">
             <input type="text" name="precio" class="form-control text-end table-input precio-input" required
-                   value="{{ '{:,.0f}'.format(item.precio).replace(',', '.') }}">
+                   value="{{ (('%.2f'|format(item.precio or 0)).replace('.', ',')) }}">
           </td>
+
           <td class="text-end">
             <input type="text" name="cantidad_real" class="form-control text-end table-input cantidad-input" required
-                   value="{{ (item.cantidad_real|string).replace('.', ',') if (item.cantidad_real|string).find('.') != -1 else item.cantidad_real|int }}">
+                   value="{{ (('%.2f'|format(item.cantidad_real or 0)).replace('.', ',')) }}">
           </td>
+
           <td class="text-end subtotal-cell">
-            {{ '{:,.0f}'.format(item.precio * item.cantidad_real).replace(',', '.') }}
+            {{ ('%.2f'|format((item.precio or 0) * (item.cantidad_real or 0))).replace('.', ',') }}
+          </td>
+
+          <td class="text-center">
+            <button type="button" class="btn btn-outline-danger btn-sm eliminar-fila" title="Eliminar fila">
+              <i class="bi bi-trash"></i>
+            </button>
           </td>
         </tr>
         {% endfor %}
       </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="6" class="text-center">
+            <button type="button" class="btn btn-primary" id="agregar-fila">
+              <i class="bi bi-plus-circle"></i> Agregar producto
+            </button>
+          </td>
+        </tr>
+      </tfoot>
     </table>
   </div>
 
@@ -64,13 +93,13 @@
       <div class="card shadow-sm">
         <div class="card-body">
           <p class="d-flex justify-content-between mb-2">
-            <span>Total remito:</span> <strong id="total-remito">0</strong>
+            <span>Total remito:</span> <strong id="total-remito">0,00</strong>
           </p>
           <p class="d-flex justify-content-between mb-2">
-            <span>Saldo anterior:</span> <strong>{{ saldo_anterior|int|string|replace(',', '.') }}</strong>
+            <span>Saldo anterior:</span> <strong>{{ ('%.2f'|format(saldo_anterior)).replace('.', ',') }}</strong>
           </p>
           <p class="d-flex justify-content-between fs-5">
-            <span>Saldo total:</span> <strong id="saldo-total">0</strong>
+            <span>Saldo total:</span> <strong id="saldo-total">0,00</strong>
           </p>
         </div>
       </div>
@@ -87,13 +116,12 @@
 {% block scripts %}
 {{ super() }}
 <script>
-  // Función para convertir string numérico ARG a número JS
+  // Convertir string numérico ARG a número JS
   function parseNumeroArg(str) {
-    // Quita puntos (miles), cambia coma por punto decimal
     return parseFloat(str.replace(/\./g, '').replace(',', '.')) || 0;
   }
 
-  // Función para formatear número a ARG (miles con punto, decimal con coma)
+  // Formatear número a ARG (miles con punto, decimal con coma)
   function formatNumeroArg(num, decimales = 2) {
     return num.toLocaleString('es-AR', {
       minimumFractionDigits: decimales,
@@ -119,16 +147,14 @@
       let subtotal = calcularSubtotal(precioInput.value, cantidadInput.value);
       total += subtotal;
 
-      subtotalCell.textContent = formatNumeroArg(subtotal, 0);
+      subtotalCell.textContent = formatNumeroArg(subtotal, 2);
     });
 
-    document.getElementById('total-remito').textContent = formatNumeroArg(total, 0);
+    document.getElementById('total-remito').textContent = formatNumeroArg(total, 2);
 
-    // Saldo anterior del dataset del formulario
     let saldoAnterior = parseNumeroArg(document.getElementById('form-remito').dataset.saldoAnterior || '0');
-
     let saldoTotal = saldoAnterior + total;
-    document.getElementById('saldo-total').textContent = formatNumeroArg(saldoTotal, 0);
+    document.getElementById('saldo-total').textContent = formatNumeroArg(saldoTotal, 2);
   }
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -137,16 +163,22 @@
     const inputsPrecio = document.querySelectorAll('input[name="precio"]');
     const inputsCantidad = document.querySelectorAll('input[name="cantidad_real"]');
 
-    inputsPrecio.forEach(input => {
-      input.addEventListener('input', () => {
+    inputsPrecio.forEach(input => input.addEventListener('input', actualizarTotales));
+    inputsCantidad.forEach(input => input.addEventListener('input', actualizarTotales));
+
+    // Evento eliminar fila
+    document.querySelectorAll('.eliminar-fila').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.target.closest('tr').remove();
         actualizarTotales();
       });
     });
 
-    inputsCantidad.forEach(input => {
-      input.addEventListener('input', () => {
-        actualizarTotales();
-      });
+    // Evento agregar fila (opcional, implementar según necesites)
+    document.getElementById('agregar-fila')?.addEventListener('click', () => {
+      // Aquí debes agregar la lógica para insertar una fila nueva
+      // luego llamar actualizarTotales();
+      actualizarTotales();
     });
   });
 </script>

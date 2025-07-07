@@ -9,8 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnEditar = document.getElementById("btnEditarClienteFecha");
 
   function actualizarResumen() {
-    const clienteSeleccionado =
-      selectCliente.options[selectCliente.selectedIndex];
+    const clienteSeleccionado = selectCliente.options[selectCliente.selectedIndex];
     const clienteNombre = clienteSeleccionado ? clienteSeleccionado.text : "";
     const fecha = inputFecha.value;
 
@@ -40,8 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const addBt = document.getElementById("btnAddLinea");
   const tot = document.getElementById("totalGeneral");
 
-  if (!sel || !cInp || !uSpan || !pInp || !tabla || !tpl || !addBt || !tot)
-    return;
+  if (!sel || !cInp || !uSpan || !pInp || !tabla || !tpl || !addBt || !tot) return;
 
   sel.addEventListener("change", () => {
     const o = sel.selectedOptions[0];
@@ -70,38 +68,48 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    if (
-      [...tabla.querySelectorAll('input[name="id_producto"]')].some(
-        (input) => input.value === idProd
-      )
-    ) {
+    if ([...tabla.querySelectorAll('input[name="id_producto"]')].some(input => input.value === idProd)) {
       alert("Ese producto ya está en el detalle.");
       return;
     }
 
     const fila = tpl.cloneNode(true);
 
-    fila.querySelector('input[name="id_producto"]').value = idProd;
-    fila.querySelector(".nombre").textContent = desc;
-    fila.querySelector('input[name="cantidad"]').value = Number.isInteger(cant)
-      ? cant
-      : cant.toFixed(3).replace(/\.?0+$/, "");
-    fila.querySelector(".cantidad").textContent = Number.isInteger(cant)
-      ? cant
-      : cant.toFixed(3).replace(/\.?0+$/, "");
-    fila.querySelector('input[name="unidad"]').value = unidad;
-    fila.querySelector(".unidad-base").textContent = unidad;
-    fila.querySelector('input[name="precio"]').value = Math.round(precio);
-    fila.querySelector(".precio").textContent = Math.round(precio);
+    // Formatos
+    const cantidadFormateada = new Intl.NumberFormat('es-AR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(cant);
+
+    const precioFormateado = new Intl.NumberFormat('es-AR', {
+      maximumFractionDigits: 0
+    }).format(precio);
 
     const subtotal = Math.round(precio * cant);
-    fila.querySelector(".subtotal").textContent = subtotal;
+    const subtotalFormateado = new Intl.NumberFormat('es-AR', {
+      maximumFractionDigits: 0
+    }).format(subtotal);
+
+    // Seteo de valores
+    fila.querySelector('input[name="id_producto"]').value = idProd;
+    fila.querySelector(".nombre").textContent = desc;
+
+    fila.querySelector('input[name="cantidad"]').value = cant.toFixed(3).replace(/\.?0+$/, "");
+    fila.querySelector(".cantidad").textContent = cantidadFormateada;
+
+    fila.querySelector('input[name="unidad"]').value = unidad;
+    fila.querySelector(".unidad-base").textContent = unidad;
+
+    fila.querySelector('input[name="precio"]').value = Math.round(precio);
+    fila.querySelector(".precio").textContent = precioFormateado;
+
     fila.querySelector('input[name="subtotal"]').value = subtotal;
+    fila.querySelector(".subtotal").textContent = subtotalFormateado;
 
     tabla.appendChild(fila);
 
+    // Limpieza
     sel.required = cInp.required = pInp.required = false;
-
     sel.selectedIndex = 0;
     cInp.value = "";
     uSpan.textContent = "";
@@ -123,12 +131,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function recalcularTotal() {
     let suma = 0;
-    tabla.querySelectorAll("tr").forEach((tr) => {
-      const c =
-        parseFloat(tr.querySelector('input[name="cantidad"]').value) || 0;
+    tabla.querySelectorAll("tr").forEach(tr => {
+      const c = parseFloat(tr.querySelector('input[name="cantidad"]').value) || 0;
       const p = parseFloat(tr.querySelector('input[name="precio"]').value) || 0;
       suma += c * p;
     });
-    tot.textContent = suma.toFixed(2);
+
+    tot.textContent = Math.round(suma).toLocaleString("es-AR");
   }
 });

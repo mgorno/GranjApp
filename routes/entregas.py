@@ -1,9 +1,8 @@
-# routes/entregas.py
 from flask import (
     Blueprint, render_template, request, redirect,
     url_for, flash, send_file, abort
 )
-import psycopg2
+from models import get_conn  # ✅ IMPORT CORRECTO
 from psycopg2.extras import RealDictCursor
 from datetime import datetime
 from io import BytesIO
@@ -24,8 +23,8 @@ def remito(id_entrega):
     GET  → muestra el formulario para confirmar cantidades reales
     POST → actualiza cantidades, impacta en cuentas y genera el PDF
     """
-    with psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor) as conn:
-        with conn.cursor() as cur:
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
             # ▸ Traer la entrega y el pedido asociado
             cur.execute("SELECT * FROM entregas WHERE id = %s", (str(id_entrega),))
             entrega = cur.fetchone()

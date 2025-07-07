@@ -4,7 +4,11 @@
 
 {% block head_extra %}
 {{ super() }}
-
+<style>
+  .card + .card {
+    margin-top: 1.5rem;
+  }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -12,30 +16,30 @@
   <i class="bi bi-truck me-2 text-success"></i>Entregas Pendientes
 </h1>
 
-<div class="container">
+<div class="container px-0">
   {% if entregas %}
     {% for fecha, pedidos in entregas.items() %}
-      <div class="card mb-3 bg-dark border-secondary text-white">
-        <div class="card-header bg-primary text-white">
-          <strong>Fecha de Entrega: {{ fecha }}</strong>
+      <div class="card mb-4 bg-dark border border-secondary rounded-3 shadow-sm">
+        <div class="card-header bg-primary text-white fw-semibold">
+          <i class="bi bi-calendar-event me-2"></i>Fecha de Entrega: {{ fecha }}
         </div>
-        <div class="card-body p-0">
-          <table class="table table-dark table-bordered align-middle mb-0">
-            <thead class="table-secondary text-dark">
+        <div class="card-body px-0 py-2">
+          <table class="table text-white mb-0 table-hover align-middle">
+            <thead class="bg-secondary text-dark">
               <tr>
-                <th>Cliente</th>
-                <th>Items</th>
-                <th>Acciones</th>
+                <th scope="col">Cliente</th>
+                <th scope="col">Items</th>
+                <th scope="col">Acciones</th>
               </tr>
             </thead>
             <tbody>
               {% for pedido in pedidos %}
                 <tr>
-                  <td>{{ pedido.cliente }}</td>
+                  <td class="ps-3">{{ pedido.cliente }}</td>
                   <td>{{ pedido.cantidad_items }}</td>
                   <td>
                     <a href="{{ url_for('entregas.generar_remito', id_pedido=pedido.id_pedido) }}"
-                       class="btn btn-sm btn-outline-success"
+                       class="btn btn-sm btn-outline-success d-inline-flex align-items-center"
                        style="font-size: 0.85rem; padding: 0.3rem 0.8rem;">
                       <i class="bi bi-file-earmark-text me-1"></i> Generar Remito
                     </a>
@@ -55,5 +59,4 @@
 
 {% block scripts %}
 {{ super() }}
-<!-- Scripts extra si los necesitás -->
 {% endblock %}

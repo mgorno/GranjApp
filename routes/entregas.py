@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, send_file
+from flask import Blueprint, render_template, request, redirect, url_for, flash, send_file, abort
 from models import get_conn
 import uuid
 from datetime import datetime
@@ -8,7 +8,7 @@ from reportlab.pdfgen import canvas
 from collections import defaultdict
 
 
-
+bp_entregas = Blueprint("entregas", __name__, url_prefix="/entregas")
 
 @bp_entregas.get("/<uuid:id_entrega>/remito")
 def generar_remito(id_entrega):

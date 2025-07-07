@@ -2,19 +2,26 @@
 
 {% block title %}Entregas Pendientes{% endblock %}
 
-{% block content %}
-<div class="container mt-4">
-  <h2 class="mb-4">Entregas Pendientes</h2>
+{% block head_extra %}
+{{ super() }}
 
+{% endblock %}
+
+{% block content %}
+<h1 class="mb-4 text-white border-bottom pb-2" style="font-weight: 500;">
+  <i class="bi bi-truck me-2 text-success"></i>Entregas Pendientes
+</h1>
+
+<div class="container">
   {% if entregas %}
     {% for fecha, pedidos in entregas.items() %}
-      <div class="card mb-3">
+      <div class="card mb-3 bg-dark border-secondary text-white">
         <div class="card-header bg-primary text-white">
           <strong>Fecha de Entrega: {{ fecha }}</strong>
         </div>
         <div class="card-body p-0">
-          <table class="table table-striped table-sm mb-0">
-            <thead class="table-light">
+          <table class="table table-dark table-bordered align-middle mb-0">
+            <thead class="table-secondary text-dark">
               <tr>
                 <th>Cliente</th>
                 <th>Items</th>
@@ -27,8 +34,10 @@
                   <td>{{ pedido.cliente }}</td>
                   <td>{{ pedido.cantidad_items }}</td>
                   <td>
-                    <a href="{{ url_for('entregas.generar_remito', id_pedido=pedido.id_pedido) }}" class="btn btn-sm btn-success">
-                      Generar Remito
+                    <a href="{{ url_for('entregas.generar_remito', id_pedido=pedido.id_pedido) }}"
+                       class="btn btn-sm btn-outline-success"
+                       style="font-size: 0.85rem; padding: 0.3rem 0.8rem;">
+                      <i class="bi bi-file-earmark-text me-1"></i> Generar Remito
                     </a>
                   </td>
                 </tr>
@@ -42,4 +51,9 @@
     <p class="alert alert-info">No hay entregas pendientes.</p>
   {% endif %}
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<!-- Scripts extra si los necesitás -->
 {% endblock %}

@@ -14,64 +14,67 @@
 {% endblock %}
 
 {% block content %}
-<h1 class="mb-4">Confirmar Cantidades Reales</h1>
+<h1 class="mb-4 text-white border-bottom pb-2" style="font-weight: 500;">
+  <i class="bi bi-clipboard-check me-2 text-warning"></i>Confirmar Cantidades Reales
+</h1>
 
-<form action="{{ url_for('entregas.remito', id_pedido=id_pedido) }}"
-      method="POST"
-      id="form-remito"
-      data-saldo-anterior="{{ '%.2f'|format(saldo_anterior) }}">
-  <div class="table-responsive mb-3">
-    <table class="table align-middle" id="tabla-remito">
-      <thead class="table-light">
+<form action="{{ url_for('entregas.remito', id_pedido=id_pedido) }}" method="POST" id="form-remito"
+  data-saldo-anterior="{{ '%.2f'|format(saldo_anterior) }}">
+
+  <!-- Tabla de productos -->
+  <div class="table-responsive mb-4">
+    <table class="table table-dark table-bordered align-middle" id="tabla-remito">
+      <thead class="table-secondary text-dark">
         <tr>
-          <th style="width: 35%">Producto</th>
-          <th style="width: 15%" class="text-end">Cantidad Original</th>
-          <th style="width: 15%" class="text-end">Precio</th>
-          <th style="width: 15%" class="text-end">Cantidad&nbsp;Real</th>
-          <th style="width: 15%" class="text-end">Subtotal</th>
-          <th style="width: 10%"></th>
+          <th style="width: 30%">Producto</th>
+          <th style="width: 10%" class="text-end">Cant. Pedida</th>
+          <th style="width: 10%" class="text-end">Precio</th>
+          <th style="width: 10%" class="text-end">Cantidad Real</th>
+          <th style="width: 10%" class="text-end">Subtotal</th>
+          <th style="width: 5%"></th>
         </tr>
       </thead>
       <tbody>
         {% for item in detalles %}
         <tr>
-          <!-- campo oculto con id_detalle -->
-          <input type="hidden" name="id_detalle" value="{{ item.id_detalle }}">
-          
+          <td hidden>
+            <input type="hidden" name="id_detalle[]" value="{{ item.id_detalle }}">
+          </td>
           <td>
-            <select name="id_producto" class="form-select producto-select" required>
+            <select name="id_producto[]" class="form-select bg-dark text-light border-secondary producto-select" required>
               <option value="" disabled>Seleccione…</option>
               {% for p in productos %}
-              <option value="{{ p.id_producto }}" data-precio="{{ '%.2f'|format(p.precio) }}" data-unidad="{{ p.unidad_base }}"
+              <option value="{{ p.id_producto }}"
+                data-precio="{{ '%.2f'|format(p.precio) }}"
+                data-unidad="{{ p.unidad_base }}"
                 {{ 'selected' if p.id_producto == item.id_producto }}>
                 {{ p.descripcion }} ({{ p.unidad_base }})
               </option>
               {% endfor %}
             </select>
           </td>
-
+          <td class="text-end">{{ '%.2f'|format(item.cantidad or 0) }}</td>
           <td class="text-end">
-            {{ (item.cantidad|string).replace('.', ',') if (item.cantidad|string).find('.') != -1 else item.cantidad|int }}
+            <input type="number" step="0.01" name="precio[]"
+              value="{{ '%.2f'|format(item.precio or 0) }}"
+              class="form-control text-end bg-dark text-light border-secondary table-input precio-input" required>
           </td>
-
           <td class="text-end">
-            <input type="text" name="precio" class="form-control text-end table-input precio-input" required
-                   value="{{ (('%.2f'|format(item.precio or 0)).replace('.', ',')) }}">
+            <input type="number" step="0.01" name="cantidad_real[]"
+              value="{{ '%.2f'|format(item.cantidad_real or 0) }}"
+              class="form-control text-end bg-dark text-light border-secondary table-input cantidad-input" required>
           </td>
-
-          <td class="text-end">
-            <input type="text" name="cantidad_real" class="form-control text-end table-input cantidad-input" required
-                   value="{{ (('%.2f'|format(item.cantidad_real or 0)).replace('.', ',')) }}">
-          </td>
-
           <td class="text-end subtotal-cell">
-            {{ ('%.2f'|format((item.precio or 0) * (item.cantidad_real or 0))).replace('.', ',') }}
+            {{ '%.2f'|format((item.precio or 0) * (item.cantidad_real or 0)) }}
           </td>
-
           <td class="text-center">
+            {% if item.id_detalle|string == "0" %}
             <button type="button" class="btn btn-outline-danger btn-sm eliminar-fila" title="Eliminar fila">
               <i class="bi bi-trash"></i>
             </button>
+            {% else %}
+            <i class="bi bi-lock-fill text-secondary" title="No se puede eliminar"></i>
+            {% endif %}
           </td>
         </tr>
         {% endfor %}
@@ -79,8 +82,8 @@
       <tfoot>
         <tr>
           <td colspan="6" class="text-center">
-            <button type="button" class="btn btn-primary" id="agregar-fila">
-              <i class="bi bi-plus-circle"></i> Agregar producto
+            <button type="button" class="btn btn-outline-success btn-sm" id="agregar-fila" title="Agregar producto">
+              <i class="bi bi-plus-circle me-1"></i>Agregar producto
             </button>
           </td>
         </tr>
@@ -88,27 +91,36 @@
     </table>
   </div>
 
+  <!-- Resumen de totales -->
   <div class="row g-3 mb-4">
     <div class="col-md-4 ms-auto">
-      <div class="card shadow-sm">
+      <div class="card bg-dark text-white border-secondary">
         <div class="card-body">
           <p class="d-flex justify-content-between mb-2">
-            <span>Total remito:</span> <strong id="total-remito">0,00</strong>
+            <span>Total remito:</span>
+            <strong id="total-remito">0.00</strong>
           </p>
           <p class="d-flex justify-content-between mb-2">
-            <span>Saldo anterior:</span> <strong>{{ ('%.2f'|format(saldo_anterior)).replace('.', ',') }}</strong>
+            <span>Saldo anterior:</span>
+            <strong>{{ '%.2f'|format(saldo_anterior) }}</strong>
           </p>
           <p class="d-flex justify-content-between fs-5">
-            <span>Saldo total:</span> <strong id="saldo-total">0,00</strong>
+            <span>Saldo total:</span>
+            <strong id="saldo-total">0.00</strong>
           </p>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Botones -->
   <div class="d-flex gap-2">
-    <a href="{{ url_for('entregas.lista_entregas') }}" class="btn btn-secondary">Cancelar</a>
-    <button type="submit" class="btn btn-success">Confirmar</button>
+    <a href="{{ url_for('entregas.lista_entregas') }}" class="btn btn-secondary">
+      <i class="bi bi-arrow-left me-1"></i>Cancelar
+    </a>
+    <button type="submit" class="btn btn-success">
+      <i class="bi bi-check2-circle me-1"></i>Confirmar
+    </button>
   </div>
 </form>
 {% endblock %}
@@ -140,9 +152,11 @@
     let total = 0;
 
     filas.forEach(fila => {
-      const precioInput = fila.querySelector('input[name="precio"]');
-      const cantidadInput = fila.querySelector('input[name="cantidad_real"]');
+      const precioInput = fila.querySelector('input[name="precio[]"]');
+      const cantidadInput = fila.querySelector('input[name="cantidad_real[]"]');
       const subtotalCell = fila.querySelector('.subtotal-cell');
+
+      if (!precioInput || !cantidadInput || !subtotalCell) return;
 
       let subtotal = calcularSubtotal(precioInput.value, cantidadInput.value);
       total += subtotal;
@@ -152,21 +166,69 @@
 
     document.getElementById('total-remito').textContent = formatNumeroArg(total, 2);
 
-    let saldoAnterior = parseNumeroArg(document.getElementById('form-remito').dataset.saldoAnterior || '0');
+    let saldoAnteriorStr = document.getElementById('form-remito').dataset.saldoAnterior || '0';
+    let saldoAnterior = parseNumeroArg(saldoAnteriorStr);
     let saldoTotal = saldoAnterior + total;
     document.getElementById('saldo-total').textContent = formatNumeroArg(saldoTotal, 2);
+  }
+
+  // Función para agregar una nueva fila vacía
+  function agregarFila() {
+    const tablaBody = document.querySelector('#tabla-remito tbody');
+    const primeraFila = tablaBody.querySelector('tr');
+    if (!primeraFila) return;
+
+    // Clonamos la primera fila para mantener estructura
+    const nuevaFila = primeraFila.cloneNode(true);
+
+    // Limpiar valores y ajustar inputs
+    nuevaFila.querySelector('input[name="id_detalle[]"]').value = "0";
+
+    const selectProducto = nuevaFila.querySelector('select[name="id_producto[]"]');
+    if (selectProducto) {
+      selectProducto.value = "";
+    }
+
+    const inputsPrecio = nuevaFila.querySelectorAll('input[name="precio[]"], input[name="cantidad_real[]"]');
+    inputsPrecio.forEach(input => input.value = "0.00");
+
+    // Subtotal a 0.00
+    const subtotalCell = nuevaFila.querySelector('.subtotal-cell');
+    if (subtotalCell) subtotalCell.textContent = "0.00";
+
+    // Cambiar botón eliminar para que siempre se pueda eliminar esta fila
+    const tdEliminar = nuevaFila.querySelector('td:last-child');
+    if (tdEliminar) {
+      tdEliminar.innerHTML = `
+        <button type="button" class="btn btn-outline-danger btn-sm eliminar-fila" title="Eliminar fila">
+          <i class="bi bi-trash"></i>
+        </button>
+      `;
+    }
+
+    tablaBody.appendChild(nuevaFila);
+
+    // Agregar event listeners a los nuevos inputs y botón eliminar
+    nuevaFila.querySelectorAll('input[name="precio[]"], input[name="cantidad_real[]"]').forEach(input => {
+      input.addEventListener('input', actualizarTotales);
+    });
+    nuevaFila.querySelector('.eliminar-fila').addEventListener('click', (e) => {
+      e.target.closest('tr').remove();
+      actualizarTotales();
+    });
+
+    actualizarTotales();
   }
 
   document.addEventListener('DOMContentLoaded', () => {
     actualizarTotales();
 
-    const inputsPrecio = document.querySelectorAll('input[name="precio"]');
-    const inputsCantidad = document.querySelectorAll('input[name="cantidad_real"]');
+    // Agregar eventos input para recalcular
+    document.querySelectorAll('input[name="precio[]"], input[name="cantidad_real[]"]').forEach(input => {
+      input.addEventListener('input', actualizarTotales);
+    });
 
-    inputsPrecio.forEach(input => input.addEventListener('input', actualizarTotales));
-    inputsCantidad.forEach(input => input.addEventListener('input', actualizarTotales));
-
-    // Evento eliminar fila
+    // Botones eliminar fila
     document.querySelectorAll('.eliminar-fila').forEach(btn => {
       btn.addEventListener('click', e => {
         e.target.closest('tr').remove();
@@ -174,12 +236,8 @@
       });
     });
 
-    // Evento agregar fila (opcional, implementar según necesites)
-    document.getElementById('agregar-fila')?.addEventListener('click', () => {
-      // Aquí debes agregar la lógica para insertar una fila nueva
-      // luego llamar actualizarTotales();
-      actualizarTotales();
-    });
+    // Botón agregar fila
+    document.getElementById('agregar-fila').addEventListener('click', agregarFila);
   });
 </script>
 {% endblock %}

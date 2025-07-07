@@ -83,7 +83,6 @@ def remito(id_pedido):
                 """, (cli["id_cliente"], total))
 
                 cur.execute("UPDATE pedidos SET estado = 'entregado' WHERE id_pedido = %s", (str(id_pedido),))
-
                 conn.commit()
 
                 pdf_buffer = generar_pdf_remito(
@@ -93,35 +92,34 @@ def remito(id_pedido):
                 return send_file(pdf_buffer, mimetype="application/pdf",
                                  as_attachment=True, download_name=filename)
 
-            # --- Aquí termina el POST y empieza el GET ---
-
+            # --- GET: mostrar los datos actuales ---
             cur.execute("""
                 SELECT pd.id_detalle,
-                       pr.descripcion AS descripcion,
+                       pr.descripcion,
                        pd.cantidad,
                        pd.cantidad_real,
                        pd.unidad,
-                       pd.precio
+                       pd.precio,
+                       pd.id_producto
                 FROM detalle_pedido pd
                 JOIN productos pr ON pd.id_producto = pr.id_producto
                 WHERE pd.id_pedido = %s
             """, (str(id_pedido),))
-            detalles = cur.fetchall()
+            items = cur.fetchall()
 
             cur.execute("SELECT id_cliente FROM pedidos WHERE id_pedido = %s", (str(id_pedido),))
             row = cur.fetchone()
             id_cliente = row["id_cliente"] if row else None
 
+            saldo_anterior = 0
             if id_cliente:
                 cur.execute("SELECT saldo FROM clientes_cuenta_corriente WHERE id_cliente = %s", (id_cliente,))
                 row_saldo = cur.fetchone()
                 saldo_anterior = row_saldo["saldo"] if row_saldo else 0
-            else:
-                saldo_anterior = 0
 
     return render_template(
         "remito_confirmar.html",
-        detalles=detalles,
+        items=items,
         id_pedido=id_pedido,
         remito_id=id_pedido,
         saldo_anterior=saldo_anterior

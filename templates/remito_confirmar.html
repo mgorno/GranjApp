@@ -45,7 +45,7 @@
             {% if item.cantidad == item.cantidad|int %}
             {{ item.cantidad|int }}
             {% else %}
-            {{ '%.3f'|format(item.cantidad).replace('.', ',') }}
+            {{ '%.3f'|format(item.cantidad)|replace('.', ',') }}
             {% endif %}
           </td>
 
@@ -63,6 +63,7 @@
 
           <td class="text-end subtotal-cell">
             {{ (item.precio * item.cantidad_real)|int | string | replace('.', '.') }}
+
           </td>
 
           <td class="text-center">

@@ -130,7 +130,7 @@ def generar_remito(id_pedido):
                 cur.execute("""
                     INSERT INTO movimientos_cuenta_corriente (id_movimiento, id_cliente, fecha, tipo_mov, importe)
                     VALUES (%s, %s, %s, %s, %s)
-                """, (str(uuid.uuid4()), id_cliente, datetime.now().date(), 'compra', total, 'remito'))
+                """, (str(uuid.uuid4()), id_cliente, datetime.now().date(), 'compra', total))
 
                 # Actualizar saldo cliente
                 cur.execute("""

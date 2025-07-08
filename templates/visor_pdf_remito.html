@@ -1,58 +1,55 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <title>Visor PDF Remito #{{ id_remito }}</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        #visor { width: 100%; height: 80vh; border: 1px solid #ccc; }
-        .botones { margin-top: 10px; }
-        button, a.btn { 
-            margin-right: 10px; 
-            padding: 10px 15px; 
-            cursor: pointer; 
-            text-decoration: none; 
-            color: #000;
-            background: #f0f0f0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Confirmar Remito #{{ id_pedido }}</title>
+  <style>
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    input[type=text] { width: 80px; }
+  </style>
 </head>
 <body>
-    <h2>Visor de Remito #{{ id_remito }}</h2>
-    <iframe
-      id="visor"
-      src="{{ url_for('entregas.remito_pdf', id_remito=id_remito) }}"
-      frameborder="0"
-    ></iframe>
-
-    <div class="botones">
-        <button onclick="document.getElementById('visor').contentWindow.print()">
-          🖨️ Imprimir
-        </button>
-
-        <button onclick="enviarPorWhatsapp()">
-          📤 Enviar por WhatsApp
-        </button>
-
-        <!-- Volver a entregas, no window.close() -->
-        <a href="{{ url_for('entregas.lista_entregas') }}" class="btn">
-          ❌ Cancelar
-        </a>
-    </div>
-
-    <script>
-        function enviarPorWhatsapp() {
-            // URL completa al PDF
-            const pdfUrl = window.location.origin
-                + "{{ url_for('entregas.remito_pdf', id_remito=id_remito) }}";
-            const text = encodeURIComponent(
-                `Hola, te comparto el remito #${{ id_remito }}: ${pdfUrl}`
-            );
-            // Abre WhatsApp Web/APP con mensaje
-            window.open(`https://wa.me/?text=${text}`, "_blank");
-        }
-    </script>
+  <h2>Confirmar Remito - Pedido #{{ id_pedido }}</h2>
+  <form method="post">
+    <table>
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Cantidad Solicitada</th>
+          <th>Cantidad Real</th>
+          <th>Unidad</th>
+          <th>Precio</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in detalles %}
+        <tr>
+          <td>{{ row.descripcion }}</td>
+          <td>{{ row.cantidad }}</td>
+          <td>
+            <input
+              type="text"
+              name="cantidad_real"
+              value="{{ row.cantidad_real }}"
+            />
+          </td>
+          <td>{{ row.unidad }}</td>
+          <td>
+            <input
+              type="text"
+              name="precio"
+              value="{{ row.precio }}"
+            />
+          </td>
+          <input type="hidden" name="id_detalle" value="{{ row.id_detalle }}">
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p>Saldo anterior: {{ saldo_anterior }}</p>
+    <button type="submit">Confirmar y Generar Remito</button>
+    <a href="{{ url_for('entregas.lista_entregas') }}"><button type="button">Cancelar</button></a>
+  </form>
 </body>
 </html>

@@ -207,22 +207,32 @@ def remito(id_pedido):
 def visualizar_remito(id_remito):
     conn = get_conn()
     with conn.cursor(cursor_factory=RealDictCursor) as cur:
+        # Traemos el remito principal
         cur.execute("SELECT * FROM remitos WHERE id_remito = %s", (id_remito,))
         remito = cur.fetchone()
+        if not remito:
+            abort(404, "Remito no encontrado")
 
-        cur.execute("""
-            SELECT rd.*, p.descripcion, p.unidad_base
-            FROM detalle_remito rd
-            JOIN productos p ON rd.id_producto = p.id_producto
-            WHERE rd.id_remito = %s
-        """, (id_remito,))
+        # Traemos los detalles del remito
+        cur.execute("SELECT * FROM remito_detalles WHERE id_remito = %s", (id_remito,))
         detalles = cur.fetchall()
 
-    total_remito = sum((item["precio_unitario"] or 0) * (item["cantidad"] or 0) for item in detalles)
+    # Reemplazamos None en cantidad_real por cantidad original para evitar errores
+    for item in detalles:
+        if item["cantidad_real"] is None:
+            item["cantidad_real"] = item.get("cantidad", 0)
 
-    return render_template("visualizar_remito.html",
-                           id_remito=id_remito,
-                           cliente_nombre=remito["id_pedido"],
-                           fecha_entrega=remito["fecha"],
-                           detalles=detalles,
-                           total_remito=total_remito)
+    # Calculamos total sumando precio * cantidad_real
+    total_remito = sum(
+        (item.get("precio") or 0) * (item.get("cantidad_real") or 0) for item in detalles
+    )
+
+    return render_template(
+        "visualizar_remito.html",
+        id_remito=id_remito,
+        cliente_nombre=remito.get("cliente"),
+        fecha_entrega=remito.get("fecha_entrega"),
+        detalles=detalles,
+        total_remito=total_remito
+    )
+

@@ -7,7 +7,7 @@ from psycopg2.extras import RealDictCursor
 from datetime import datetime
 import uuid
 from collections import defaultdict
-from .fn_generar_remito import generar_pdf_remito
+from .generar_remito import generar_pdf_remito
 
 
 

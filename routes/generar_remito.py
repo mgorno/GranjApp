@@ -1,4 +1,4 @@
-from io import BytesIO
+routes/fn_generar_remito.py from io import BytesIO
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors

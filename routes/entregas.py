@@ -244,3 +244,8 @@ def remito_pdf(id_remito):
     filename = f"Remito_{cli['nombre'].replace(' ', '_')}_{id_remito}.pdf"
     
     return send_file(pdf_buffer, mimetype="application/pdf", download_name=filename)
+    
+@bp_entregas.route("/remito/visor/<int:id_remito>")
+def visualizador_pdf_remito(id_remito):
+    # Aquí se va a renderizar tu plantilla con el iframe y los botones
+    return render_template("visor_pdf_remito.html", id_remito=id_remito)

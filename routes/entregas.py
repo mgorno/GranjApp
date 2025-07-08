@@ -117,7 +117,13 @@ def remito(id_pedido):
                 ON CONFLICT (id_cliente)
                 DO UPDATE SET saldo = clientes_cuenta_corriente.saldo + EXCLUDED.saldo
             """, (cli['id_cliente'], total))
+            cur.execute("SELECT id_remito FROM remitos WHERE id_pedido = %s", (id_pedido,))
+            remito_existente = cur.fetchone()
 
+            if remito_existente:
+                # Ya existe el remito, redirigir a la visualización del PDF o mostrar mensaje
+                id_remito = remito_existente["id_remito"]
+                return redirect(url_for("entregas.visualizador_pdf_remito", id_remito=id_remito))
             # Guardar el remito y sus detalles
             cur.execute("""
                 INSERT INTO remitos (id_pedido, fecha, total, saldo_anterior)

@@ -40,6 +40,7 @@ def lista_entregas():
 
     return render_template("entregas_pendientes.html", entregas=entregas_por_fecha)
 
+
 def obtener_productos():
     with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
         cur.execute("SELECT id_producto, descripcion, unidad_base, precio FROM productos ORDER BY descripcion")
@@ -66,13 +67,12 @@ def remito(id_pedido):
             for id_det, real_str, precio_str, id_prod in zip(id_detalles, cantidades_reales, precios, id_productos):
                 try:
                     real = float(real_str.replace(',', '.'))
-                except Exception:
+                except:
                     real = 0
                 try:
                     precio = float(precio_str.replace(',', '.'))
-                except Exception:
+                except:
                     precio = 0
-
                 cur.execute("""
                     UPDATE detalle_pedido
                     SET cantidad_real = %s,
@@ -108,9 +108,7 @@ def remito(id_pedido):
             total = 0
             detalles = []
             for row in detalles_raw:
-                cant_real = row["cantidad_real"]
-                if cant_real is None:
-                    cant_real = row["cantidad"]
+                cant_real = row["cantidad_real"] if row["cantidad_real"] is not None else row["cantidad"]
                 cant_real = float(cant_real)
                 precio = float(row["precio"] or 0)
                 total += cant_real * precio
@@ -133,7 +131,6 @@ def remito(id_pedido):
                 DO UPDATE SET saldo = clientes_cuenta_corriente.saldo + EXCLUDED.saldo
             """, (cli["id_cliente"], total))
 
-            # Guardar el remito y sus detalles
             cur.execute("""
                 INSERT INTO remitos (id_pedido, fecha, total, saldo_anterior)
                 VALUES (%s, NOW(), %s, %s)
@@ -150,14 +147,10 @@ def remito(id_pedido):
             cur.execute("UPDATE pedidos SET estado = 'entregado' WHERE id_pedido = %s", (id_pedido,))
             conn.commit()
 
-            # Generar y devolver el PDF del remito
-            pdf_buffer = generar_pdf_remito(
-                cli["nombre"], cli["direccion"], cli["fecha_entrega"], detalles, total, saldo_anterior, id_remito
-            )
-            filename = f"Remito_{cli['nombre'].replace(' ', '_')}_{id_remito}.pdf"
+            # Redirigir al visor (no devolver PDF directo)
             return redirect(url_for("entregas.visualizador_pdf_remito", id_remito=id_remito))
 
-        # GET - mostrar pantalla para confirmar cantidades
+        # GET: mostrar formulario
         cur.execute("""
             SELECT pd.id_detalle,
                    pr.descripcion,
@@ -174,12 +167,8 @@ def remito(id_pedido):
 
         detalles = []
         for row in detalles_raw:
-            cant_real = row["cantidad_real"]
-            if cant_real is None:
-                cant_real = row["cantidad"]
-            cant_real = float(cant_real)
-            precio = float(row["precio"] or 0)
-            detalles.append({**row, "cantidad_real": cant_real, "precio": precio})
+            cant_real = row["cantidad_real"] if row["cantidad_real"] is not None else row["cantidad"]
+            detalles.append({**row, "cantidad_real": float(cant_real), "precio": float(row["precio"] or 0)})
 
         cur.execute("SELECT id_cliente FROM pedidos WHERE id_pedido = %s", (id_pedido,))
         row = cur.fetchone()
@@ -239,13 +228,11 @@ def remito_pdf(id_remito):
         detalles=detalles,
         total_remito=total_remito,
         saldo_anterior=remito["saldo_anterior"],
-        numero_remito=id_remito
+        id_remito=id_remito
     )
     filename = f"Remito_{cli['nombre'].replace(' ', '_')}_{id_remito}.pdf"
-    
-    return redirect(url_for("entregas.visualizador_pdf_remito", id_remito=id_remito))
+    return send_file(pdf_buffer, mimetype="application/pdf", download_name=filename)
 
 @bp_entregas.route("/remito/visor/<int:id_remito>")
 def visualizador_pdf_remito(id_remito):
-    # Aquí se va a renderizar tu plantilla con el iframe y los botones
     return render_template("visor_pdf_remito.html", id_remito=id_remito)

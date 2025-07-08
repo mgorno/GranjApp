@@ -69,6 +69,22 @@ CREATE TABLE IF NOT EXISTS clientes_cuenta_corriente (
     id_cliente TEXT PRIMARY KEY,
     saldo      NUMERIC(10,0) NOT NULL DEFAULT 0
 );
+
+CREATE TABLE IF NOT EXISTS remitos (
+    id_remito SERIAL PRIMARY KEY,
+    id_pedido TEXT REFERENCES pedidos(id_pedido),
+    fecha TIMESTAMP DEFAULT NOW(),
+    total NUMERIC(12,2) NOT NULL,
+    saldo_anterior NUMERIC(12,2) NOT NULL
+);
+CREATE TABLE IF NOT EXISTS detalle_remito (
+    id_detalle SERIAL PRIMARY KEY,
+    id_remito INTEGER REFERENCES remitos(id_remito),
+    id_producto TEXT REFERENCES productos(id_producto),
+    cantidad NUMERIC(10,3) NOT NULL,
+    precio_unitario NUMERIC(10,0) NOT NULL
+);
+
 """
 
 

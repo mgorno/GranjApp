@@ -24,7 +24,8 @@ def formato_precio(n):
 
 def formato_precio_arg(value):
     s = f"{int(value):,}"
-    return s.replace(",", ".")        
+    return s.replace(",", ".")      
+  
 
 app.jinja_env.filters["formato_cantidad"] = formato_cantidad
 app.jinja_env.filters["formato_precio"] = formato_precio

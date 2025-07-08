@@ -9,16 +9,10 @@ import uuid
 from collections import defaultdict
 from .generar_remito import generar_pdf_remito
 
-
-
 bp_entregas = Blueprint("entregas", __name__, url_prefix="/entregas")
 
 @bp_entregas.route("/")
 def lista_entregas():
-    """
-    Lista los pedidos pendientes agrupados por fecha de entrega
-    """
-    
     with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
         cur.execute("""
             SELECT p.id_pedido,
@@ -49,10 +43,10 @@ def obtener_productos():
     with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
         cur.execute("SELECT id_producto, descripcion, unidad_base, precio FROM productos ORDER BY descripcion")
         return cur.fetchall()
+
 @bp_entregas.route("/<id_pedido>/remito", methods=["GET", "POST"])
 def remito(id_pedido):
     with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
-        # Verificar que exista el pedido
         cur.execute("SELECT * FROM pedidos WHERE id_pedido = %s", (id_pedido,))
         pedido = cur.fetchone()
         if not pedido:
@@ -64,15 +58,13 @@ def remito(id_pedido):
             precios = request.form.getlist("precio")
             id_productos = request.form.getlist("id_producto")
 
-            # Verificar que lleguen todas las listas con igual cantidad
             if not (len(cantidades_reales) == len(id_detalles) == len(precios) == len(id_productos)):
                 flash("Faltan datos para registrar la entrega.", "error")
                 return redirect(url_for("entregas.remito", id_pedido=id_pedido))
 
-            # Actualizar detalles: parsear a float cantidades y precios para evitar errores
             for id_det, real_str, precio_str, id_prod in zip(id_detalles, cantidades_reales, precios, id_productos):
                 try:
-                    real = float(real_str.replace(',', '.'))  # aceptar coma decimal si llega
+                    real = float(real_str.replace(',', '.'))
                 except Exception:
                     real = 0
                 try:
@@ -88,7 +80,6 @@ def remito(id_pedido):
                     WHERE id_detalle = %s
                 """, (real, precio, id_prod, id_det))
 
-            # Obtener datos cliente y pedido
             cur.execute("""
                 SELECT c.id_cliente, c.nombre, c.direccion, p.fecha_entrega
                 FROM pedidos p
@@ -100,14 +91,14 @@ def remito(id_pedido):
                 flash("Cliente no encontrado.", "error")
                 return redirect(url_for("entregas.lista_entregas"))
 
-            # Obtener detalles actualizados
             cur.execute("""
                 SELECT pr.descripcion,
                        pd.cantidad,
                        pd.cantidad_real,
                        pd.unidad,
                        pd.precio,
-                       pd.id_detalle
+                       pd.id_detalle,
+                       pd.id_producto
                 FROM detalle_pedido pd
                 JOIN productos pr ON pd.id_producto = pr.id_producto
                 WHERE pd.id_pedido = %s
@@ -117,7 +108,6 @@ def remito(id_pedido):
             total = 0
             detalles = []
             for row in detalles_raw:
-                # Si cantidad_real es None, usar cantidad original
                 cant_real = row["cantidad_real"]
                 if cant_real is None:
                     cant_real = row["cantidad"]
@@ -126,12 +116,15 @@ def remito(id_pedido):
                 total += cant_real * precio
                 detalles.append({**row, "cantidad_real": cant_real, "precio": precio})
 
-            mov_id = str(uuid.uuid4())
+            cur.execute("SELECT saldo FROM clientes_cuenta_corriente WHERE id_cliente = %s", (cli["id_cliente"],))
+            row_saldo = cur.fetchone()
+            saldo_anterior = row_saldo["saldo"] if row_saldo else 0
+
             cur.execute("""
                 INSERT INTO movimientos_cuenta_corriente
                     (id_movimiento, id_cliente, fecha, tipo_mov, importe)
                 VALUES (%s, %s, %s, 'compra', %s)
-            """, (mov_id, cli["id_cliente"], datetime.utcnow().date(), total))
+            """, (str(uuid.uuid4()), cli["id_cliente"], datetime.utcnow().date(), total))
 
             cur.execute("""
                 INSERT INTO clientes_cuenta_corriente (id_cliente, saldo)
@@ -140,25 +133,25 @@ def remito(id_pedido):
                 DO UPDATE SET saldo = clientes_cuenta_corriente.saldo + EXCLUDED.saldo
             """, (cli["id_cliente"], total))
 
+            # Guardar el remito y sus detalles
+            cur.execute("""
+                INSERT INTO remitos (id_pedido, fecha, total, saldo_anterior)
+                VALUES (%s, NOW(), %s, %s)
+                RETURNING id_remito
+            """, (id_pedido, total, saldo_anterior))
+            id_remito = cur.fetchone()["id_remito"]
+
+            for row in detalles:
+                cur.execute("""
+                    INSERT INTO detalle_remito (id_remito, id_producto, cantidad, precio_unitario)
+                    VALUES (%s, %s, %s, %s)
+                """, (id_remito, row["id_producto"], row["cantidad_real"], row["precio"]))
+
             cur.execute("UPDATE pedidos SET estado = 'entregado' WHERE id_pedido = %s", (id_pedido,))
             conn.commit()
 
-            # Obtener saldo anterior para PDF
-            saldo_anterior = 0
-            cur.execute("SELECT saldo FROM clientes_cuenta_corriente WHERE id_cliente = %s", (cli["id_cliente"],))
-            row_saldo = cur.fetchone()
-            if row_saldo:
-                saldo_anterior = row_saldo["saldo"]
+            return redirect(url_for("entregas.visualizar_remito", id_remito=id_remito))
 
-            # Generar PDF con saldo_anterior
-            pdf_buffer = generar_pdf_remito(
-                cli["nombre"], cli["direccion"], cli["fecha_entrega"], detalles, total, saldo_anterior
-            )
-            filename = f"Remito_{cli['nombre']}_{id_pedido}.pdf"
-            return send_file(pdf_buffer, mimetype="application/pdf",
-                             as_attachment=True, download_name=filename)
-
-        # --- GET ---
         cur.execute("""
             SELECT pd.id_detalle,
                    pr.descripcion,
@@ -177,7 +170,7 @@ def remito(id_pedido):
         for row in detalles_raw:
             cant_real = row["cantidad_real"]
             if cant_real is None:
-                cant_real = row["cantidad"]  # aseguramos que no sea None
+                cant_real = row["cantidad"]
             cant_real = float(cant_real)
             precio = float(row["precio"] or 0)
             detalles.append({**row, "cantidad_real": cant_real, "precio": precio})
@@ -191,14 +184,15 @@ def remito(id_pedido):
             cur.execute("SELECT saldo FROM clientes_cuenta_corriente WHERE id_cliente = %s", (id_cliente,))
             row_saldo = cur.fetchone()
             saldo_anterior = row_saldo["saldo"] if row_saldo else 0
+
         cur.execute("""
             SELECT c.nombre AS cliente_nombre, p.fecha_entrega
             FROM pedidos p
             JOIN clientes c ON p.id_cliente = c.id_cliente
             WHERE p.id_pedido = %s
-            """, (id_pedido,))
+        """, (id_pedido,))
         info_cliente = cur.fetchone()
-        
+
     return render_template(
         "remito_confirmar.html",
         detalles=detalles,
@@ -209,3 +203,26 @@ def remito(id_pedido):
         fecha_entrega=info_cliente["fecha_entrega"]
     )
 
+@bp_entregas.route("/remito/visualizar/<int:id_remito>")
+def visualizar_remito(id_remito):
+    conn = get_conn()
+    with conn.cursor(cursor_factory=RealDictCursor) as cur:
+        cur.execute("SELECT * FROM remitos WHERE id_remito = %s", (id_remito,))
+        remito = cur.fetchone()
+
+        cur.execute("""
+            SELECT rd.*, p.descripcion, p.unidad_base
+            FROM detalle_remito rd
+            JOIN productos p ON rd.id_producto = p.id_producto
+            WHERE rd.id_remito = %s
+        """, (id_remito,))
+        detalles = cur.fetchall()
+
+    total_remito = sum((item["precio_unitario"] or 0) * (item["cantidad"] or 0) for item in detalles)
+
+    return render_template("visualizar_remito.html",
+                           id_remito=id_remito,
+                           cliente_nombre=remito["id_pedido"],
+                           fecha_entrega=remito["fecha"],
+                           detalles=detalles,
+                           total_remito=total_remito)

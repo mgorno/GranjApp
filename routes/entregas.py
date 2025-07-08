@@ -183,11 +183,20 @@ def remito(id_pedido):
             cur.execute("SELECT saldo FROM clientes_cuenta_corriente WHERE id_cliente = %s", (id_cliente,))
             row_saldo = cur.fetchone()
             saldo_anterior = row_saldo["saldo"] if row_saldo else 0
-
+        cur.execute("""
+            SELECT c.nombre AS cliente_nombre, p.fecha_entrega
+            FROM pedidos p
+            JOIN clientes c ON p.id_cliente = c.id_cliente
+            WHERE p.id_pedido = %s
+            """, (id_pedido,))
+        info_cliente = cur.fetchone()
+        
     return render_template(
         "remito_confirmar.html",
         detalles=detalles,
         productos=obtener_productos(),
         id_pedido=id_pedido,
-        saldo_anterior=saldo_anterior
+        saldo_anterior=saldo_anterior,
+        cliente_nombre=info_cliente["cliente_nombre"],
+        fecha_entrega=info_cliente["fecha_entrega"]
     )

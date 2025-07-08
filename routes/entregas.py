@@ -227,7 +227,7 @@ def visualizar_remito(id_remito):
         "visualizar_remito.html",
         id_remito=id_remito,
         cliente_nombre=remito.get("cliente"),
-        fecha_entrega=remito.get("fecha_entrega"),
+        fecha_entrega=remito.get("fecha"),
         detalles=detalles,
         total_remito=total_remito
     )

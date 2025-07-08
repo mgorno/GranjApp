@@ -199,4 +199,5 @@ def remito_pdf(id_remito):
     return send_file(pdf_buffer, mimetype="application/pdf", download_name=filename)
 
 @bp_entregas.route("/remito/visor/<int:id_remito>")
-
+def visualizador_pdf_remito(id_remito):
+    return render_template("visor_pdf_remito.html", id_remito=id_remito)

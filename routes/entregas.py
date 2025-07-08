@@ -214,7 +214,7 @@ def visualizar_remito(id_remito):
             abort(404, "Remito no encontrado")
 
         # Traemos los detalles del remito
-        cur.execute("SELECT * FROM remito_detalles WHERE id_remito = %s", (id_remito,))
+        cur.execute("SELECT * FROM detalle_remito WHERE id_remito = %s", (id_remito,))
         detalles = cur.fetchall()
 
     # Reemplazamos None en cantidad_real por cantidad original para evitar errores

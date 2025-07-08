@@ -23,7 +23,7 @@ def formato_precio(n):
         return "$0"
 
 def formato_precio_arg(value):
-    s = f"{int(value):,}"
+    s = f"${int(value):,}"
     return s.replace(",", ".")      
   
 

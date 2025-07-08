@@ -217,14 +217,10 @@ def visualizar_remito(id_remito):
         cur.execute("SELECT * FROM detalle_remito WHERE id_remito = %s", (id_remito,))
         detalles = cur.fetchall()
 
-    # Reemplazamos None en cantidad_real por cantidad original para evitar errores
-    for item in detalles:
-        if item["cantidad_real"] is None:
-            item["cantidad_real"] = item.get("cantidad", 0)
 
     # Calculamos total sumando precio * cantidad_real
     total_remito = sum(
-        (item.get("precio") or 0) * (item.get("cantidad_real") or 0) for item in detalles
+        (item.get("precio") or 0) * (item.get("cantidad") or 0) for item in detalles
     )
 
     return render_template(

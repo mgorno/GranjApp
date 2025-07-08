@@ -240,7 +240,7 @@ def remito_pdf(id_remito):
         detalles=detalles,
         total_remito=total_remito,
         saldo_anterior=remito["saldo_anterior"],
-        numero_remito=id_remito  # si modificaste tu función para recibirlo
+        numero_remito=id_remito
     )
     filename = f"Remito_{cli['nombre']}_{id_remito}.pdf"
     return redirect(url_for("entregas.visualizador_pdf_remito", id_remito=id_remito))

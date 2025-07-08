@@ -1,6 +1,6 @@
 (() => {
   const tabla = document.getElementById("tabla-remito");
-  if (!tabla) return; // por si el script se carga en otra vista
+  if (!tabla) return; // si no está la tabla, salir
 
   const form = document.getElementById("form-remito");
   const tbody = tabla.querySelector("tbody");
@@ -8,39 +8,58 @@
   const saldoTotalEl = document.getElementById("saldo-total");
   const saldoAnterior = parseFloat(form?.dataset?.saldoAnterior || window.SALDO_ANTERIOR || 0);
 
-  // Formatea número a $ 1.234,56
-  const formatoPrecio = (num) => {
-    return "$ " + num.toFixed(2).replace(".", ",");
-  };
+  // Formatea número a cantidad con miles y coma decimal (hasta 3 decimales)
+  function formatoCantidad(num) {
+    if (num === 0) return "0";
+    const entero = Math.trunc(num);
+    const decimales = Math.abs(num - entero);
+    const enteroStr = entero.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    if (decimales === 0) return enteroStr;
+    let decStr = decimales.toFixed(3).substring(2).replace(/0+$/, "");
+    return enteroStr + (decStr ? "," + decStr : "");
+  }
 
-  // Actualiza el subtotal de una fila
-  const actualizarSubtotalFila = (fila) => {
+  // Formatea número a precio: "$ 1.234"
+  function formatoPrecio(num) {
+    const entero = Math.floor(num);
+    const enteroStr = entero.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    return `$ ${enteroStr}`;
+  }
+
+  // Actualiza el subtotal de una fila y formatea inputs
+  function actualizarSubtotalFila(fila) {
     const precioInput = fila.querySelector(".precio-input");
     const cantidadInput = fila.querySelector(".cantidad-input");
-    // Convertir coma a punto para parsear
-    const precio = parseFloat(precioInput.value.replace(",", ".")) || 0;
-    const cantidad = parseFloat(cantidadInput.value.replace(",", ".")) || 0;
+
+    // Parsear valores: reemplazar puntos miles y coma decimal a punto decimal JS
+    const precio = parseFloat(precioInput.value.replace(/\./g, "").replace(",", ".")) || 0;
+    const cantidad = parseFloat(cantidadInput.value.replace(/\./g, "").replace(",", ".")) || 0;
+
     const subtotal = precio * cantidad;
     fila.querySelector(".subtotal-cell").textContent = formatoPrecio(subtotal);
-  };
 
-  // Recalcula los totales del remito y saldo total
-  const recalcularTotales = () => {
+    // Formatear inputs para mostrar correctamente
+    cantidadInput.value = formatoCantidad(cantidad);
+    // Precio solo parte entera formateada con puntos
+    precioInput.value = Math.floor(precio).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  }
+
+  // Recalcula totales y actualiza visualización
+  function recalcularTotales() {
     let total = 0;
     tbody.querySelectorAll("tr").forEach((fila) => {
       const textoSubtotal = fila.querySelector(".subtotal-cell").textContent;
-      // Quitar $ y espacio, cambiar coma por punto para parsear
-      const subtotalNum = parseFloat(textoSubtotal.replace("$", "").trim().replace(",", ".")) || 0;
+      // Quitar signo $, puntos miles y reemplazar coma decimal a punto JS
+      const subtotalNum = parseFloat(textoSubtotal.replace("$", "").replace(/\./g, "").replace(",", ".")) || 0;
       total += subtotalNum;
     });
     totalRemitoEl.textContent = formatoPrecio(total);
     saldoTotalEl.textContent = formatoPrecio(total + saldoAnterior);
-  };
+  }
 
-  // Crea una fila vacía para agregar
-  const crearFilaVacia = () => {
+  // Crear una fila vacía para agregar
+  function crearFilaVacia() {
     const tr = document.createElement("tr");
-    // Copiar opciones del select original para mantener productos
     const opciones = document.querySelector(".producto-select")?.innerHTML || "";
 
     tr.innerHTML = `
@@ -50,12 +69,12 @@
         </select>
       </td>
       <td class="text-end">
-        <input type="number" step="0.01" name="precio[]" value="0,00" class="form-control text-end table-input precio-input" required>
+        <input type="number" step="0.01" name="precio[]" value="0" class="form-control text-end table-input precio-input" required>
       </td>
       <td class="text-end">
-        <input type="number" step="0.01" name="cantidad_real[]" value="0,00" class="form-control text-end table-input cantidad-input" required>
+        <input type="number" step="0.001" name="cantidad_real[]" value="0" class="form-control text-end table-input cantidad-input" required>
       </td>
-      <td class="text-end subtotal-cell">$ 0,00</td>
+      <td class="text-end subtotal-cell">$ 0</td>
       <td class="text-center">
         <button type="button" class="btn btn-outline-danger btn-sm eliminar-fila" title="Eliminar fila">
           <i class="bi bi-trash"></i>
@@ -67,17 +86,15 @@
     if (select) select.value = "";
 
     return tr;
-  };
+  }
 
-  // Formatear subtotales actuales al cargar
+  // Inicializar subtotales y totales al cargar
   tbody.querySelectorAll("tr").forEach(fila => actualizarSubtotalFila(fila));
   recalcularTotales();
 
   // Eventos delegados en tbody
   tbody.addEventListener("input", (e) => {
     if (e.target.classList.contains("precio-input") || e.target.classList.contains("cantidad-input")) {
-      // Reemplazar coma por punto en inputs para evitar errores al parsear
-      e.target.value = e.target.value.replace(",", ".");
       const fila = e.target.closest("tr");
       actualizarSubtotalFila(fila);
       recalcularTotales();
@@ -89,7 +106,8 @@
       const fila = e.target.closest("tr");
       const precioInput = fila.querySelector(".precio-input");
       const option = e.target.selectedOptions[0];
-      precioInput.value = parseFloat(option.dataset.precio || 0).toFixed(2).replace(".", ",");
+      const precioOpt = parseFloat(option.dataset.precio || 0);
+      precioInput.value = Math.floor(precioOpt).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
       actualizarSubtotalFila(fila);
       recalcularTotales();
     }

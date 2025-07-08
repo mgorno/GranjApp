@@ -3,27 +3,31 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.platypus import Table, TableStyle
+from decimal import Decimal
+
 
 def generar_pdf_remito(nombre_cliente, direccion, fecha_entrega, detalles, total_remito, saldo_anterior):
     buffer = BytesIO()
     p = canvas.Canvas(buffer, pagesize=A4)
 
-    def formato_numero(n):
+    # Formatear cantidades y precios
+    def formato_cantidad(n):
         return str(int(n)) if n == int(n) else f"{n:.3f}".rstrip("0").replace(".", ",")
 
     def formato_con_signo(n):
-        return f"${formato_numero(n)}"
+        n = float(n)  # Asegura que sea float para usar el formato
+        return f"${int(n)}" if n == int(n) else f"${n:.2f}".rstrip("0").rstrip(".")  # sin .00 al final
 
     ancho, alto = A4
     margen_x = 40
     y = alto - 40
 
-    # Logo y título
+    # Título
     p.setFont("Helvetica-Bold", 18)
     p.drawCentredString(ancho / 2, y, "REMITO DE ENTREGA")
     y -= 40
 
-    # Cliente
+    # Datos del cliente
     p.setFont("Helvetica", 11)
     p.drawString(margen_x, y, f"Cliente: {nombre_cliente}")
     y -= 15
@@ -36,15 +40,10 @@ def generar_pdf_remito(nombre_cliente, direccion, fecha_entrega, detalles, total
     data = [["Producto", "Cantidad", "Precio", "Subtotal"]]
     for item in detalles:
         desc = item["descripcion"]
-        cantidad = item['cantidad_real']
-        precio_unit = item['precio']
-        subtotal_val = cantidad * precio_unit
-
-        cant = formato_numero(cantidad)
-        precio = formato_con_signo(precio_unit)
-        subtotal = formato_con_signo(subtotal_val)
-
-        data.append([desc, cant, precio, subtotal])
+        cantidad = formato_cantidad(item["cantidad_real"])
+        precio = formato_con_signo(item["precio"])
+        subtotal = formato_con_signo(item["cantidad_real"] * item["precio"])
+        data.append([desc, cantidad, precio, subtotal])
 
     table = Table(data, colWidths=[220, 80, 80, 80])
     table.setStyle(TableStyle([
@@ -68,11 +67,13 @@ def generar_pdf_remito(nombre_cliente, direccion, fecha_entrega, detalles, total
     p.setFont("Helvetica-Bold", 11)
     p.line(margen_x, y, ancho - margen_x, y)
     y -= 20
+
     p.drawRightString(ancho - margen_x, y, f"Total del remito: {formato_con_signo(total_remito)}")
     y -= 15
     p.drawRightString(ancho - margen_x, y, f"Saldo anterior: {formato_con_signo(saldo_anterior)}")
     y -= 15
-    p.drawRightString(ancho - margen_x, y, f"Saldo total: {formato_con_signo(total_remito + saldo_anterior)}")
+    total = Decimal(str(total_remito)) + Decimal(str(saldo_anterior))
+    p.drawRightString(ancho - margen_x, y, f"Saldo total: {formato_con_signo(total)}")
 
     y -= 40
     p.setFont("Helvetica-Oblique", 9)

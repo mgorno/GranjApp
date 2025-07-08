@@ -155,8 +155,7 @@ def remito(id_pedido):
                 cli["nombre"], cli["direccion"], cli["fecha_entrega"], detalles, total, saldo_anterior, id_remito
             )
             filename = f"Remito_{cli['nombre'].replace(' ', '_')}_{id_remito}.pdf"
-            return send_file(pdf_buffer, mimetype="application/pdf",
-                             as_attachment=True, download_name=filename)
+            return redirect(url_for("entregas.visualizador_pdf_remito", id_remito=id_remito))
 
         # GET - mostrar pantalla para confirmar cantidades
         cur.execute("""
@@ -242,10 +241,6 @@ def remito_pdf(id_remito):
         saldo_anterior=remito["saldo_anterior"],
         numero_remito=id_remito
     )
-    filename = f"Remito_{cli['nombre']}_{id_remito}.pdf"
-    return redirect(url_for("entregas.visualizador_pdf_remito", id_remito=id_remito))
-
-@bp_entregas.route("/remito/visor/<int:id_remito>")
-def visualizador_pdf_remito(id_remito):
-    # agregar validaciones si es necesario
-    return render_template("visor_pdf_remito.html", id_remito=id_remito)
+    filename = f"Remito_{cli['nombre'].replace(' ', '_')}_{id_remito}.pdf"
+    
+    return send_file(pdf_buffer, mimetype="application/pdf", download_name=filename)

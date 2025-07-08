@@ -1,58 +1,41 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8" />
-    <title>Visor PDF Remito #{{ id_remito }}</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        #visor { width: 100%; height: 80vh; border: 1px solid #ccc; }
-        .botones { margin-top: 10px; }
-        button, a.btn { 
-            margin-right: 10px; 
-            padding: 10px 15px; 
-            cursor: pointer; 
-            text-decoration: none; 
-            color: #000;
-            background: #f0f0f0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-    </style>
-</head>
-<body>
-    <h2>Visor de Remito #{{ id_remito }}</h2>
-    <iframe
-      id="visor"
-      src="{{ url_for('entregas.remito_pdf', id_remito=id_remito) }}"
-      frameborder="0"
-    ></iframe>
+{% extends "base.html" %}
 
-    <div class="botones">
-        <button onclick="document.getElementById('visor').contentWindow.print()">
-          🖨️ Imprimir
-        </button>
+{% block title %}Remito #{{ id_remito }}{% endblock %}
 
-        <button onclick="enviarPorWhatsapp()">
-          📤 Enviar por WhatsApp
-        </button>
+{% block content %}
+<h2 class="mb-4">Remito #{{ id_remito }}</h2>
 
-        <!-- Volver a entregas, no window.close() -->
-        <a href="{{ url_for('entregas.lista_entregas') }}" class="btn">
-          ❌ Cancelar
-        </a>
-    </div>
+<div class="ratio ratio-1x1 ratio-sm-4x3 ratio-md-16x9 mb-3">
+  <iframe
+    id="visor"
+    src="{{ url_for('entregas.remito_pdf', id_remito=id_remito) }}"
+    title="Remito PDF"
+    allowfullscreen
+    style="border: 1px solid #ccc;"
+  ></iframe>
+</div>
 
-    <script>
-        function enviarPorWhatsapp() {
-            // URL completa al PDF
-            const pdfUrl = window.location.origin
-                + "{{ url_for('entregas.remito_pdf', id_remito=id_remito) }}";
-            const text = encodeURIComponent(
-                Hola, te comparto el remito #${{ id_remito }}: ${pdfUrl}
-            );
-            // Abre WhatsApp Web/APP con mensaje
-            window.open(https://wa.me/?text=${text}, "_blank");
-        }
-    </script>
-</body>
-</html>
+<div class="d-grid gap-2 gap-md-3 d-md-flex justify-content-md-start">
+  <button class="btn btn-secondary" onclick="document.getElementById('visor').contentWindow.print()">
+    🖨️ Imprimir
+  </button>
+
+  <button class="btn btn-success" onclick="enviarPorWhatsapp()">
+    📤 Enviar por WhatsApp
+  </button>
+
+  <a href="{{ url_for('entregas.lista_entregas') }}" class="btn btn-outline-light">
+    ❌ Cancelar
+  </a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function enviarPorWhatsapp() {
+    const pdfUrl = window.location.origin + "{{ url_for('entregas.remito_pdf', id_remito=id_remito) }}";
+    const text = encodeURIComponent("Hola, te comparto el remito #{{ id_remito }}: " + pdfUrl);
+    window.open("https://wa.me/?text=" + text, "_blank");
+  }
+</script>
+{% endblock %}

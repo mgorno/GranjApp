@@ -217,18 +217,21 @@ def visualizar_remito(id_remito):
         cur.execute("SELECT * FROM detalle_remito WHERE id_remito = %s", (id_remito,))
         detalles = cur.fetchall()
 
-
     # Calculamos total sumando precio * cantidad_real
     total_remito = sum(
         (item.get("precio") or 0) * (item.get("cantidad") or 0) for item in detalles
     )
 
+    # Formateamos la fecha antes de pasarla a la plantilla
+    fecha_entrega = remito.get("fecha").strftime('%d/%m/%Y') if remito.get("fecha") else "Fecha no disponible"
+
     return render_template(
         "visualizar_remito.html",
         id_remito=id_remito,
         cliente_nombre=remito.get("cliente"),
-        fecha_entrega=remito.get("fecha"),
+        fecha_entrega=fecha_entrega,  # Pasamos la fecha ya formateada
         detalles=detalles,
         total_remito=total_remito
     )
+
 

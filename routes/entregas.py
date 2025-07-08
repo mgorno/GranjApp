@@ -7,6 +7,8 @@ from psycopg2.extras import RealDictCursor
 from datetime import datetime
 import uuid
 from collections import defaultdict
+from utils.fn_generar_remito import generar_pdf_remito
+
 
 bp_entregas = Blueprint("entregas", __name__, url_prefix="/entregas")
 
@@ -46,7 +48,6 @@ def obtener_productos():
     with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
         cur.execute("SELECT id_producto, descripcion, unidad_base, precio FROM productos ORDER BY descripcion")
         return cur.fetchall()
-
 @bp_entregas.route("/<id_pedido>/remito", methods=["GET", "POST"])
 def remito(id_pedido):
     with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
@@ -119,7 +120,6 @@ def remito(id_pedido):
                 cant_real = row["cantidad_real"]
                 if cant_real is None:
                     cant_real = row["cantidad"]
-                # parsear a float para evitar errores en plantilla
                 cant_real = float(cant_real)
                 precio = float(row["precio"] or 0)
                 total += cant_real * precio
@@ -142,9 +142,16 @@ def remito(id_pedido):
             cur.execute("UPDATE pedidos SET estado = 'entregado' WHERE id_pedido = %s", (id_pedido,))
             conn.commit()
 
-            # Generar PDF
+            # Obtener saldo anterior para PDF
+            saldo_anterior = 0
+            cur.execute("SELECT saldo FROM clientes_cuenta_corriente WHERE id_cliente = %s", (cli["id_cliente"],))
+            row_saldo = cur.fetchone()
+            if row_saldo:
+                saldo_anterior = row_saldo["saldo"]
+
+            # Generar PDF con saldo_anterior
             pdf_buffer = generar_pdf_remito(
-                cli["nombre"], cli["direccion"], cli["fecha_entrega"], detalles, total
+                cli["nombre"], cli["direccion"], cli["fecha_entrega"], detalles, total, saldo_anterior
             )
             filename = f"Remito_{cli['nombre']}_{id_pedido}.pdf"
             return send_file(pdf_buffer, mimetype="application/pdf",
@@ -200,3 +207,4 @@ def remito(id_pedido):
         cliente_nombre=info_cliente["cliente_nombre"],
         fecha_entrega=info_cliente["fecha_entrega"]
     )
+

@@ -32,8 +32,8 @@
     const cantidadInput = fila.querySelector(".cantidad-input");
 
     // Parsear valores: reemplazar puntos miles y coma decimal a punto decimal JS
-    const precio = parseFloat(precioInput.value.replace(/\./g, "").replace(",", ".")) || 0;
-    const cantidad = parseFloat(cantidadInput.value.replace(/\./g, "").replace(",", ".")) || 0;
+   const precio = parseFloat(precioInput.value) || 0;
+   const cantidad = parseFloat(cantidadInput.value) || 0;
 
     const subtotal = precio * cantidad;
     fila.querySelector(".subtotal-cell").textContent = formatoPrecio(subtotal);
@@ -41,7 +41,7 @@
     // Formatear inputs para mostrar correctamente
     cantidadInput.value = formatoCantidad(cantidad);
     // Precio solo parte entera formateada con puntos
-    precioInput.value = Math.floor(precio).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    precioInput.value = parseFloat(option.dataset.precio || 0).toFixed(0);;
   }
 
   // Recalcula totales y actualiza visualización
@@ -113,20 +113,5 @@
     }
   });
 
-  tbody.addEventListener("click", (e) => {
-    const btn = e.target.closest(".eliminar-fila");
-    if (btn) {
-      btn.closest("tr").remove();
-      recalcularTotales();
-    }
-  });
 
-  const btnAgregarFila = document.getElementById("agregar-fila");
-  if (btnAgregarFila) {
-    btnAgregarFila.addEventListener("click", () => {
-      const nuevaFila = crearFilaVacia();
-      tbody.appendChild(nuevaFila);
-      recalcularTotales();
-    });
-  }
 })();

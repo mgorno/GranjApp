@@ -235,4 +235,4 @@ def remito_pdf(id_remito):
 
 @bp_entregas.route("/remito/visor/<int:id_remito>")
 def visualizador_pdf_remito(id_remito):
-    return rend
+    return render_template("visor_pdf_remito.html", id_remito=id_remito)

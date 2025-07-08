@@ -143,7 +143,7 @@ def remito(id_pedido):
 
             for row in detalles:
                 cur.execute("""
-                    INSERT INTO detalle_remito (id_remito, id_producto, cantidad, precio_unitario)
+                    INSERT INTO detalle_remito (id_remito, id_producto, cantidad, precio)
                     VALUES (%s, %s, %s, %s)
                 """, (id_remito, row["id_producto"], row["cantidad_real"], row["precio"]))
 

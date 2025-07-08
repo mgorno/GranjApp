@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS detalle_remito (
     id_remito INTEGER REFERENCES remitos(id_remito),
     id_producto TEXT REFERENCES productos(id_producto),
     cantidad NUMERIC(10,3) NOT NULL,
-    precio_unitario NUMERIC(10,0) NOT NULL
+    precio NUMERIC(10,0) NOT NULL
 );
 
 """

@@ -23,9 +23,9 @@
     {% for item in detalles %}
     <tr>
       <td>{{ item.descripcion }}</td>
-      <td class="text-end">{{ item.cantidad_real | round(3) }}</td>
+      <td class="text-end">{{ item.cantidad | round(3) }}</td>
       <td class="text-end">$ {{ item.precio | int | formato_precio_arg }}</td>
-      <td class="text-end">$ {{ (item.precio * item.cantidad_real) | int | formato_precio_arg }}</td>
+      <td class="text-end">$ {{ (item.precio * item.cantidad) | int | formato_precio_arg }}</td>
     </tr>
     {% endfor %}
   </tbody>

@@ -1,52 +1,63 @@
 (() => {
   const tabla = document.getElementById("tabla-remito");
-  if (!tabla) return;
+  if (!tabla) return; // por si el script se carga en otra vista
 
   const form = document.getElementById("form-remito");
   const tbody = tabla.querySelector("tbody");
   const totalRemitoEl = document.getElementById("total-remito");
   const saldoTotalEl = document.getElementById("saldo-total");
+  const saldoAnterior = parseFloat(form?.dataset?.saldoAnterior || window.SALDO_ANTERIOR || 0);
 
-  // Parsear saldo anterior con formato argentino
-  const saldoAnterior = parseFloat(
-    (form?.dataset?.saldoAnterior || "0")
-      .replace(/\./g, "")
-      .replace(",", ".")
-  ) || 0;
-
-  // 👉 Formatea número con separador de miles y decimales (coma)
-  const formatoArg = (num, decimales = 2) => {
-    return num
-      .toFixed(decimales)
-      .replace(".", ",")
+  // Formatea número a $ 1.234 (sin decimales, punto como separador de miles)
+  const formatoPrecio = (num) => {
+    return "$ " + num
+      .toFixed(0)
       .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
 
-  const formatoPrecio = (num) => "$ " + formatoArg(num, 0); // precios sin decimales
-  const formatoCantidad = (num) => formatoArg(num, 3).replace(/,?0+$/, "").replace(/,$/, "");
+  // Formatea cantidad con hasta 3 decimales, usa coma decimal y punto miles
+  const formatoCantidad = (num) => {
+    let parts = num.toString().split(".");
+    let integerPart = parts[0];
+    let decimalPart = parts[1] ? parts[1].substring(0, 3) : "";
+
+    // Formatear parte entera con puntos
+    integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+    if (decimalPart.length > 0) {
+      return integerPart + "," + decimalPart;
+    }
+    return integerPart;
+  };
 
   // Actualiza el subtotal de una fila
   const actualizarSubtotalFila = (fila) => {
     const precioInput = fila.querySelector(".precio-input");
     const cantidadInput = fila.querySelector(".cantidad-input");
 
-    const precio = parseFloat(precioInput.value.replace(/\./g, "").replace(",", ".")) || 0;
-    const cantidad = parseFloat(cantidadInput.value.replace(/\./g, "").replace(",", ".")) || 0;
+    // Convertir valor numérico directamente (inputs type=number ya tienen punto decimal)
+    const precio = Number(precioInput.value) || 0;
+    const cantidad = Number(cantidadInput.value) || 0;
 
     const subtotal = precio * cantidad;
     fila.querySelector(".subtotal-cell").textContent = formatoPrecio(subtotal);
   };
 
+  // Recalcula totales del remito y saldo total
   const recalcularTotales = () => {
     let total = 0;
     tbody.querySelectorAll("tr").forEach((fila) => {
       const textoSubtotal = fila.querySelector(".subtotal-cell").textContent;
+      // Quitar $ y espacios, quitar puntos, cambiar coma por punto para parsear
       const subtotalNum = parseFloat(
-        textoSubtotal.replace(/\./g, "").replace(",", ".").replace("$", "").trim()
+        textoSubtotal
+          .replace("$", "")
+          .replace(/\./g, "")
+          .replace(",", ".")
+          .trim()
       ) || 0;
       total += subtotalNum;
     });
-
     totalRemitoEl.textContent = formatoPrecio(total);
     saldoTotalEl.textContent = formatoPrecio(total + saldoAnterior);
   };
@@ -63,10 +74,10 @@
         </select>
       </td>
       <td class="text-end">
-        <input type="text" name="precio[]" value="0" class="form-control text-end table-input precio-input" required>
+        <input type="number" step="1" name="precio[]" value="0" class="form-control text-end table-input precio-input" required>
       </td>
       <td class="text-end">
-        <input type="text" name="cantidad_real[]" value="0" class="form-control text-end table-input cantidad-input" required>
+        <input type="number" step="0.001" name="cantidad_real[]" value="0" class="form-control text-end table-input cantidad-input" required>
       </td>
       <td class="text-end subtotal-cell">$ 0</td>
       <td class="text-center">
@@ -76,17 +87,24 @@
       </td>
     `;
 
+    const select = tr.querySelector(".producto-select");
+    if (select) select.value = "";
+
     return tr;
   };
 
-  // Inicializa
-  tbody.querySelectorAll("tr").forEach((fila) => actualizarSubtotalFila(fila));
+  // Formatear subtotales actuales al cargar
+  tbody.querySelectorAll("tr").forEach(fila => actualizarSubtotalFila(fila));
   recalcularTotales();
 
-  // Escuchar cambios en inputs
+  // Eventos delegados en tbody
   tbody.addEventListener("input", (e) => {
     if (e.target.classList.contains("precio-input") || e.target.classList.contains("cantidad-input")) {
       const fila = e.target.closest("tr");
+
+      // Opcional: formatear cantidad en el input con formato argentino
+      // pero cuidado, inputs type=number no permiten comas, así que mejor no formatear aquí
+
       actualizarSubtotalFila(fila);
       recalcularTotales();
     }
@@ -97,7 +115,7 @@
       const fila = e.target.closest("tr");
       const precioInput = fila.querySelector(".precio-input");
       const option = e.target.selectedOptions[0];
-      precioInput.value = parseFloat(option.dataset.precio || 0).toFixed(0);
+      precioInput.value = Math.round(Number(option.dataset.precio || 0));
       actualizarSubtotalFila(fila);
       recalcularTotales();
     }

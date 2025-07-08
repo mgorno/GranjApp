@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS movimientos_cuenta_corriente (
     tipo_mov      TEXT NOT NULL,
     importe       NUMERIC(10,0) NOT NULL,
     forma_pago    TEXT
+    id_remito     INTEGER UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS clientes_cuenta_corriente (
@@ -76,6 +77,7 @@ CREATE TABLE IF NOT EXISTS remitos (
     fecha TIMESTAMP DEFAULT NOW(),
     total NUMERIC(12,2) NOT NULL,
     saldo_anterior NUMERIC(12,2) NOT NULL
+    CONSTRAINT un_remito_por_pedido UNIQUE (id_pedido)
 );
 CREATE TABLE IF NOT EXISTS detalle_remito (
     id_detalle SERIAL PRIMARY KEY,

@@ -1,64 +1,50 @@
 (() => {
   const tabla = document.getElementById("tabla-remito");
-  if (!tabla) return; // si no está la tabla, salir
+  if (!tabla) return;
 
   const form = document.getElementById("form-remito");
   const tbody = tabla.querySelector("tbody");
   const totalRemitoEl = document.getElementById("total-remito");
   const saldoTotalEl = document.getElementById("saldo-total");
-  const saldoAnterior = parseFloat(form?.dataset?.saldoAnterior || window.SALDO_ANTERIOR || 0);
+  const saldoAnterior = parseFloat(form?.dataset?.saldoAnterior?.replace(",", ".") || 0);
 
-  // Formatea número a cantidad con miles y coma decimal (hasta 3 decimales)
-  function formatoCantidad(num) {
-    if (num === 0) return "0";
-    const entero = Math.trunc(num);
-    const decimales = Math.abs(num - entero);
-    const enteroStr = entero.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    if (decimales === 0) return enteroStr;
-    let decStr = decimales.toFixed(3).substring(2).replace(/0+$/, "");
-    return enteroStr + (decStr ? "," + decStr : "");
-  }
+  // ✅ Formato tipo: "$ 1.234.567"
+  const formatoPrecio = (num) => {
+    return "$ " + Math.round(num).toLocaleString("es-AR");
+  };
 
-  // Formatea número a precio: "$ 1.234"
-  function formatoPrecio(num) {
-    const entero = Math.floor(num);
-    const enteroStr = entero.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    return `$ ${enteroStr}`;
-  }
+  // ✅ Formato tipo: "1", "1,2", "1,121"
+  const formatoCantidad = (num) => {
+    const str = num.toString().replace(".", ",");
+    return str.endsWith(",000") ? str.split(",")[0] : str;
+  };
 
-  // Actualiza el subtotal de una fila y formatea inputs
-  function actualizarSubtotalFila(fila) {
+  const actualizarSubtotalFila = (fila) => {
     const precioInput = fila.querySelector(".precio-input");
     const cantidadInput = fila.querySelector(".cantidad-input");
 
-    // Parsear valores: reemplazar puntos miles y coma decimal a punto decimal JS
-   const precio = parseFloat(precioInput.value) || 0;
-   const cantidad = parseFloat(cantidadInput.value) || 0;
-
+    const precio = parseFloat(precioInput.value.toString().replace(",", ".")) || 0;
+    const cantidad = parseFloat(cantidadInput.value.toString().replace(",", ".")) || 0;
     const subtotal = precio * cantidad;
+
     fila.querySelector(".subtotal-cell").textContent = formatoPrecio(subtotal);
+  };
 
-    // Formatear inputs para mostrar correctamente
-    cantidadInput.value = formatoCantidad(cantidad);
-    // Precio solo parte entera formateada con puntos
-    precioInput.value = parseFloat(option.dataset.precio || 0).toFixed(0);;
-  }
-
-  // Recalcula totales y actualiza visualización
-  function recalcularTotales() {
+  const recalcularTotales = () => {
     let total = 0;
     tbody.querySelectorAll("tr").forEach((fila) => {
       const textoSubtotal = fila.querySelector(".subtotal-cell").textContent;
-      // Quitar signo $, puntos miles y reemplazar coma decimal a punto JS
-      const subtotalNum = parseFloat(textoSubtotal.replace("$", "").replace(/\./g, "").replace(",", ".")) || 0;
+      const subtotalNum = parseFloat(
+        textoSubtotal.replace("$", "").trim().replace(/\./g, "").replace(",", ".")
+      ) || 0;
       total += subtotalNum;
     });
+
     totalRemitoEl.textContent = formatoPrecio(total);
     saldoTotalEl.textContent = formatoPrecio(total + saldoAnterior);
-  }
+  };
 
-  // Crear una fila vacía para agregar
-  function crearFilaVacia() {
+  const crearFilaVacia = () => {
     const tr = document.createElement("tr");
     const opciones = document.querySelector(".producto-select")?.innerHTML || "";
 
@@ -69,10 +55,10 @@
         </select>
       </td>
       <td class="text-end">
-        <input type="number" step="0.01" name="precio[]" value="0" class="form-control text-end table-input precio-input" required>
+        <input type="number" step="1" name="precio[]" value="0" class="form-control text-end table-input precio-input" required>
       </td>
       <td class="text-end">
-        <input type="number" step="0.001" name="cantidad_real[]" value="0" class="form-control text-end table-input cantidad-input" required>
+        <input type="number" step="0.001" name="cantidad_real[]" value="0,00" class="form-control text-end table-input cantidad-input" required>
       </td>
       <td class="text-end subtotal-cell">$ 0</td>
       <td class="text-center">
@@ -81,18 +67,14 @@
         </button>
       </td>
     `;
-
-    const select = tr.querySelector(".producto-select");
-    if (select) select.value = "";
-
     return tr;
-  }
+  };
 
-  // Inicializar subtotales y totales al cargar
-  tbody.querySelectorAll("tr").forEach(fila => actualizarSubtotalFila(fila));
+  // Inicializar subtotales al cargar
+  tbody.querySelectorAll("tr").forEach((fila) => actualizarSubtotalFila(fila));
   recalcularTotales();
 
-  // Eventos delegados en tbody
+  // Escuchar cambios en inputs
   tbody.addEventListener("input", (e) => {
     if (e.target.classList.contains("precio-input") || e.target.classList.contains("cantidad-input")) {
       const fila = e.target.closest("tr");
@@ -101,17 +83,35 @@
     }
   });
 
+  // Cambiar producto
   tbody.addEventListener("change", (e) => {
     if (e.target.classList.contains("producto-select")) {
       const fila = e.target.closest("tr");
       const precioInput = fila.querySelector(".precio-input");
       const option = e.target.selectedOptions[0];
-      const precioOpt = parseFloat(option.dataset.precio || 0);
-      precioInput.value = Math.floor(precioOpt).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      const precio = parseFloat(option.dataset.precio || 0);
+      precioInput.value = Math.round(precio);
       actualizarSubtotalFila(fila);
       recalcularTotales();
     }
   });
 
+  // Eliminar fila
+  tbody.addEventListener("click", (e) => {
+    const btn = e.target.closest(".eliminar-fila");
+    if (btn) {
+      btn.closest("tr").remove();
+      recalcularTotales();
+    }
+  });
 
+  // Agregar fila vacía
+  const btnAgregarFila = document.getElementById("agregar-fila");
+  if (btnAgregarFila) {
+    btnAgregarFila.addEventListener("click", () => {
+      const nuevaFila = crearFilaVacia();
+      tbody.appendChild(nuevaFila);
+      recalcularTotales();
+    });
+  }
 })();

@@ -5,8 +5,7 @@ from reportlab.lib import colors
 from reportlab.platypus import Table, TableStyle
 from decimal import Decimal
 
-
-def generar_pdf_remito(nombre_cliente, direccion, fecha_entrega, detalles, total_remito, saldo_anterior):
+def generar_pdf_remito(nombre_cliente, direccion, fecha_entrega, detalles, total_remito, saldo_anterior, id_remito):
     buffer = BytesIO()
     p = canvas.Canvas(buffer, pagesize=A4)
 
@@ -15,8 +14,8 @@ def generar_pdf_remito(nombre_cliente, direccion, fecha_entrega, detalles, total
         return str(int(n)) if n == int(n) else f"{n:.3f}".rstrip("0").replace(".", ",")
 
     def formato_con_signo(n):
-        n = float(n)  # Asegura que sea float para usar el formato
-        return f"${int(n)}" if n == int(n) else f"${n:.2f}".rstrip("0").rstrip(".")  # sin .00 al final
+        n = float(n)
+        return f"${int(n)}" if n == int(n) else f"${n:.2f}".rstrip("0").rstrip(".")
 
     ancho, alto = A4
     margen_x = 40
@@ -25,10 +24,14 @@ def generar_pdf_remito(nombre_cliente, direccion, fecha_entrega, detalles, total
     # Título
     p.setFont("Helvetica-Bold", 18)
     p.drawCentredString(ancho / 2, y, "REMITO DE ENTREGA")
-    y -= 40
+    y -= 25
+
+    # Número de remito
+    p.setFont("Helvetica", 11)
+    p.drawCentredString(ancho / 2, y, f"N.º Remito: {id_remito}")
+    y -= 30
 
     # Datos del cliente
-    p.setFont("Helvetica", 11)
     p.drawString(margen_x, y, f"Cliente: {nombre_cliente}")
     y -= 15
     p.drawString(margen_x, y, f"Dirección: {direccion}")

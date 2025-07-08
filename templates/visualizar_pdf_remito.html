@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Visor PDF Remito #{{ id_remito }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #visor { width: 100%; height: 80vh; border: 1px solid #ccc; }
+        .botones { margin-top: 10px; }
+        button { margin-right: 10px; padding: 10px 15px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h2>Visor de Remito #{{ id_remito }}</h2>
+    <iframe id="visor" src="{{ url_for('entregas.remito_pdf', id_remito=id_remito) }}" frameborder="0"></iframe>
+
+    <div class="botones">
+        <button onclick="document.getElementById('visor').contentWindow.print()">Imprimir</button>
+        <button onclick="enviarPorWhatsapp()">Enviar por WhatsApp</button>
+        <button onclick="window.close()">Cancelar</button>
+    </div>
+
+    <script>
+        function enviarPorWhatsapp() {
+            alert('Para enviar por WhatsApp podés implementar un backend que genere un link o enviar el PDF por email.');
+            // Para enviar un archivo PDF por WhatsApp Web no hay un método directo en JS por limitaciones del navegador.
+            // Podés generar un link público o enviarlo por backend y luego compartir ese link.
+        }
+    </script>
+</body>
+</html>

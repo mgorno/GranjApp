@@ -8,6 +8,7 @@ from datetime import datetime
 import uuid
 from collections import defaultdict
 from utils.generar_remito import generar_pdf_remito
+import os
 
 bp_entregas = Blueprint("entregas", __name__, url_prefix="/entregas")
 
@@ -77,7 +78,7 @@ def remito(id_pedido):
                     SET cantidad_real = %s,
                         precio = %s
                     WHERE id_detalle = %s
-                """, (real, precio, id_prod, id_det))
+                """, (real, precio, id_det))
 
             cur.execute("""
                 SELECT c.id_cliente, c.nombre, c.direccion, p.fecha_entrega
@@ -149,8 +150,15 @@ def remito(id_pedido):
             cur.execute("UPDATE pedidos SET estado = 'entregado' WHERE id_pedido = %s", (id_pedido,))
             conn.commit()
 
-            return redirect(url_for("entregas.visualizar_remito", id_remito=id_remito))
+            # Generar y devolver el PDF del remito
+            pdf_buffer = generar_pdf_remito(
+                cli["nombre"], cli["direccion"], cli["fecha_entrega"], detalles, total, saldo_anterior, id_remito
+            )
+            filename = f"Remito_{cli['nombre'].replace(' ', '_')}_{id_remito}.pdf"
+            return send_file(pdf_buffer, mimetype="application/pdf",
+                             as_attachment=True, download_name=filename)
 
+        # GET - mostrar pantalla para confirmar cantidades
         cur.execute("""
             SELECT pd.id_detalle,
                    pr.descripcion,
@@ -202,35 +210,42 @@ def remito(id_pedido):
         fecha_entrega=info_cliente["fecha_entrega"]
     )
 
-@bp_entregas.route("/remito/visualizar/<int:id_remito>")
-def visualizar_remito(id_remito):
-    conn = get_conn()
-    with conn.cursor(cursor_factory=RealDictCursor) as cur:
-        # Traemos el remito principal
+@bp_entregas.route("/remito/pdf/<int:id_remito>")
+def remito_pdf(id_remito):
+    with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
         cur.execute("SELECT * FROM remitos WHERE id_remito = %s", (id_remito,))
         remito = cur.fetchone()
         if not remito:
             abort(404, "Remito no encontrado")
 
-        # Traemos los detalles del remito
         cur.execute("SELECT * FROM detalle_remito WHERE id_remito = %s", (id_remito,))
         detalles = cur.fetchall()
 
-    # Calculamos total sumando precio * cantidad_real
+        cur.execute("""
+            SELECT c.nombre, c.direccion, p.fecha_entrega
+            FROM pedidos p
+            JOIN clientes c ON p.id_cliente = c.id_cliente
+            WHERE p.id_pedido = %s
+        """, (remito['id_pedido'],))
+        cli = cur.fetchone()
+
     total_remito = sum(
         (item.get("precio") or 0) * (item.get("cantidad") or 0) for item in detalles
     )
 
-    # Formateamos la fecha antes de pasarla a la plantilla
-    fecha_entrega = remito.get("fecha").strftime('%d/%m/%Y') if remito.get("fecha") else "Fecha no disponible"
-
-    return render_template(
-        "visualizar_remito.html",
-        id_remito=id_remito,
-        cliente_nombre=remito.get("cliente"),
-        fecha_entrega=fecha_entrega,  # Pasamos la fecha ya formateada
+    pdf_buffer = generar_pdf_remito(
+        nombre_cliente=cli["nombre"],
+        direccion=cli["direccion"],
+        fecha_entrega=cli["fecha_entrega"],
         detalles=detalles,
-        total_remito=total_remito
+        total_remito=total_remito,
+        saldo_anterior=remito["saldo_anterior"],
+        numero_remito=id_remito  # si modificaste tu función para recibirlo
     )
+    filename = f"Remito_{cli['nombre']}_{id_remito}.pdf"
+    return send_file(pdf_buffer, mimetype="application/pdf", download_name=filename)
 
-
+@bp_entregas.route("/remito/visor/<int:id_remito>")
+def visualizador_pdf_remito(id_remito):
+    # agregar validaciones si es necesario
+    return render_template("visor_pdf_remito.html", id_remito=id_remito)

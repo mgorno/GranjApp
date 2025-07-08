@@ -14,10 +14,12 @@
   };
 
   // ✅ Formato tipo: "1", "1,2", "1,121"
-  const formatoCantidad = (num) => {
-    const str = num.toString().replace(".", ",");
-    return str.endsWith(",000") ? str.split(",")[0] : str;
-  };
+const formatoCantidad = (num) => {
+  const redondeado = parseFloat(num).toFixed(3); // 3 decimales como máximo
+  const limpio = redondeado.replace(/\.?0+$/, ""); // elimina ceros innecesarios
+  return limpio.replace(".", ",");
+};
+
 
   const actualizarSubtotalFila = (fila) => {
     const precioInput = fila.querySelector(".precio-input");
@@ -71,17 +73,19 @@
   };
 
   // Inicializar subtotales al cargar
-  tbody.querySelectorAll("tr").forEach((fila) => actualizarSubtotalFila(fila));
-  recalcularTotales();
+tbody.querySelectorAll("tr").forEach((fila) => {
+  const precioInput = fila.querySelector(".precio-input");
+  const cantidadInput = fila.querySelector(".cantidad-input");
 
-  // Escuchar cambios en inputs
-  tbody.addEventListener("input", (e) => {
-    if (e.target.classList.contains("precio-input") || e.target.classList.contains("cantidad-input")) {
-      const fila = e.target.closest("tr");
-      actualizarSubtotalFila(fila);
-      recalcularTotales();
-    }
-  });
+  const precio = parseFloat(precioInput.value.replace(",", ".")) || 0;
+  const cantidad = parseFloat(cantidadInput.value.replace(",", ".")) || 0;
+
+  // Actualizamos valores formateados en inputs
+  precioInput.value = Math.round(precio);
+  cantidadInput.value = formatoCantidad(cantidad);
+
+  actualizarSubtotalFila(fila);
+});
 
   // Cambiar producto
   tbody.addEventListener("change", (e) => {

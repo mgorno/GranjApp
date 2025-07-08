@@ -104,24 +104,29 @@ def remito(id_pedido):
             # Insertar movimiento y actualizar saldo
             cur.execute("SELECT saldo FROM clientes_cuenta_corriente WHERE id_cliente = %s", (cli['id_cliente'],))
             saldo_anterior = cur.fetchone()["saldo"] if cur.rowcount else 0
-
             cur.execute("""
-                INSERT INTO movimientos_cuenta_corriente
-                    (id_movimiento, id_cliente, fecha, tipo_mov, importe)
-                VALUES (%s, %s, %s, 'compra', %s)
-            """, (str(uuid.uuid4()), cli['id_cliente'], datetime.utcnow().date(), total))
-
-            cur.execute("""
-                INSERT INTO clientes_cuenta_corriente (id_cliente, saldo)
-                VALUES (%s, %s)
-                ON CONFLICT (id_cliente)
-                DO UPDATE SET saldo = clientes_cuenta_corriente.saldo + EXCLUDED.saldo
+            SELECT id_movimiento FROM movimientos_cuenta_corriente 
+                WHERE id_cliente = %s AND tipo_mov = 'compra' AND importe = %s
             """, (cli['id_cliente'], total))
-            cur.execute("SELECT id_remito FROM remitos WHERE id_pedido = %s", (id_pedido,))
-            remito_existente = cur.fetchone()
+            mov_existente = cur.fetchone()
+
+            if not mov_existente:
+                cur.execute("""
+                    INSERT INTO movimientos_cuenta_corriente
+                        (id_movimiento, id_cliente, fecha, tipo_mov, importe)
+                    VALUES (%s, %s, %s, 'compra', %s)
+                """, (str(uuid.uuid4()), cli['id_cliente'], datetime.utcnow().date(), total))
+
+                cur.execute("""
+                    INSERT INTO clientes_cuenta_corriente (id_cliente, saldo)
+                    VALUES (%s, %s)
+                    ON CONFLICT (id_cliente)
+                    DO UPDATE SET saldo = clientes_cuenta_corriente.saldo + EXCLUDED.saldo
+                """, (cli['id_cliente'], total))
+                cur.execute("SELECT id_remito FROM remitos WHERE id_pedido = %s", (id_pedido,))
+                remito_existente = cur.fetchone()
 
             if remito_existente:
-                # Ya existe el remito, redirigir a la visualización del PDF o mostrar mensaje
                 id_remito = remito_existente["id_remito"]
                 return redirect(url_for("entregas.visualizador_pdf_remito", id_remito=id_remito))
             # Guardar el remito y sus detalles

@@ -48,130 +48,107 @@ def obtener_productos():
 @bp_entregas.route("/<id_pedido>/remito", methods=["GET", "POST"])
 def remito(id_pedido):
     with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
+        # Validar pedido
         cur.execute("SELECT * FROM pedidos WHERE id_pedido = %s", (id_pedido,))
-        pedido = cur.fetchone()
-        if not pedido:
+        if not cur.fetchone():
             abort(404, "Pedido no encontrado")
 
         if request.method == "POST":
-            # actualiza cantidades reales y precios
+            # actualizar cantidades reales y precios
             cantidades_reales = request.form.getlist("cantidad_real")
             id_detalles = request.form.getlist("id_detalle")
             precios = request.form.getlist("precio")
 
             for id_det, real_str, precio_str in zip(id_detalles, cantidades_reales, precios):
-                try:
-                    real = float(real_str.replace(',', '.'))
-                except:
-                    real = 0
-                try:
-                    precio = float(precio_str.replace(',', '.'))
-                except:
-                    precio = 0
-                cur.execute("""
-                    UPDATE detalle_pedido
-                    SET cantidad_real = %s,
-                        precio = %s
-                    WHERE id_detalle = %s
-                """, (real, precio, id_det))
+                real = float(real_str.replace(',', '.')) if real_str else 0
+                precio = float(precio_str.replace(',', '.')) if precio_str else 0
+                cur.execute(
+                    "UPDATE detalle_pedido SET cantidad_real=%s, precio=%s WHERE id_detalle=%s",
+                    (real, precio, id_det)
+                )
 
-            # Traer datos de cliente y pedido
+            # traer cliente y pedido
             cur.execute("""
                 SELECT c.id_cliente, c.nombre, c.direccion, p.fecha_entrega
                 FROM pedidos p
-                JOIN clientes c ON p.id_cliente = c.id_cliente
-                WHERE p.id_pedido = %s
+                JOIN clientes c ON p.id_cliente=c.id_cliente
+                WHERE p.id_pedido=%s
             """, (id_pedido,))
             cli = cur.fetchone()
 
-            # Traer detalles actualizados
+            # traer detalles actualizados
             cur.execute("""
-                SELECT pr.descripcion,
-                       pd.cantidad,
-                       pd.cantidad_real,
-                       pd.precio
+                SELECT pd.id_detalle, pd.id_producto, pr.descripcion, pr.unidad_base AS unidad,
+                       pd.cantidad, pd.cantidad_real, pd.precio
                 FROM detalle_pedido pd
-                JOIN productos pr ON pd.id_producto = pr.id_producto
-                WHERE pd.id_pedido = %s
+                JOIN productos pr ON pd.id_producto=pr.id_producto
+                WHERE pd.id_pedido=%s
             """, (id_pedido,))
             detalles_raw = cur.fetchall()
 
+            # calcular total
             total = sum(
                 float(row['cantidad_real'] or row['cantidad']) * float(row['precio'] or 0)
                 for row in detalles_raw
             )
 
-            # Insertar movimiento y actualizar saldo
-            cur.execute("SELECT saldo FROM clientes_cuenta_corriente WHERE id_cliente = %s", (cli['id_cliente'],))
+            # insertar movimientos
+            cur.execute("SELECT saldo FROM clientes_cuenta_corriente WHERE id_cliente=%s", (cli['id_cliente'],))
             saldo_anterior = cur.fetchone()["saldo"] if cur.rowcount else 0
+            cur.execute(
+                "INSERT INTO movimientos_cuenta_corriente(id_movimiento, id_cliente, fecha, tipo_mov, importe) VALUES(%s,%s,%s,'compra',%s)",
+                (str(uuid.uuid4()), cli['id_cliente'], datetime.utcnow().date(), total)
+            )
+            cur.execute(
+                "INSERT INTO clientes_cuenta_corriente(id_cliente, saldo) VALUES(%s,%s) ON CONFLICT(id_cliente) DO UPDATE SET saldo=clientes_cuenta_corriente.saldo+EXCLUDED.saldo",
+                (cli['id_cliente'], total)
+            )
 
-            cur.execute("""
-                INSERT INTO movimientos_cuenta_corriente
-                    (id_movimiento, id_cliente, fecha, tipo_mov, importe)
-                VALUES (%s, %s, %s, 'compra', %s)
-            """, (str(uuid.uuid4()), cli['id_cliente'], datetime.utcnow().date(), total))
-
-            cur.execute("""
-                INSERT INTO clientes_cuenta_corriente (id_cliente, saldo)
-                VALUES (%s, %s)
-                ON CONFLICT (id_cliente)
-                DO UPDATE SET saldo = clientes_cuenta_corriente.saldo + EXCLUDED.saldo
-            """, (cli['id_cliente'], total))
-
-            # Guardar el remito y sus detalles
-            cur.execute("""
-                INSERT INTO remitos (id_pedido, fecha, total, saldo_anterior)
-                VALUES (%s, NOW(), %s, %s)
-                RETURNING id_remito
-            """, (id_pedido, total, saldo_anterior))
+            # guardar remito
+            cur.execute(
+                "INSERT INTO remitos(id_pedido, fecha, total, saldo_anterior) VALUES(%s,NOW(),%s,%s) RETURNING id_remito",
+                (id_pedido, total, saldo_anterior)
+            )
             id_remito = cur.fetchone()["id_remito"]
 
-            # Detalle_remito
+            # detalle_remito: usar id_producto correcto
             for row in detalles_raw:
                 cant_real = float(row['cantidad_real'] or row['cantidad'])
-                cur.execute("""
-                    INSERT INTO detalle_remito (id_remito, id_producto, cantidad, precio)
-                    VALUES (%s, (SELECT id_producto FROM detalle_pedido WHERE id_pedido = %s LIMIT 1), %s, %s)
-                """, (id_remito, id_pedido, cant_real, float(row['precio'] or 0)))
+                cur.execute(
+                    "INSERT INTO detalle_remito(id_remito, id_producto, cantidad, precio) VALUES(%s,%s,%s,%s)",
+                    (id_remito, row['id_producto'], cant_real, float(row['precio'] or 0))
+                )
 
-            cur.execute("UPDATE pedidos SET estado = 'entregado' WHERE id_pedido = %s", (id_pedido,))
+            # actualizar estado pedido
+            cur.execute("UPDATE pedidos SET estado='entregado' WHERE id_pedido=%s", (id_pedido,))
             conn.commit()
 
             return redirect(url_for("entregas.visualizador_pdf_remito", id_remito=id_remito))
 
-        # GET: mostrar formulario
+        # GET: mostrar formulario con detalles previos
         cur.execute("""
-            SELECT pd.id_detalle,
-                   pr.descripcion,
-                   pd.cantidad,
-                   pd.cantidad_real,
-                   pd.precio
+            SELECT pd.id_detalle, pr.descripcion, pr.unidad_base AS unidad,
+                   pd.cantidad, pd.cantidad_real, pd.precio
             FROM detalle_pedido pd
-            JOIN productos pr ON pd.id_producto = pr.id_producto
-            WHERE pd.id_pedido = %s
+            JOIN productos pr ON pd.id_producto=pr.id_producto
+            WHERE pd.id_pedido=%s
         """, (id_pedido,))
-        detalles_raw = cur.fetchall()
-
         detalles = [
-            {
-                **row,
-                'cantidad_real': float(row['cantidad_real'] or row['cantidad']),
-                'precio': float(row['precio'] or 0)
-            }
-            for row in detalles_raw
+            {**row,
+             'cantidad_real': float(row['cantidad_real'] or row['cantidad']),
+             'precio': float(row['precio'] or 0)}
+            for row in cur.fetchall()
         ]
 
-        cur.execute("SELECT id_cliente FROM pedidos WHERE id_pedido = %s", (id_pedido,))
+        cur.execute("SELECT id_cliente FROM pedidos WHERE id_pedido=%s", (id_pedido,))
         id_cliente = cur.fetchone()["id_cliente"]
-
-        cur.execute("SELECT saldo FROM clientes_cuenta_corriente WHERE id_cliente = %s", (id_cliente,))
+        cur.execute("SELECT saldo FROM clientes_cuenta_corriente WHERE id_cliente=%s", (id_cliente,))
         saldo_anterior = cur.fetchone()["saldo"] if cur.rowcount else 0
-
         cur.execute("""
             SELECT c.nombre AS cliente_nombre, p.fecha_entrega
             FROM pedidos p
-            JOIN clientes c ON p.id_cliente = c.id_cliente
-            WHERE p.id_pedido = %s
+            JOIN clientes c ON p.id_cliente=c.id_cliente
+            WHERE p.id_pedido=%s
         """, (id_pedido,))
         info_cliente = cur.fetchone()
 
@@ -181,41 +158,34 @@ def remito(id_pedido):
         productos=obtener_productos(),
         id_pedido=id_pedido,
         saldo_anterior=saldo_anterior,
-        cliente_nombre=info_cliente["cliente_nombre"],
-        fecha_entrega=info_cliente["fecha_entrega"]
+        cliente_nombre=info_cliente['cliente_nombre'],
+        fecha_entrega=info_cliente['fecha_entrega']
     )
 
 @bp_entregas.route("/remito/pdf/<int:id_remito>")
 def remito_pdf(id_remito):
     with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
-        cur.execute("SELECT * FROM remitos WHERE id_remito = %s", (id_remito,))
+        cur.execute("SELECT * FROM remitos WHERE id_remito=%s", (id_remito,))
         remito = cur.fetchone()
         if not remito:
             abort(404, "Remito no encontrado")
-
-        # Unir detalle_remito con productos para tener descripcion
+        # obtener detalles con unidad
         cur.execute("""
-            SELECT pr.descripcion,
-                   dr.cantidad AS cantidad_real,
-                   dr.precio
+            SELECT pr.descripcion, pr.unidad_base AS unidad,
+                   dr.cantidad AS cantidad_real, dr.precio
             FROM detalle_remito dr
-            JOIN productos pr ON dr.id_producto = pr.id_producto
-            WHERE dr.id_remito = %s
+            JOIN productos pr ON dr.id_producto=pr.id_producto
+            WHERE dr.id_remito=%s
         """, (id_remito,))
         detalles = cur.fetchall()
-
         cur.execute("""
             SELECT c.nombre, c.direccion, p.fecha_entrega
             FROM pedidos p
-            JOIN clientes c ON p.id_cliente = c.id_cliente
-            WHERE p.id_pedido = %s
+            JOIN clientes c ON p.id_cliente=c.id_cliente
+            WHERE p.id_pedido=%s
         """, (remito['id_pedido'],))
         cli = cur.fetchone()
-
-    total_remito = sum(
-        float(item['cantidad_real']) * float(item['precio']) for item in detalles
-    )
-
+    total_remito = sum(float(item['cantidad_real'])*float(item['precio']) for item in detalles)
     pdf_buffer = generar_pdf_remito(
         nombre_cliente=cli['nombre'],
         direccion=cli['direccion'],
@@ -225,9 +195,8 @@ def remito_pdf(id_remito):
         saldo_anterior=remito['saldo_anterior'],
         id_remito=id_remito
     )
-    filename = f"Remito_{cli['nombre'].replace(' ', '_')}_{id_remito}.pdf"
+    filename=f"Remito_{cli['nombre'].replace(' ', '_')}_{id_remito}.pdf"
     return send_file(pdf_buffer, mimetype="application/pdf", download_name=filename)
 
 @bp_entregas.route("/remito/visor/<int:id_remito>")
-def visualizador_pdf_remito(id_remito):
-    return render_template("visor_pdf_remito.html", id_remito=id_remito)
+

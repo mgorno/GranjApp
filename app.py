@@ -22,8 +22,13 @@ def formato_precio(n):
     except (ValueError, TypeError):
         return "$0"
 
+def formato_precio_arg(value):
+    s = f"{int(value):,}"
+    return s.replace(",", ".")        
+
 app.jinja_env.filters["formato_cantidad"] = formato_cantidad
 app.jinja_env.filters["formato_precio"] = formato_precio
+app.jinja_env.filters["formato_precio_arg"] = formato_precio_arg
 
 if __name__ == "__main__":
     port  = int(os.environ.get("PORT", 5000))

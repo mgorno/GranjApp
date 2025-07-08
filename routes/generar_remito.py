@@ -4,10 +4,15 @@ from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.platypus import Table, TableStyle
 
-
 def generar_pdf_remito(nombre_cliente, direccion, fecha_entrega, detalles, total_remito, saldo_anterior):
     buffer = BytesIO()
     p = canvas.Canvas(buffer, pagesize=A4)
+
+    def formato_numero(n):
+        return str(int(n)) if n == int(n) else f"{n:.3f}".rstrip("0").replace(".", ",")
+
+    def formato_con_signo(n):
+        return f"${formato_numero(n)}"
 
     ancho, alto = A4
     margen_x = 40
@@ -31,9 +36,14 @@ def generar_pdf_remito(nombre_cliente, direccion, fecha_entrega, detalles, total
     data = [["Producto", "Cantidad", "Precio", "Subtotal"]]
     for item in detalles:
         desc = item["descripcion"]
-        cant = f"{item['cantidad_real']:.2f}"
-        precio = f"${item['precio']:.2f}"
-        subtotal = f"${item['cantidad_real'] * item['precio']:.2f}"
+        cantidad = item['cantidad_real']
+        precio_unit = item['precio']
+        subtotal_val = cantidad * precio_unit
+
+        cant = formato_numero(cantidad)
+        precio = formato_con_signo(precio_unit)
+        subtotal = formato_con_signo(subtotal_val)
+
         data.append([desc, cant, precio, subtotal])
 
     table = Table(data, colWidths=[220, 80, 80, 80])
@@ -58,11 +68,11 @@ def generar_pdf_remito(nombre_cliente, direccion, fecha_entrega, detalles, total
     p.setFont("Helvetica-Bold", 11)
     p.line(margen_x, y, ancho - margen_x, y)
     y -= 20
-    p.drawRightString(ancho - margen_x, y, f"Total del remito: ${total_remito:.2f}")
+    p.drawRightString(ancho - margen_x, y, f"Total del remito: {formato_con_signo(total_remito)}")
     y -= 15
-    p.drawRightString(ancho - margen_x, y, f"Saldo anterior: ${saldo_anterior:.2f}")
+    p.drawRightString(ancho - margen_x, y, f"Saldo anterior: {formato_con_signo(saldo_anterior)}")
     y -= 15
-    p.drawRightString(ancho - margen_x, y, f"Saldo total: ${total_remito + saldo_anterior:.2f}")
+    p.drawRightString(ancho - margen_x, y, f"Saldo total: {formato_con_signo(total_remito + saldo_anterior)}")
 
     y -= 40
     p.setFont("Helvetica-Oblique", 9)

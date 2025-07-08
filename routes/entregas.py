@@ -75,8 +75,7 @@ def remito(id_pedido):
                 cur.execute("""
                     UPDATE detalle_pedido
                     SET cantidad_real = %s,
-                        precio = %s,
-                        id_producto = %s
+                        precio = %s
                     WHERE id_detalle = %s
                 """, (real, precio, id_prod, id_det))
 

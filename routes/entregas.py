@@ -243,7 +243,7 @@ def remito_pdf(id_remito):
         numero_remito=id_remito  # si modificaste tu función para recibirlo
     )
     filename = f"Remito_{cli['nombre']}_{id_remito}.pdf"
-    return send_file(pdf_buffer, mimetype="application/pdf", download_name=filename)
+    return redirect(url_for("entregas.visualizador_pdf_remito", id_remito=id_remito))
 
 @bp_entregas.route("/remito/visor/<int:id_remito>")
 def visualizador_pdf_remito(id_remito):

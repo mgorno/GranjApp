@@ -53,9 +53,14 @@ def remito(id_pedido):
             abort(404, "Pedido no encontrado")
 
         if request.method == "POST":
-            cantidades_reales = request.form.getlist("cantidad_real")
-            id_detalles = request.form.getlist("id_detalle")
-            precios = request.form.getlist("precio")
+            cantidades_reales = request.form.getlist("cantidad_real[]")
+            id_detalles = request.form.getlist("id_detalle[]")
+            precios = request.form.getlist("precio[]")
+
+            print("cantidades_reales:", cantidades_reales)
+            print("id_detalles:", id_detalles)
+            print("precios:", precios)
+
 
             for id_det, real_str, precio_str in zip(id_detalles, cantidades_reales, precios):
                 try:

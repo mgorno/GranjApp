@@ -36,6 +36,7 @@ def formato_precio_arg(value):
 
 app.jinja_env.filters["formato_cantidad"] = formato_cantidad
 app.jinja_env.filters["formato_precio"] = formato_precio
+app.jinja_env.filters["formato_precio_sin_signo"] = formato_precio_sin_signo
 app.jinja_env.filters["formato_precio_arg"] = formato_precio_arg
 
 if __name__ == "__main__":

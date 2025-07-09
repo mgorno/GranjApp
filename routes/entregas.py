@@ -7,7 +7,7 @@ from psycopg2.extras import RealDictCursor
 from datetime import datetime
 import uuid
 from collections import defaultdict
-from utils.generar_pdf_remito.py import generar_pdf_remito
+from utils.generar_pdf_remito import generar_pdf_remito
 
 bp_entregas = Blueprint("entregas", __name__, url_prefix="/entregas")
 

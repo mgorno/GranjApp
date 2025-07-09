@@ -44,7 +44,8 @@ def generar_pdf_remito(nombre_cliente, direccion, fecha_entrega, detalles, total
     p.drawCentredString(ancho / 2, y, "REMITO")
     y -= 25
     p.setFont("Helvetica", 11)
-    p.drawRightString(ancho - margen_x, y, f"Fecha: {fecha_entrega.strftime('%d/%m/%Y')}")
+    fecha_str = fecha_entrega.strftime('%d/%m/%Y') if isinstance(fecha_entrega, datetime) else ""
+    p.drawRightString(ancho - margen_x, y, f"Fecha: {fecha_str}")
     y -= 15
     p.drawRightString(ancho - margen_x, y, f"N.º Remito: {id_remito}")
     y -= 25
@@ -53,19 +54,21 @@ def generar_pdf_remito(nombre_cliente, direccion, fecha_entrega, detalles, total
     p.setFont("Helvetica-Bold", 11)
     p.drawString(margen_x, y, "Cliente:")
     p.setFont("Helvetica", 10)
-    p.drawString(margen_x + 50, y, nombre_cliente)
+    p.drawString(margen_x + 50, y, nombre_cliente or "")
     y -= 15
     p.drawString(margen_x, y, "Dirección:")
-    p.drawString(margen_x + 50, y, direccion)
+    p.drawString(margen_x + 50, y, direccion or "")
     y -= 30
 
-    # === Tabla de productos con estilo moderno ===
+    # === Tabla de productos ===
     data = [["Producto", "Cantidad", "Precio Unit.", "Subtotal"]]
     for item in detalles:
-        desc = item["descripcion"]
-        cantidad = formato_cantidad(item["cantidad_real"])
-        precio = formato_con_signo(item["precio"])
-        subtotal = formato_con_signo(Decimal(str(item["cantidad_real"])) * Decimal(str(item["precio"])))
+        desc = item.get("descripcion", "")
+        cantidad = formato_cantidad(item.get("cantidad_real", 0))
+        precio_unit = item.get("precio", 0)
+        precio = formato_con_signo(precio_unit)
+        subtotal_val = Decimal(str(item.get("cantidad_real", 0))) * Decimal(str(precio_unit))
+        subtotal = formato_con_signo(subtotal_val)
         data.append([desc, cantidad, precio, subtotal])
 
     table = Table(data, colWidths=[220, 80, 80, 80])
@@ -87,7 +90,7 @@ def generar_pdf_remito(nombre_cliente, direccion, fecha_entrega, detalles, total
 
     y -= table_height + 30
 
-    # === Totales destacados ===
+    # === Totales ===
     p.setFont("Helvetica-Bold", 11)
     p.setStrokeColor(colors.black)
     p.setLineWidth(0.7)
@@ -108,11 +111,11 @@ def generar_pdf_remito(nombre_cliente, direccion, fecha_entrega, detalles, total
     p.drawRightString(ancho - margen_x, y, "__________________________")
     p.drawRightString(ancho - margen_x, y - 12, "Firma del Vendedor")
 
-    # === Pie de página moderno ===
+    # === Pie de página ===
     y -= 40
     p.setFont("Helvetica-Oblique", 9)
     p.setFillColor(colors.grey)
-    p.drawCentredString(ancho / 2, y, "Gracias por su compra ❤ — Consultá nuestras ofertas mayoristas semanales.")
+    p.drawCentredString(ancho / 2, y, "Aca se puede agregar algo o lo dejamos vacio?")
     p.setFillColor(colors.black)
 
     p.showPage()

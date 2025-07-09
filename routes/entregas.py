@@ -208,7 +208,8 @@ def remito_pdf(id_remito):
         cur.execute("""
             SELECT pr.descripcion,
                    dr.cantidad AS cantidad_real,
-                   dr.precio
+                   dr.precio,
+                   pr.unidad_base 
             FROM detalle_remito dr
             JOIN productos pr ON dr.id_producto = pr.id_producto
             WHERE dr.id_remito = %s

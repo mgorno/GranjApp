@@ -22,6 +22,12 @@ def formato_precio(n):
         return f"${int(n)}" if n == int(n) else f"${n:.2f}".rstrip("0").rstrip(".")
     except (ValueError, TypeError):
         return "$0"
+def formato_precio_sin_signo(n):
+    try:
+        n = float(n)
+        return f"{int(n)}" if n == int(n) else f"${n:.2f}".rstrip("0").rstrip(".")
+    except (ValueError, TypeError):
+        return "$0"    
 
 def formato_precio_arg(value):
     s = f"${int(value):,}"

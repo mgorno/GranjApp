@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if ([...tabla.querySelectorAll('input[name="id_producto"]')].some(input => input.value === idProd)) {
-      alert("Ese producto ya está en el detalle.");
+      alert("Ese producto ya está en eal detalle.");
       return;
     }
 

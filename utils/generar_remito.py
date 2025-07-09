@@ -22,12 +22,12 @@ def generar_pdf_remito(nombre_cliente, direccion, fecha_entrega, detalles, total
 
     # === Encabezado del vendedor ===
     p.setFont("Helvetica-Bold", 16)
-    p.drawString(margen_x, y, "Pollería Don Pollo")
+    p.drawString(margen_x, y, "Pollería Do Pollo")
     p.setFont("Helvetica", 10)
     y -= 15
     p.drawString(margen_x, y, "CUIT: 30-12345678-9  |  Tel: 11-2345-6789")
     y -= 15
-    p.drawString(margen_x, y, "Dirección: Av. de los Alimentos 1234, CABA")
+    p.drawString(margen_x, y, "Dirección: Av. de los Cruz 1234, CABA")
     y -= 25
 
     # === Título del remito ===

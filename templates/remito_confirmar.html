@@ -36,7 +36,7 @@
           <th style="width: 30%">Producto</th>
           <th style="width: 10%" class="text-end">Cant. Pedida</th>
           <th style="width: 10%" class="text-end">Precio</th>
-          <th style="width: 10%" class="text-end">Cant. Real</th>
+          <th style="width: 10%" class="text-end">Cant. Ajustada</th>
           <th style="width: 10%" class="text-end">Subtotal</th>
           <th style="width: 5%"></th>
         </tr>
@@ -51,7 +51,7 @@
           </td>
 
           <td class="text-end">
-            {{ '%.2f'|format(item.cantidad_pedida or 0) }}
+            {{ '%.2f'|format(item.cantidad or 0) }}
           </td>
 
           <td class="text-end">

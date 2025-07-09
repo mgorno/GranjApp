@@ -44,26 +44,30 @@
       <tbody>
         {% for item in detalles %}
         <tr>
-          <td hidden>
-            <input type="hidden" name="id_detalle[]" value="{{ item.id_detalle }}">
-          </td>
-    
           <td>
             {{ item.descripcion }} ({{ item.unidad }})
             <input type="hidden" name="id_producto[]" value="{{ item.id_producto }}">
+            <input type="hidden" name="id_detalle[]" value="{{ item.id_detalle }}">
           </td>
 
           <td class="text-end">
-            <input type="number" step="0.01" name="precio[]" value="{{ (item.precio or 0) | int }}"
+            {{ '%.2f'|format(item.cantidad_pedida or 0) }}
+          </td>
+
+          <td class="text-end">
+            <input type="number" step="0.01" name="precio[]" value="{{ (item.precio or 0) | float }}"
               class="form-control text-end bg-dark text-light border-secondary table-input precio-input" required>
           </td>
+
           <td class="text-end">
             <input type="number" step="0.01" name="cantidad_real[]" value="{{ '%.2f'|format(item.cantidad_real or 0) }}"
               class="form-control text-end bg-dark text-light border-secondary table-input cantidad-input" required>
           </td>
+
           <td class="text-end subtotal-cell">
             {{ ((item.precio or 0) * (item.cantidad_real or 0)) | formato_precio }}
           </td>
+
           <td class="text-center">
             {% if item.id_detalle|string == "0" %}
             <button type="button" class="btn btn-outline-danger btn-sm eliminar-fila" title="Eliminar fila">
@@ -78,6 +82,7 @@
       </tbody>
     </table>
   </div>
+
 
   <!-- Resumen de totales -->
   <div class="row g-3 mb-4">

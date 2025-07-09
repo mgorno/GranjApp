@@ -307,3 +307,11 @@ input.precio-input {
     border-bottom-right-radius: .375rem;
     overflow: hidden;
   }
+    .table-input {
+    width: 100%;
+    text-align: right;
+  }
+
+  input[type="number"] {
+    text-align: right;
+  }

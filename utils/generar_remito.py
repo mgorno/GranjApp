@@ -20,18 +20,27 @@ def generar_pdf_remito(nombre_cliente, direccion, fecha_entrega, detalles, total
         n = float(n)
         return f"${int(n)}" if n == int(n) else f"${n:.2f}".rstrip("0").rstrip(".")
 
-    # === Encabezado del vendedor ===
+    # === Encabezado elegante ===
     p.setFont("Helvetica-Bold", 16)
+    p.setFillColor(colors.darkblue)
     p.drawString(margen_x, y, "Pollería Do Pollo")
+    p.setFillColor(colors.black)
     p.setFont("Helvetica", 10)
     y -= 15
     p.drawString(margen_x, y, "CUIT: 30-12345678-9  |  Tel: 11-2345-6789")
     y -= 15
     p.drawString(margen_x, y, "Dirección: Av. de los Cruz 1234, CABA")
+    y -= 20
+
+    # Línea divisoria
+    p.setStrokeColor(colors.grey)
+    p.setLineWidth(0.5)
+    p.line(margen_x, y, ancho - margen_x, y)
     y -= 25
 
-    # === Título del remito ===
+    # === Título y datos del remito ===
     p.setFont("Helvetica-Bold", 18)
+    p.setFillColor(colors.black)
     p.drawCentredString(ancho / 2, y, "REMITO")
     y -= 25
     p.setFont("Helvetica", 11)
@@ -50,34 +59,38 @@ def generar_pdf_remito(nombre_cliente, direccion, fecha_entrega, detalles, total
     p.drawString(margen_x + 50, y, direccion)
     y -= 30
 
-    # === Tabla de productos ===
+    # === Tabla de productos con estilo moderno ===
     data = [["Producto", "Cantidad", "Precio Unit.", "Subtotal"]]
     for item in detalles:
         desc = item["descripcion"]
         cantidad = formato_cantidad(item["cantidad_real"])
         precio = formato_con_signo(item["precio"])
-        subtotal = formato_con_signo(item["cantidad_real"] * item["precio"])
+        subtotal = formato_con_signo(Decimal(str(item["cantidad_real"])) * Decimal(str(item["precio"])))
         data.append([desc, cantidad, precio, subtotal])
 
     table = Table(data, colWidths=[220, 80, 80, 80])
     table.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
-        ("TEXTCOLOR", (0, 0), (-1, 0), colors.black),
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#dfe9f3")),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.darkblue),
         ("ALIGN", (1, 1), (-1, -1), "RIGHT"),
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
         ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
         ("FONTSIZE", (0, 0), (-1, -1), 10),
-        ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
-        ("BOTTOMPADDING", (0, 0), (-1, 0), 8),
+        ("GRID", (0, 0), (-1, -1), 0.3, colors.grey),
+        ("BOTTOMPADDING", (0, 0), (-1, 0), 6),
+        ("TOPPADDING", (0, 1), (-1, -1), 4),
+        ("BOTTOMPADDING", (0, 1), (-1, -1), 4),
     ]))
     table.wrapOn(p, ancho, alto)
     table_height = table._height
     table.drawOn(p, margen_x, y - table_height)
 
-    y = y - table_height - 30
+    y -= table_height + 30
 
-    # === Totales ===
+    # === Totales destacados ===
     p.setFont("Helvetica-Bold", 11)
+    p.setStrokeColor(colors.black)
+    p.setLineWidth(0.7)
     p.line(margen_x, y, ancho - margen_x, y)
     y -= 20
     p.drawRightString(ancho - margen_x, y, f"Total del remito: {formato_con_signo(total_remito)}")
@@ -87,7 +100,7 @@ def generar_pdf_remito(nombre_cliente, direccion, fecha_entrega, detalles, total
     total = Decimal(str(total_remito)) + Decimal(str(saldo_anterior))
     p.drawRightString(ancho - margen_x, y, f"Saldo total: {formato_con_signo(total)}")
 
-    # === Firma ===
+    # === Firmas ===
     y -= 60
     p.setFont("Helvetica", 10)
     p.drawString(margen_x, y, "__________________________")
@@ -95,10 +108,12 @@ def generar_pdf_remito(nombre_cliente, direccion, fecha_entrega, detalles, total
     p.drawRightString(ancho - margen_x, y, "__________________________")
     p.drawRightString(ancho - margen_x, y - 12, "Firma del Vendedor")
 
-    # === Pie de página ===
+    # === Pie de página moderno ===
     y -= 40
     p.setFont("Helvetica-Oblique", 9)
-    p.drawCentredString(ancho / 2, y, "Gracias por su compra. Consulte nuestras ofertas mayoristas semanales.")
+    p.setFillColor(colors.grey)
+    p.drawCentredString(ancho / 2, y, "Gracias por su compra ❤ — Consultá nuestras ofertas mayoristas semanales.")
+    p.setFillColor(colors.black)
 
     p.showPage()
     p.save()

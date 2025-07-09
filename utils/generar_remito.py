@@ -5,6 +5,8 @@ from reportlab.lib import colors
 from reportlab.platypus import Table, TableStyle
 from decimal import Decimal
 from datetime import datetime
+from formatos_numeros import formato_precio_arg, formato_cantidad
+
 
 def generar_pdf_remito(nombre_cliente, direccion, fecha_entrega, detalles, total_remito, saldo_anterior, id_remito):
     buffer = BytesIO()
@@ -13,12 +15,6 @@ def generar_pdf_remito(nombre_cliente, direccion, fecha_entrega, detalles, total
     margen_x = 40
     y = alto - 40
 
-    def formato_cantidad(n):
-        return str(int(n)) if n == int(n) else f"{n:.3f}".rstrip("0").replace(".", ",")
-
-    def formato_con_signo(n):
-        n = float(n)
-        return f"${int(n)}" if n == int(n) else f"${n:.2f}".rstrip("0").rstrip(".")
 
     # === Encabezado elegante ===
     p.setFont("Helvetica-Bold", 16)
@@ -66,9 +62,9 @@ def generar_pdf_remito(nombre_cliente, direccion, fecha_entrega, detalles, total
         desc = item.get("descripcion", "")
         cantidad = formato_cantidad(item.get("cantidad_real", 0))
         precio_unit = item.get("precio", 0)
-        precio = formato_con_signo(precio_unit)
+        precio = formato_precio_arg(precio_unit)
         subtotal_val = Decimal(str(item.get("cantidad_real", 0))) * Decimal(str(precio_unit))
-        subtotal = formato_con_signo(subtotal_val)
+        subtotal = formato_precio_arg(subtotal_val)
         data.append([desc, cantidad, precio, subtotal])
 
     table = Table(data, colWidths=[220, 80, 80, 80])
@@ -96,16 +92,16 @@ def generar_pdf_remito(nombre_cliente, direccion, fecha_entrega, detalles, total
     p.setLineWidth(0.7)
     p.line(margen_x, y, ancho - margen_x, y)
     y -= 20
-    p.drawRightString(ancho - margen_x, y, f"Total del remito: {formato_con_signo(total_remito)}")
+    p.drawRightString(ancho - margen_x, y, f"Total del remito: {formato_precio_arg(total_remito)}")
     y -= 15
-    p.drawRightString(ancho - margen_x, y, f"Saldo anterior: {formato_con_signo(saldo_anterior)}")
+    p.drawRightString(ancho - margen_x, y, f"Saldo anterior: {formato_precio_arg(saldo_anterior)}")
     y -= 15
     total = Decimal(str(total_remito)) + Decimal(str(saldo_anterior))
-    p.drawRightString(ancho - margen_x, y, f"Saldo total: {formato_con_signo(total)}")
+    p.drawRightString(ancho - margen_x, y, f"Saldo total: {formato_precio_arg(total)}")
 
     # === Firmas ===
     y -= 60
-    p.setFont("Helvetica", 10)
+    p.setFont("Helvetica", 10)a
     p.drawString(margen_x, y, "__________________________")
     p.drawString(margen_x, y - 12, "Firma del Cliente")
     p.drawRightString(ancho - margen_x, y, "__________________________")

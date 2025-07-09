@@ -37,13 +37,13 @@
         {% for item in detalles %}
         <tr>
           <td>
-            {{ item.descripcion }} ({{ item.unidad }})
+            {{ item.descripcion }} ({{ item.unidad_base }})
             <input type="hidden" name="id_producto[]" value="{{ item.id_producto }}">
             <input type="hidden" name="id_detalle[]" value="{{ item.id_detalle }}">
           </td>
 
           <td class="text-end">
-            {{ '%.2f'|format(item.cantidad or 0) }}
+            {{ formato_cantidad(item.cantidad) }}
           </td>
 
           <td class="text-end">

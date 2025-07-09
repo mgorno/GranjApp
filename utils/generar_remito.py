@@ -101,7 +101,7 @@ def generar_pdf_remito(nombre_cliente, direccion, fecha_entrega, detalles, total
 
     # === Firmas ===
     y -= 60
-    p.setFont("Helvetica", 10)a
+    p.setFont("Helvetica", 10)
     p.drawString(margen_x, y, "__________________________")
     p.drawString(margen_x, y - 12, "Firma del Cliente")
     p.drawRightString(ancho - margen_x, y, "__________________________")

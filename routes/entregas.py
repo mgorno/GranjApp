@@ -88,6 +88,7 @@ def remito(id_pedido):
 
             cur.execute("""
                 SELECT pr.descripcion,
+                       pr.unidad_base, 
                        pd.cantidad,
                        pd.cantidad_real,
                        pd.precio,

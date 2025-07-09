@@ -1,3 +1,5 @@
+
+from .formatos_numeros import formato_precio_arg, formato_cantidad
 from io import BytesIO
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
@@ -5,7 +7,6 @@ from reportlab.lib import colors
 from reportlab.platypus import Table, TableStyle
 from decimal import Decimal
 from datetime import datetime
-from formatos_numeros import formato_precio_arg, formato_cantidad
 
 
 def generar_pdf_remito(nombre_cliente, direccion, fecha_entrega, detalles, total_remito, saldo_anterior, id_remito):

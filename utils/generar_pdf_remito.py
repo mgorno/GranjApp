@@ -4,10 +4,10 @@ from weasyprint import HTML
 from decimal import Decimal
 from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
-env = Environment(loader=FileSystemLoader('templates'))
+
 
 def generar_pdf_remito(nombre_cliente, direccion, fecha_entrega, detalles, total_remito, saldo_anterior, id_remito):
-    env = Environment(loader=FileSystemLoader("."))  # buscar en directorio actual
+    env = Environment(loader=FileSystemLoader('templates'))
     template = env.get_template("remito_template.html")
 
     # Procesar datos

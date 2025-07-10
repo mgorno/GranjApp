@@ -157,7 +157,8 @@ def remito(id_pedido):
                    pr.descripcion,
                    pd.cantidad,
                    pd.cantidad_real,
-                   pd.precio
+                   pd.precio,
+                   pr.unidad_base
             FROM detalle_pedido pd
             JOIN productos pr ON pd.id_producto = pr.id_producto
             WHERE pd.id_pedido = %s

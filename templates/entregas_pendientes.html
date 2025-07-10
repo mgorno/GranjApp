@@ -39,7 +39,8 @@
       </thead>
       <tbody>
         {% for pedido in pedidos %}
-        <tr class="{% if pedido.fecha_entrega.date() != fecha_hoy %}table-secondary text-muted{% endif %}">
+
+        <tr>
           <td>{{ pedido.cliente }}</td>
           <td>{{ pedido.cantidad_items }}</td>
           <td>
@@ -51,7 +52,7 @@
             </a>
             {% else %}
             <span class="text-muted d-inline-block me-2" style="font-size: 0.85rem;">
-              Solo disponible el {{ pedido.fecha_entrega.strftime('%d/%m') }}
+              Solo disponible el día {{ pedido.fecha_entrega.strftime('%d/%m') }}
             </span>
             {% endif %}
 
@@ -65,6 +66,8 @@
           </td>
         </tr>
         {% endfor %}
+
+
       </tbody>
 
     </table>

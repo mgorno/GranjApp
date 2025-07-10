@@ -244,3 +244,23 @@ def remito_pdf(id_remito):
 @bp_entregas.route("/remito/visor/<int:id_remito>")
 def visualizador_pdf_remito(id_remito):
     return render_template("visor_pdf_remito.html", id_remito=id_remito)
+
+
+@bp_entregas.route("/<id_pedido>/cancelar", methods=["POST"])
+def cancelar_pedido(id_pedido):
+    with get_conn() as conn, conn.cursor() as cur:
+        # Verificar si el pedido existe y no fue entregado aún
+        cur.execute("SELECT estado FROM pedidos WHERE id_pedido = %s", (id_pedido,))
+        pedido = cur.fetchone()
+        if not pedido:
+            abort(404, "Pedido no encontrado")
+
+        if pedido[0] == 'entregado':
+            flash("No se puede cancelar un pedido ya entregado.", "danger")
+        else:
+            cur.execute("UPDATE pedidos SET estado = 'cancelado' WHERE id_pedido = %s", (id_pedido,))
+            conn.commit()
+            flash("Pedido cancelado exitosamente.", "success")
+
+    return redirect(url_for("entregas.lista_entregas"))
+

@@ -22,7 +22,7 @@ def lista_entregas():
             FROM pedidos p
             JOIN clientes c     ON p.id_cliente  = c.id_cliente
             JOIN detalle_pedido pd ON pd.id_pedido = p.id_pedido
-            WHERE p.estado is null 
+            WHERE p.estado = 'pendiente'
             GROUP BY p.id_pedido, c.nombre, p.fecha_entrega
             ORDER BY p.fecha_entrega
         """)

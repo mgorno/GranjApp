@@ -94,8 +94,15 @@ def editar_cliente(id_cliente):
 def borrar_cliente(id_cliente):
     with get_conn() as conn:
         with conn.cursor() as cur:
+            cur.execute("SELECT COUNT(*) FROM pedidos WHERE id_cliente = %s", (id_cliente,))
+            cantidad_pedidos = cur.fetchone()[0]
+
+            if cantidad_pedidos > 0:
+                flash("No se puede eliminar el cliente porque tiene pedidos cargados.", "warning")
+                return redirect(url_for("clientes.clientes"))
             cur.execute("DELETE FROM clientes WHERE id_cliente = %s", (id_cliente,))
         conn.commit()
 
-    flash("Cliente eliminado", "success")
-    return redirect(url_for("clientes.clientes"))  # corregí endpoint
+    flash("Cliente eliminado correctamente", "success")
+    return redirect(url_for("clientes.clientes"))
+

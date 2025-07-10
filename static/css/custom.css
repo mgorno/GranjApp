@@ -315,3 +315,7 @@ input.precio-input {
   input[type="number"] {
     text-align: right;
   }
+  .btn-pequeño {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+}

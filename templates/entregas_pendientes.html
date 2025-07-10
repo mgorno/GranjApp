@@ -48,10 +48,7 @@
                 class="btn btn-sm btn-outline-success d-inline-flex align-items-center btn-pequeño">
                 <i class="bi bi-file-earmark-text me-1"></i> Generar Remito
               </a>
-              {% else %}
-              <span class="text-muted d-inline-block me-3" style="font-size: 0.85rem;">
-                Solo disponible el día {{ pedido.fecha_entrega.strftime('%d/%m') }}
-              </span>
+        
               {% endif %}
 
               <!-- Botón que abre el modal -->

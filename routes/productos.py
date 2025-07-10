@@ -86,7 +86,7 @@ def editar(id):
 def borrar(id):
     with get_conn() as conn, conn.cursor() as cur:
         # Verificamos si el producto está en detalles_pedido
-        cur.execute("SELECT COUNT(*) FROM detalles_pedido WHERE id_producto = %s", (id,))
+        cur.execute("SELECT COUNT(*) FROM detalle_pedido WHERE id_producto = %s", (id,))
         cantidad_usos = cur.fetchone()[0]
 
         if cantidad_usos > 0:

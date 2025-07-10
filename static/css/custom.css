@@ -341,3 +341,99 @@ input.precio-input {
 input[type="number"] {
   text-align: right;
 }
+/* ————————— Pollería Achabal ————————— */
+:root {
+  --polleria-primary: #f08c00;
+  --polleria-accent: #d35400;
+  --polleria-dark: #2c3e50;
+  --polleria-light: #ecf0f1;
+}
+
+/* Hero banner */
+.hero {
+  background: linear-gradient(135deg, var(--polleria-primary), var(--polleria-accent));
+  color: var(--polleria-light);
+  padding: 3rem 1rem;
+  text-align: center;
+  border-radius: 0 0 2rem 2rem;
+  margin-bottom: 2rem;
+}
+.hero-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+.hero-subtitle {
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Section titles */
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--polleria-dark);
+  margin-bottom: 1rem;
+}
+
+/* Date headers */
+.date-header {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--polleria-accent);
+  margin: 2rem 0 1rem;
+}
+
+/* Cards “Achabal” */
+.card-polleria {
+  background-color: var(--polleria-light);
+  color: var(--polleria-dark);
+  border: none;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.card-polleria:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+.card-polleria .card-title,
+.card-polleria .card-text {
+  color: var(--polleria-dark);
+}
+
+/* Botones “Achabal” */
+.btn-primary {
+  background-color: var(--polleria-dark);
+  border: none;
+}
+.btn-primary:hover {
+  background-color: #1f2a38;
+}
+.btn-success {
+  background-color: var(--polleria-primary);
+  border: none;
+}
+.btn-success:hover {
+  background-color: #e07e00;
+}
+.btn-danger {
+  background-color: var(--polleria-accent);
+  border: none;
+}
+.btn-danger:hover {
+  background-color: #b34700;
+}
+
+/* Íconos en botones */
+.btn i {
+  vertical-align: middle;
+}
+
+/* Modales redondeados */
+.modal-content {
+  border-radius: 1rem;
+}
+.modal-header,
+.modal-footer {
+  border: none;
+}

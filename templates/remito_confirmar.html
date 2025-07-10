@@ -53,8 +53,6 @@
 
           <td class="text-end">
             <input type="number" step="0.01" name="cantidad_real[]" value="{{ (item.cantidad_real or 0)|float }}"
-
-            
               class="form-control text-end bg-dark text-light border-secondary table-input cantidad-input" required>
           </td>
 
@@ -75,6 +73,30 @@
         {% endfor %}
       </tbody>
     </table>
+    <hr class="my-4">
+
+    <h5 class="text-white mb-3">Agregar nuevo producto</h5>
+
+    <div class="row g-2 align-items-center mb-3">
+      <div class="col-8 col-md-6">
+        <select name="nuevo_id_producto" class="form-select form-select-sm" aria-label="Seleccionar producto nuevo">
+          <option value="" selected>-- Seleccionar producto --</option>
+          {% for p in productos %}
+          <option value="{{ p.id_producto }}">{{ p.descripcion }} ({{ p.unidad_base }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-4 col-md-2">
+        <input type="number" name="nuevo_cantidad" min="0.01" step="0.01" class="form-control form-control-sm"
+          placeholder="Cantidad">
+      </div>
+      <div class="col-12 col-md-4">
+        <button type="submit" name="accion" value="agregar" class="btn btn-sm btn-outline-success">
+          <i class="bi bi-plus-circle me-1"></i>Agregar producto
+        </button>
+      </div>
+    </div>
+
   </div>
 
 
@@ -105,9 +127,10 @@
     <a href="{{ url_for('entregas.lista_entregas') }}" class="btn btn-secondary">
       <i class="bi bi-arrow-left me-1"></i>Cancelar
     </a>
-    <button type="submit" class="btn btn-success">
+    <button type="submit" name="accion" value="confirmar" class="btn btn-success">
       <i class="bi bi-check2-circle me-1"></i>Confirmar
     </button>
+
   </div>
 </form>
 {% endblock %}

@@ -53,6 +53,30 @@ def remito(id_pedido):
             abort(404, "Pedido no encontrado")
 
         if request.method == "POST":
+            accion = request.form.get("accion")
+
+            if accion == "agregar":
+                nuevo_id_producto = request.form.get("nuevo_id_producto")
+                nueva_cantidad = request.form.get("nuevo_cantidad")
+                if nuevo_id_producto and nueva_cantidad:
+                    try:
+                        cant = float(nueva_cantidad.replace(',', '.'))
+                        if cant > 0:
+                            cur.execute("SELECT precio FROM productos WHERE id_producto = %s", (nuevo_id_producto,))
+                            precio_producto = cur.fetchone()
+                            precio_val = float(precio_producto['precio']) if precio_producto else 0
+
+                            cur.execute("""
+                                INSERT INTO detalle_pedido (id_pedido, id_producto, cantidad, cantidad_real, precio)
+                                VALUES (%s, %s, %s, %s, %s)
+                            """, (id_pedido, nuevo_id_producto, cant, cant, precio_val))
+                            conn.commit()
+                            flash("Producto agregado correctamente", "success")
+                    except Exception as e:
+                        flash(f"Error al agregar producto nuevo: {e}", "danger")
+
+                return redirect(url_for("entregas.remito", id_pedido=id_pedido))
+        elif accion == "confirmar":
             cantidades_reales = request.form.getlist("cantidad_real[]")
             id_detalles = request.form.getlist("id_detalle[]")
             precios = request.form.getlist("precio[]")
@@ -151,7 +175,6 @@ def remito(id_pedido):
 
             conn.commit()
             return redirect(url_for("entregas.visualizador_pdf_remito", id_remito=id_remito))
-
         cur.execute("""
             SELECT pd.id_detalle,
                    pr.descripcion,
@@ -197,6 +220,8 @@ def remito(id_pedido):
         cliente_nombre=info_cliente["cliente_nombre"],
         fecha_entrega=info_cliente["fecha_entrega"]
     )
+
+
 
 @bp_entregas.route("/remito/pdf/<int:id_remito>")
 def remito_pdf(id_remito):

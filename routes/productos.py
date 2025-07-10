@@ -85,7 +85,17 @@ def editar(id):
 @bp_productos.route("/borrar/<id>")
 def borrar(id):
     with get_conn() as conn, conn.cursor() as cur:
+        # Verificamos si el producto está en detalles_pedido
+        cur.execute("SELECT COUNT(*) FROM detalles_pedido WHERE id_producto = %s", (id,))
+        cantidad_usos = cur.fetchone()[0]
+
+        if cantidad_usos > 0:
+            flash("No se puede eliminar el producto porque ya fue utilizado en pedidos.", "warning")
+            return redirect(url_for("productos.productos"))
+
+        # Si no está en detalles_pedido, lo eliminamos
         cur.execute("DELETE FROM productos WHERE id_producto = %s", (id,))
         conn.commit()
+
     flash("Producto borrado correctamente.", "success")
     return redirect(url_for("productos.productos"))

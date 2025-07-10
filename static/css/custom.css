@@ -437,3 +437,30 @@ input[type="number"] {
 .modal-footer {
   border: none;
 }
+.card-action .display-6 {
+  font-size: 2.5rem;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.card-action:hover .display-6 {
+  transform: scale(1.2) rotate(-5deg);
+  color: #22c55e; /* Verde éxito */
+}
+
+.card-action p {
+  transition: color 0.3s ease;
+}
+
+.card-action:hover p {
+  color: #22c55e;
+}
+
+.card-action {
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-action:hover {
+  background-color: #2a2a2a;
+  box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+  cursor: pointer;
+}

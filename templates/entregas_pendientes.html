@@ -4,7 +4,6 @@
 
 {% block head_extra %}
 {{ super() }}
-
 {% endblock %}
 
 {% block content %}
@@ -46,8 +45,7 @@
             <div class="d-flex align-items-center">
               {% if pedido.fecha_entrega.date() == fecha_hoy %}
               <a href="{{ url_for('entregas.remito', id_pedido=pedido.id_pedido) }}"
-                class="btn btn-sm btn-outline-success d-inline-flex align-items-center btn-pequeño"
-                style="font-size: 0.85rem; padding: 0.3rem 0.8rem;">
+                class="btn btn-sm btn-outline-success d-inline-flex align-items-center btn-pequeño">
                 <i class="bi bi-file-earmark-text me-1"></i> Generar Remito
               </a>
               {% else %}
@@ -89,9 +87,6 @@
         </tr>
         {% endfor %}
       </tbody>
-
-
-
     </table>
   </div>
   {% endfor %}

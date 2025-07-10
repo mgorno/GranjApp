@@ -229,10 +229,6 @@ label {
   -webkit-overflow-scrolling: touch;
 }
 
-.btn-pequeño {
-  font-size: 0.75rem;
-  padding: 0.2rem 0.6rem;
-}
 
 @media (max-width: 576px) {
   body {
@@ -326,4 +322,12 @@ input[type="number"] {
 .btn-pequeño {
   font-size: 0.75rem;
   padding: 0.2rem 0.6rem;
+  min-width: 110px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  border-radius: 10px;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
 }

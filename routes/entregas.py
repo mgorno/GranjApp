@@ -76,15 +76,11 @@ def remito(id_pedido):
                         flash(f"Error al agregar producto nuevo: {e}", "danger")
 
                 return redirect(url_for("entregas.remito", id_pedido=id_pedido))
+
             elif accion == "confirmar":
                 cantidades_reales = request.form.getlist("cantidad_real[]")
                 id_detalles = request.form.getlist("id_detalle[]")
                 precios = request.form.getlist("precio[]")
-
-                print("cantidades_reales:", cantidades_reales)
-                print("id_detalles:", id_detalles)
-                print("precios:", precios)
-
 
                 for id_det, real_str, precio_str in zip(id_detalles, cantidades_reales, precios):
                     try:
@@ -112,11 +108,11 @@ def remito(id_pedido):
 
                 cur.execute("""
                     SELECT pr.descripcion,
-                        pr.unidad_base, 
-                        pd.cantidad,
-                        pd.cantidad_real,
-                        pd.precio,
-                        pd.id_producto
+                           pr.unidad_base, 
+                           pd.cantidad,
+                           pd.cantidad_real,
+                           pd.precio,
+                           pd.id_producto
                     FROM detalle_pedido pd
                     JOIN productos pr ON pd.id_producto = pr.id_producto
                     WHERE pd.id_pedido = %s
@@ -175,27 +171,29 @@ def remito(id_pedido):
 
                 conn.commit()
                 return redirect(url_for("entregas.visualizador_pdf_remito", id_remito=id_remito))
-            cur.execute("""
-                SELECT pd.id_detalle,
-                    pr.descripcion,
-                    pd.cantidad,
-                    pd.cantidad_real,
-                    pd.precio,
-                    pr.unidad_base
-                FROM detalle_pedido pd
-                JOIN productos pr ON pd.id_producto = pr.id_producto
-                WHERE pd.id_pedido = %s
-            """, (id_pedido,))
-            detalles_raw = cur.fetchall()
 
-            detalles = [
-                {
-                    **row,
-                    'cantidad_real': float(row['cantidad_real'] or row['cantidad']),
-                    'precio': float(row['precio'] or 0)
-                }
-                for row in detalles_raw
-            ]
+        # ---- GET o POST sin acción válida ----
+        cur.execute("""
+            SELECT pd.id_detalle,
+                   pr.descripcion,
+                   pd.cantidad,
+                   pd.cantidad_real,
+                   pd.precio,
+                   pr.unidad_base
+            FROM detalle_pedido pd
+            JOIN productos pr ON pd.id_producto = pr.id_producto
+            WHERE pd.id_pedido = %s
+        """, (id_pedido,))
+        detalles_raw = cur.fetchall()
+
+        detalles = [
+            {
+                **row,
+                'cantidad_real': float(row['cantidad_real'] or row['cantidad']),
+                'precio': float(row['precio'] or 0)
+            }
+            for row in detalles_raw
+        ]
 
         cur.execute("SELECT id_cliente FROM pedidos WHERE id_pedido = %s", (id_pedido,))
         id_cliente = cur.fetchone()["id_cliente"]

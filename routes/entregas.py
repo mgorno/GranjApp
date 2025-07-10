@@ -4,7 +4,7 @@ from flask import (
 )
 from models import get_conn
 from psycopg2.extras import RealDictCursor
-from datetime import datetime
+from datetime import datetime, date
 import uuid
 from collections import defaultdict
 from utils.generar_remito import generar_pdf_remito
@@ -37,7 +37,7 @@ def lista_entregas():
             "cantidad_items": row["cantidad_items"]
         })
 
-    return render_template("entregas_pendientes.html", entregas=entregas_por_fecha)
+    return render_template("entregas_pendientes.html", entregas=entregas_por_fecha, fecha_hoy=date.today())
 
 def obtener_productos():
     with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:

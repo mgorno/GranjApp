@@ -1,6 +1,5 @@
 {% extends "base.html" %}
-
-{% block title %}Inicio · Pollería Achabal{% endblock %}
+{% block title %}Inicio{% endblock %}
 
 {% block head_extra %}
   {{ super() }}
@@ -8,71 +7,43 @@
 {% endblock %}
 
 {% block content %}
-<header class="hero">
-  <div class="hero-content">
-    <h1 class="hero-title">🐔 Pollería <strong>Achabal</strong></h1>
-    <p class="hero-subtitle">¡La mejor calidad y sabor de la región!</p>
-    <a href="{{ url_for('pedidos.nuevo') }}" class="btn btn-primary btn-lg">
-      <i class="bi bi-plus-lg me-2"></i>Nuevo Pedido
-    </a>
-  </div>
+<header class="hero-small">
+  <h1 class="hero-title-sm">🐔 Pollería <strong>Achabal</strong></h1>
+  <p class="hero-subtitle-sm">Acciones rápidas</p>
 </header>
 
-<main class="container my-5">
-  <h2 class="section-title">Entregas pendientes</h2>
-  <div class="row g-4">
-    {% for fecha, pedidos in entregas.items() %}
-      <div class="col-12">
-        <h3 class="date-header">
-          <i class="bi bi-calendar-event-fill"></i> {{ fecha }}
-        </h3>
-      </div>
-      {% for pedido in pedidos %}
-        <div class="col-md-4">
-          <div class="card card-polleria h-100">
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title"><i class="bi bi-person-circle me-1"></i>{{ pedido.cliente }}</h5>
-              <p class="card-text">Items: <strong>{{ pedido.cantidad_items }}</strong></p>
-              <div class="mt-auto d-flex justify-content-between">
-                {% if pedido.fecha_entrega.date() == fecha_hoy %}
-                  <a href="{{ url_for('entregas.remito', id_pedido=pedido.id_pedido) }}"
-                     class="btn btn-success btn-sm">
-                    <i class="bi bi-receipt me-1"></i>Remito
-                  </a>
-                {% else %}
-                  <span class="text-muted small">Solo {{ pedido.fecha_entrega.strftime('%d/%m') }}</span>
-                {% endif %}
-                <button class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                        data-bs-target="#modalCancelar{{ pedido.id_pedido }}">
-                  <i class="bi bi-x-circle me-1"></i>Cancelar
-                </button>
-              </div>
-            </div>
+<div class="container my-4">
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="col">
+      <a href="{{ url_for('pedidos.nuevo') }}" class="card-action-link">
+        <div class="card card-polleria h-100 text-center">
+          <div class="card-body d-flex flex-column align-items-center justify-content-center">
+            <i class="bi bi-plus-circle display-4 mb-2"></i>
+            <h5 class="card-title">Nuevo Pedido</h5>
           </div>
         </div>
-
-        <!-- Modal -->
-        <div class="modal fade" id="modalCancelar{{ pedido.id_pedido }}" tabindex="-1" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-light">
-              <div class="modal-header border-0">
-                <h5 class="modal-title text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>Atención</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-              </div>
-              <div class="modal-body">
-                ¿Seguro que querés <strong>cancelar</strong> el pedido de <em>{{ pedido.cliente }}</em>?
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">No</button>
-                <form action="{{ url_for('entregas.cancelar_pedido', id_pedido=pedido.id_pedido) }}" method="POST">
-                  <button type="submit" class="btn btn-danger btn-sm">Sí, cancelar</button>
-                </form>
-              </div>
-            </div>
+      </a>
+    </div>
+    <div class="col">
+      <a href="{{ url_for('entregas.lista_entregas') }}" class="card-action-link">
+        <div class="card card-polleria h-100 text-center">
+          <div class="card-body d-flex flex-column align-items-center justify-content-center">
+            <i class="bi bi-list-task display-4 mb-2"></i>
+            <h5 class="card-title">Pendientes</h5>
           </div>
         </div>
-      {% endfor %}
-    {% endfor %}
+      </a>
+    </div>
+    <div class="col">
+      <a href="{{ url_for('pagos.registrar_pago') }}" class="card-action-link">
+        <div class="card card-polleria h-100 text-center">
+          <div class="card-body d-flex flex-column align-items-center justify-content-center">
+            <i class="bi bi-currency-dollar display-4 mb-2"></i>
+            <h5 class="card-title">Registrar Pago</h5>
+          </div>
+        </div>
+      </a>
+    </div>
   </div>
-</main>
+</div>
 {% endblock %}

@@ -16,7 +16,7 @@ def nuevo():
             # Verificar si ya hay un pedido pendiente
             cur.execute("""
                 SELECT id_pedido FROM pedidos 
-                WHERE id_cliente = %s AND DATE(fecha_entrega) = %s AND estado = 'pendiente'
+                WHERE id_cliente = %s AND DATE(fecha_entrega) = %s AND TRIM(LOWER(estado)) = 'pendiente'
             """, (id_cliente, fecha_entrega))
             existe = cur.fetchone()
 

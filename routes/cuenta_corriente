@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from models import get_conn
 
-bp_cuenta_corriente = Blueprint("cuenta_corriente", __name__, url_prefix="/cuenta")
+bp_cuenta_corriente = Blueprint("cuenta_corriente", __name__, url_prefix="/cuenta_corriente")
 
 @bp_cuenta_corriente.route("/")
 def resumen():

@@ -5,17 +5,20 @@ from datetime import date
 
 bp_pedidos = Blueprint("pedidos", __name__, url_prefix="/pedidos")
 
+
 @bp_pedidos.route('/nuevo', methods=['GET'])
 def nuevo_pedido():
     hoy = date.today().isoformat()
     with get_conn() as conn, conn.cursor() as cur:
-        clientes, productos = obtener_clientes_productos(cur)
+        clientes = obtener_clientes(cur)
+        productos = obtener_productos(cur)
     return render_template("nuevo_pedido.html", clientes=clientes, productos=productos, fecha_hoy=hoy)
-
 
 
 @bp_pedidos.route("/nuevo", methods=["GET", "POST"])
 def nuevo():
+    hoy = date.today().isoformat()
+
     if request.method == "POST":
         try:
             with get_conn() as conn, conn.cursor() as cur:
@@ -31,8 +34,9 @@ def nuevo():
 
                 if existe:
                     flash("Ya existe un pedido pendiente para este cliente en esa fecha.", "error")
-                    clientes, productos = obtener_clientes_productos(cur)
-                    return render_template("nuevo_pedido.html", clientes=clientes, productos=productos)
+                    clientes = obtener_clientes(cur)
+                    productos = obtener_productos(cur)
+                    return render_template("nuevo_pedido.html", clientes=clientes, productos=productos, fecha_hoy=hoy)
 
                 id_pedido = str(uuid.uuid4())
 
@@ -66,8 +70,9 @@ def nuevo():
                 if detalles_insertados == 0:
                     conn.rollback()
                     flash("No se agregó ningún producto al pedido.", "error")
-                    clientes, productos = obtener_clientes_productos(cur)
-                    return render_template("nuevo_pedido.html", clientes=clientes, productos=productos)
+                    clientes = obtener_clientes(cur)
+                    productos = obtener_productos(cur, excluir_ids=ids_producto)
+                    return render_template("nuevo_pedido.html", clientes=clientes, productos=productos, fecha_hoy=hoy)
 
                 conn.commit()
                 flash("Pedido creado correctamente.", "success")
@@ -77,22 +82,35 @@ def nuevo():
             conn.rollback()
             flash(f"Ocurrió un error al crear el pedido: {e}", "danger")
             with get_conn() as conn, conn.cursor() as cur:
-                clientes, productos = obtener_clientes_productos(cur)
-            return render_template("nuevo_pedido.html", clientes=clientes, productos=productos)
+                clientes = obtener_clientes(cur)
+                productos = obtener_productos(cur)
+            return render_template("nuevo_pedido.html", clientes=clientes, productos=productos, fecha_hoy=hoy)
 
     # Si es GET
     with get_conn() as conn, conn.cursor() as cur:
-        clientes, productos = obtener_clientes_productos(cur)
-    return render_template("nuevo_pedido.html", clientes=clientes, productos=productos)
+        clientes = obtener_clientes(cur)
+        productos = obtener_productos(cur)
+    return render_template("nuevo_pedido.html", clientes=clientes, productos=productos, fecha_hoy=hoy)
 
 
-def obtener_clientes_productos(cur):
+def obtener_clientes(cur):
     cur.execute("SELECT id_cliente, nombre FROM clientes ORDER BY nombre")
-    clientes = cur.fetchall()
-    cur.execute("SELECT id_producto, descripcion, precio, unidad_base FROM productos ORDER BY descripcion")
-    productos = cur.fetchall()
-    return clientes, productos
-    
+    return cur.fetchall()
+
+
+def obtener_productos(cur, excluir_ids=None):
+    query = "SELECT id_producto, descripcion, precio, unidad_base FROM productos"
+    params = []
+
+    if excluir_ids:
+        placeholders = ','.join(['%s'] * len(excluir_ids))
+        query += f" WHERE id_producto NOT IN ({placeholders})"
+        params.extend(excluir_ids)
+
+    query += " ORDER BY descripcion"
+    cur.execute(query, params)
+    return cur.fetchall()
+
 
 @bp_pedidos.route("/eliminar/<id_pedido>", methods=["POST", "GET"])
 def eliminar(id_pedido):

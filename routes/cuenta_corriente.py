@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, request
 from models import get_conn
+import io
 import pandas as pd
+from flask import send_file
 
 bp_cuenta_corriente = Blueprint("cuenta_corriente", __name__, url_prefix="/cuenta_corriente")
 

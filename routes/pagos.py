@@ -1,4 +1,8 @@
 from datetime import datetime, timedelta
+from flask import Blueprint, render_template, request, redirect, url_for, flash
+from db import get_conn 
+
+bp_pagos = Blueprint("pagos", __name__, url_prefix="/pagos")
 
 @bp_pagos.route("/", methods=["GET", "POST"])
 def lista():

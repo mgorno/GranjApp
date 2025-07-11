@@ -161,26 +161,28 @@ def remito(id_pedido):
 
                     cur.execute("UPDATE pedidos SET estado = 'entregado' WHERE id_pedido = %s", (id_pedido,))
 
-                cur.execute("""
-                    SELECT id_movimiento FROM movimientos_cuenta_corriente 
-                    WHERE id_cliente = %s AND tipo_mov = 'compra' AND importe = %s AND id_remito = %s
-                """, (cli['id_cliente'], total, id_remito))
-                mov_existente = cur.fetchone()
-
-                if not mov_existente:
-               # Invertir el signo del total, ya que una compra es un débito
+   
                     importe_negativo = -total
+
                     cur.execute("""
-                        INSERT INTO movimientos_cuenta_corriente
-                            (id_movimiento, id_cliente, fecha, tipo_mov, importe, id_remito)
-                        VALUES (%s, %s, %s, 'compra', %s, %s)
-                    """, (str(uuid.uuid4()), cli['id_cliente'], datetime.utcnow().date(), importe_negativo, id_remito))
-                    cur.execute("""
-                        INSERT INTO clientes_cuenta_corriente (id_cliente, saldo)
-                        VALUES (%s, %s)
-                        ON CONFLICT (id_cliente)
-                        DO UPDATE SET saldo = clientes_cuenta_corriente.saldo + EXCLUDED.saldo
-                    """, (cli['id_cliente'], importe_negativo))
+                        SELECT id_movimiento FROM movimientos_cuenta_corriente 
+                        WHERE id_cliente = %s AND tipo_mov = 'compra' AND importe = %s AND id_remito = %s
+                    """, (cli['id_cliente'], importe_negativo, id_remito))
+                    mov_existente = cur.fetchone()
+
+                    if not mov_existente:
+                        cur.execute("""
+                            INSERT INTO movimientos_cuenta_corriente
+                                (id_movimiento, id_cliente, fecha, tipo_mov, importe, id_remito)
+                            VALUES (%s, %s, %s, 'compra', %s, %s)
+                        """, (str(uuid.uuid4()), cli['id_cliente'], datetime.utcnow().date(), importe_negativo, id_remito))
+
+                        cur.execute("""
+                            INSERT INTO clientes_cuenta_corriente (id_cliente, saldo)
+                            VALUES (%s, %s)
+                            ON CONFLICT (id_cliente)
+                            DO UPDATE SET saldo = clientes_cuenta_corriente.saldo + EXCLUDED.saldo
+                        """, (cli['id_cliente'], importe_negativo))
 
                 conn.commit()
                 return redirect(url_for("entregas.visualizador_pdf_remito", id_remito=id_remito))

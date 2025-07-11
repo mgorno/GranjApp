@@ -11,8 +11,14 @@ def cuenta_corriente():
     fecha_desde = request.args.get("desde")
     fecha_hasta = request.args.get("hasta")
 
-    query = """
-        SELECT m.fecha, m.tipo_mov, m.importe, m.forma_pago, m.id_remito, c.nombre
+    query ="""
+        SELECT 
+            m.id_movimiento,
+            c.nombre,
+            m.fecha,
+            m.tipo_mov,
+            m.importe,
+            m.forma_pago
         FROM movimientos_cuenta_corriente m
         LEFT JOIN clientes c ON c.id_cliente = m.id_cliente
         WHERE 1=1

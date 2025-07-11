@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from models import get_conn
 import uuid
+from datetime import date
 
 bp_pedidos = Blueprint("pedidos", __name__, url_prefix="/pedidos")
 

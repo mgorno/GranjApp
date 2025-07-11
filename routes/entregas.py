@@ -168,23 +168,24 @@ def remito(id_pedido):
                 mov_existente = cur.fetchone()
 
                 if not mov_existente:
+               # Invertir el signo del total, ya que una compra es un débito
+                    importe_negativo = -total
                     cur.execute("""
                         INSERT INTO movimientos_cuenta_corriente
                             (id_movimiento, id_cliente, fecha, tipo_mov, importe, id_remito)
                         VALUES (%s, %s, %s, 'compra', %s, %s)
-                    """, (str(uuid.uuid4()), cli['id_cliente'], datetime.utcnow().date(), total, id_remito))
-
+                    """, (str(uuid.uuid4()), cli['id_cliente'], datetime.utcnow().date(), importe_negativo, id_remito))
                     cur.execute("""
                         INSERT INTO clientes_cuenta_corriente (id_cliente, saldo)
                         VALUES (%s, %s)
                         ON CONFLICT (id_cliente)
                         DO UPDATE SET saldo = clientes_cuenta_corriente.saldo + EXCLUDED.saldo
-                    """, (cli['id_cliente'], total))
+                    """, (cli['id_cliente'], importe_negativo))
 
                 conn.commit()
                 return redirect(url_for("entregas.visualizador_pdf_remito", id_remito=id_remito))
 
-        # ---- GET o POST sin acción válida ----
+
         cur.execute("""
             SELECT pd.id_detalle,
                    pr.descripcion,

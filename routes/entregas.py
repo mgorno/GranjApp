@@ -39,10 +39,20 @@ def lista_entregas():
 
     return render_template("entregas_pendientes.html", entregas=entregas_por_fecha, fecha_hoy=date.today())
 
-def obtener_productos():
+def obtener_productos(excluir_ids=None):
+    query = "SELECT id_producto, descripcion, unidad_base, precio FROM productos"
+    params = []
+
+    if excluir_ids:
+        query += " WHERE id_producto NOT IN %s"
+        params.append(tuple(excluir_ids))  # psycopg2 necesita tuplas para IN
+
+    query += " ORDER BY descripcion"
+
     with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
-        cur.execute("SELECT id_producto, descripcion, unidad_base, precio FROM productos ORDER BY descripcion")
+        cur.execute(query, params)
         return cur.fetchall()
+
 
 @bp_entregas.route("/<id_pedido>/remito", methods=["GET", "POST"])
 def remito(id_pedido):

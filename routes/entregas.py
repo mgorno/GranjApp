@@ -34,7 +34,7 @@ def lista_entregas():
         entregas_por_fecha[row["fecha_entrega"].strftime("%Y-%m-%d")].append({
             "id_pedido":      row["id_pedido"],
             "cliente":        row["nombre"],
-            "fecha_entrega":  row["fecha_entrega"],
+            "fecha_entrega":  row["fecha_entrega"].strftime("%Y-%m-%d"),
             "cantidad_items": row["cantidad_items"]
         })
     fecha_hoy = date.today().strftime("%Y-%m-%d")

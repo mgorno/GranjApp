@@ -37,8 +37,8 @@ def lista_entregas():
             "fecha_entrega":  row["fecha_entrega"],
             "cantidad_items": row["cantidad_items"]
         })
-
-    return render_template("entregas_pendientes.html", entregas=entregas_por_fecha, fecha_hoy=date.today())
+    fecha_hoy = date.today().strftime("%Y-%m-%d")
+    return render_template("entregas_pendientes.html", entregas=entregas_por_fecha, fecha_hoy=fecha_hoy)
 
 from psycopg2 import sql
 

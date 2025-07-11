@@ -62,14 +62,15 @@ def remito(id_pedido):
                     try:
                         cant = float(nueva_cantidad.replace(',', '.'))
                         if cant > 0:
-                            cur.execute("SELECT precio FROM productos WHERE id_producto = %s", (nuevo_id_producto,))
+                            cur.execute("SELECT precio, unidad_base FROM productos WHERE id_producto = %s", (nuevo_id_producto,))
                             precio_producto = cur.fetchone()
                             precio_val = float(precio_producto['precio']) if precio_producto else 0
+                            unidad_val = precio_producto['unidad_base'] if precio_producto else 'unidad'
 
                             cur.execute("""
-                                INSERT INTO detalle_pedido (id_pedido, id_producto, cantidad, cantidad_real, precio)
-                                VALUES (%s, %s, %s, %s, %s)
-                            """, (id_pedido, nuevo_id_producto, cant, cant, precio_val))
+                                INSERT INTO detalle_pedido (id_pedido, id_producto, cantidad, cantidad_real, precio, unidad)
+                                VALUES (%s, %s, %s, %s, %s, %s)
+                            """, (id_pedido, nuevo_id_producto, cant, cant, precio_val, unidad_val))
                             conn.commit()
                             flash("Producto agregado correctamente", "success")
                     except Exception as e:

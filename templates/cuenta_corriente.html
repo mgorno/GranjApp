@@ -32,13 +32,12 @@
     </button>
   </div>
   <div class="col-md-1">
-    <a class="btn btn-outline-success w-100"
-       href="{{ url_for('cuenta_corriente.exportar_excel',
-                        cliente=request.args.get('cliente', ''),
-                        desde=request.args.get('desde', ''),
-                        hasta=request.args.get('hasta', '')) }}">
-      <i class="bi bi-file-earmark-excel me-1"></i> Excel
-    </a>
+    <button id="btn-exportar-excel">Exportar a Excel</button>
+<form id="form-exportar" action="{{ url_for('cuenta_corriente.exportar_excel') }}" method="get" style="display: none;">
+    <input type="hidden" name="cliente" value="{{ request.args.get('cliente', '') }}">
+    <input type="hidden" name="desde" value="{{ request.args.get('desde', '') }}">
+    <input type="hidden" name="hasta" value="{{ request.args.get('hasta', '') }}">
+</form>
   </div>
 </form>
 

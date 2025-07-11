@@ -45,11 +45,11 @@ def cuenta_corriente():
         clientes = cur.fetchall()
 
         # Traer saldo actual del cliente si se seleccionó uno
-        saldo_actual = None
         if cliente_id:
             cur.execute("SELECT saldo FROM clientes_cuenta_corriente WHERE id_cliente = %s", (cliente_id,))
             row = cur.fetchone()
-            if row:
-                saldo_actual = row[0]
+            saldo_actual = row[0] if row and row[0] is not None else 0
+        else:
+            saldo_actual = 0
 
     return render_template("cuenta_corriente.html", movimientos=movimientos, clientes=clientes, saldo_actual=saldo_actual)

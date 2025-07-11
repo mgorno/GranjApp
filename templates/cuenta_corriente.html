@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 {% block title %}Cuenta Corriente{% endblock %}
+
 {% block head_extra %}
 {{ super() }}
 <script src="{{ url_for('static', filename='js/cuenta_corriente.js') }}" defer></script>
 {% endblock %}
+
 {% block content %}
 <h1 class="mb-4 text-white border-bottom pb-2" style="font-weight: 500;">
   <i class="bi bi-wallet2 me-2 text-warning"></i>Cuenta Corriente
@@ -35,13 +37,17 @@
     </button>
   </div>
   <div class="col-md-1">
-    <button id="btn-exportar-excel">Exportar a Excel</button>
-<form id="form-exportar" action="{{ url_for('cuenta_corriente.exportar_excel') }}" method="get" style="display: none;">
-    <input type="hidden" name="cliente" value="{{ request.args.get('cliente', '') }}">
-    <input type="hidden" name="desde" value="{{ request.args.get('desde', '') }}">
-    <input type="hidden" name="hasta" value="{{ request.args.get('hasta', '') }}">
-</form>
+    <button id="btn-exportar-excel" class="btn btn-outline-success w-100" type="button">
+      <i class="bi bi-file-earmark-excel me-1"></i>
+    </button>
   </div>
+</form>
+
+<!-- Formulario oculto para exportar -->
+<form id="form-exportar" action="{{ url_for('cuenta_corriente.exportar_excel') }}" method="get" style="display: none;">
+  <input type="hidden" name="cliente" value="{{ request.args.get('cliente', '') }}">
+  <input type="hidden" name="desde" value="{{ request.args.get('desde', '') }}">
+  <input type="hidden" name="hasta" value="{{ request.args.get('hasta', '') }}">
 </form>
 
 {% if movimientos %}
@@ -78,6 +84,4 @@
   </tbody>
 </table>
 {% else %}
-<p class="text-muted fst-italic">No hay movimientos registrados en este rango.</p>
-{% endif %}
-{% endblock %}
+<p class="text-muted fst-italic">No hay movimientos registrados en este rango.</p>p

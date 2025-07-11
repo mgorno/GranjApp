@@ -3,6 +3,7 @@ from flask import (
     url_for, flash, send_file, abort
 )
 from models import get_conn
+from psycopg2 import sql
 from psycopg2.extras import RealDictCursor
 from datetime import datetime, date
 import uuid
@@ -39,19 +40,25 @@ def lista_entregas():
 
     return render_template("entregas_pendientes.html", entregas=entregas_por_fecha, fecha_hoy=date.today())
 
+from psycopg2 import sql
+
 def obtener_productos(excluir_ids=None):
-    query = "SELECT id_producto, descripcion, unidad_base, precio FROM productos"
+    base_query = sql.SQL("SELECT id_producto, descripcion, unidad_base, precio FROM productos")
+    where_clause = sql.SQL("")
+    order_clause = sql.SQL(" ORDER BY descripcion")
     params = []
 
     if excluir_ids:
-        query += " WHERE id_producto NOT IN %s"
-        params.append(tuple(excluir_ids))  # psycopg2 necesita tuplas para IN
+        placeholders = sql.SQL(', ').join(sql.Placeholder() * len(excluir_ids))
+        where_clause = sql.SQL(" WHERE id_producto NOT IN ({})").format(placeholders)
+        params.extend(excluir_ids)
 
-    query += " ORDER BY descripcion"
+    final_query = base_query + where_clause + order_clause
 
     with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
-        cur.execute(query, params)
+        cur.execute(final_query, params)
         return cur.fetchall()
+
 
 
 @bp_entregas.route("/<id_pedido>/remito", methods=["GET", "POST"])

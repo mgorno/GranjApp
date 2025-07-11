@@ -4,7 +4,7 @@ import uuid
 
 bp_pedidos = Blueprint("pedidos", __name__, url_prefix="/pedidos")
 
-@app.route('/nuevo', methods=['GET'])
+@bp_pedidos.route('/nuevo', methods=['GET'])
 def nuevo_pedido():
     hoy = date.today().isoformat()  
     return render_template("nuevo_pedido.html", clientes=clientes, productos=productos, fecha_hoy=hoy)

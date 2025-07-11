@@ -10,7 +10,6 @@ def register_all_blueprints(app):
     from .productos import bp_productos
     from .entregas import bp_entregas  
     from .cuenta_corriente import bp_cuenta_corriente
-
     app.register_blueprint(bp_clientes, url_prefix='/clientes')
     app.register_blueprint(bp_main)
     app.register_blueprint(bp_pagos, url_prefix='/pagos')

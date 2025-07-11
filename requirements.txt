@@ -2,3 +2,5 @@ flask>=2.3
 psycopg2-binary
 gunicorn
 reportlab
+pandas
+XlsxWriter

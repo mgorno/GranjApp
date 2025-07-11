@@ -5,8 +5,7 @@ bp_cuenta_corriente = Blueprint("cuenta_corriente", __name__, url_prefix="/cuent
 
 @bp_cuenta_corriente.route("/", methods=["GET"])
 def cuenta_corriente():
-    # Acá obtenés el parámetro 'cliente' que viene del formulario (select name="cliente")
-    cliente_id = request.args.get("cliente")  
+    cliente_id = request.args.get("cliente")
     fecha_desde = request.args.get("desde")
     fecha_hasta = request.args.get("hasta")
 
@@ -36,14 +35,21 @@ def cuenta_corriente():
 
     query += " ORDER BY m.fecha DESC"
 
-    with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(query, tuple(params))
-            movimientos = cur.fetchall()
+    with get_conn() as conn, conn.cursor() as cur:
+        # Movimientos filtrados
+        cur.execute(query, tuple(params))
+        movimientos = cur.fetchall()
 
-            # También necesitás la lista de clientes para el select
-            cur.execute("SELECT id_cliente, nombre FROM clientes ORDER BY nombre")
-            clientes = cur.fetchall()
+        # Lista de clientes para el filtro
+        cur.execute("SELECT id_cliente, nombre FROM clientes ORDER BY nombre")
+        clientes = cur.fetchall()
 
-    # Finalmente le pasás movimientos y clientes a la plantilla
-    return render_template("cuenta_corriente.html", movimientos=movimientos, clientes=clientes)
+        # Traer saldo actual del cliente si se seleccionó uno
+        saldo_actual = None
+        if cliente_id:
+            cur.execute("SELECT saldo FROM clientes_cuenta_corriente WHERE id_cliente = %s", (cliente_id,))
+            row = cur.fetchone()
+            if row:
+                saldo_actual = row[0]
+
+    return render_template("cuenta_corriente.html", movimientos=movimientos, clientes=clientes, saldo_actual=saldo_actual)

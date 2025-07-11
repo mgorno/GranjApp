@@ -1,16 +1,39 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request
 from models import get_conn
 
 bp_cuenta_corriente = Blueprint("cuenta_corriente", __name__, url_prefix="/cuenta_corriente")
 
-@bp_cuenta_corriente.route("/")
-def resumen():
-    with get_conn() as conn, conn.cursor() as cur:
-        cur.execute("""
-            SELECT c.nombre, cc.saldo
-            FROM clientes c
-            JOIN clientes_cuenta_corriente cc ON c.id_cliente = cc.id_cliente
-            ORDER BY c.nombre
-        """)
-        saldos = cur.fetchall()
-    return render_template("cuenta_corriente.html", saldos=saldos)
+
+@bp_cuenta_corriente.route("/", methods=["GET"])
+def cuenta_corriente():
+    cliente_id = request.args.get("cliente_id")
+    fecha_desde = request.args.get("desde")
+    fecha_hasta = request.args.get("hasta")
+
+    query = """
+        SELECT m.fecha, m.tipo_mov, m.importe, m.forma_pago, m.id_remito, c.nombre
+        FROM movimientos_cuenta_corriente m
+        LEFT JOIN clientes c ON c.id_cliente = m.id_cliente
+        WHERE 1=1
+    """
+    params = []
+
+    if cliente_id:
+        query += " AND m.id_cliente = %s"
+        params.append(cliente_id)
+    if fecha_desde:
+        query += " AND m.fecha >= %s"
+        params.append(fecha_desde)
+    if fecha_hasta:
+        query += " AND m.fecha <= %s"
+        params.append(fecha_hasta)
+
+    query += " ORDER BY m.fecha DESC"
+
+    movimientos = []
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(query, tuple(params))
+            movimientos = cur.fetchall()
+
+    return render_template("cuenta_corriente.html", movimientos=movimientos)

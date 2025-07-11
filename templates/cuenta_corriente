@@ -45,7 +45,9 @@
     </tr>
   </thead>
   <tbody>
+    {% set total = 0 %}
     {% for m in movimientos %}
+    {% set total = total + m[4] %}
     <tr>
       <td>{{ m[2].strftime('%Y-%m-%d') }}</td>
       <td>{{ m[1] }}</td>
@@ -56,6 +58,12 @@
       <td>{{ m[5] or '-' }}</td>
     </tr>
     {% endfor %}
+    <tr class="fw-bold border-top border-light">
+      <td colspan="3" class="text-end">Saldo total:</td>
+      <td colspan="2" class="{% if total < 0 %}text-danger{% elif total > 0 %}text-success{% endif %}">
+        ${{ "%.2f"|format(total) }}
+      </td>
+    </tr>
   </tbody>
 </table>
 {% else %}

@@ -1,7 +1,4 @@
-from flask import (
-    Blueprint, render_template, request, redirect,
-    url_for, flash, send_file, abort
-)
+from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, send_file
 from models import get_conn
 from psycopg2 import sql
 from psycopg2.extras import RealDictCursor

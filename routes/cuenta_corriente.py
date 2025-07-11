@@ -3,15 +3,14 @@ from models import get_conn
 
 bp_cuenta_corriente = Blueprint("cuenta_corriente", __name__, url_prefix="/cuenta_corriente")
 
-
 @bp_cuenta_corriente.route("/", methods=["GET"])
-
 def cuenta_corriente():
-    cliente_id = request.args.get("cliente_id")
+    # Acá obtenés el parámetro 'cliente' que viene del formulario (select name="cliente")
+    cliente_id = request.args.get("cliente")  
     fecha_desde = request.args.get("desde")
     fecha_hasta = request.args.get("hasta")
 
-    query ="""
+    query = """
         SELECT 
             m.id_movimiento,
             c.nombre,
@@ -37,10 +36,14 @@ def cuenta_corriente():
 
     query += " ORDER BY m.fecha DESC"
 
-    movimientos = []
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(query, tuple(params))
             movimientos = cur.fetchall()
 
-    return render_template("cuenta_corriente.html", movimientos=movimientos)
+            # También necesitás la lista de clientes para el select
+            cur.execute("SELECT id_cliente, nombre FROM clientes ORDER BY nombre")
+            clientes = cur.fetchall()
+
+    # Finalmente le pasás movimientos y clientes a la plantilla
+    return render_template("cuenta_corriente.html", movimientos=movimientos, clientes=clientes)

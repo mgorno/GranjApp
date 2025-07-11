@@ -57,7 +57,6 @@ def cuenta_corriente():
 
     return render_template("cuenta_corriente.html", movimientos=movimientos, clientes=clientes, saldo_actual=saldo_actual)
 
-
 @bp_cuenta_corriente.route("/exportar_excel", methods=["GET"])
 def exportar_excel():
     cliente_id = request.args.get("cliente")
@@ -96,14 +95,13 @@ def exportar_excel():
 
     # Convertir a DataFrame de pandas
     df = pd.DataFrame(rows, columns=["ID Movimiento", "Cliente", "Fecha", "Tipo", "Importe", "Forma de pago"])
-    # Formatear fecha para mejor lectura
     df["Fecha"] = df["Fecha"].apply(lambda x: x.strftime("%Y-%m-%d") if x else "")
 
     # Generar Excel en memoria
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
         df.to_excel(writer, index=False, sheet_name="Movimientos")
-        writer.save()
+
     output.seek(0)
 
     return send_file(

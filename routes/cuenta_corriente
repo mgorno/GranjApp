@@ -1,0 +1,16 @@
+from flask import Blueprint, render_template, request
+from models import get_conn
+
+bp_cuenta = Blueprint("cuenta_corriente", __name__, url_prefix="/cuenta")
+
+@bp_cuenta.route("/")
+def resumen():
+    with get_conn() as conn, conn.cursor() as cur:
+        cur.execute("""
+            SELECT c.nombre, cc.saldo
+            FROM clientes c
+            JOIN clientes_cuenta_corriente cc ON c.id_cliente = cc.id_cliente
+            ORDER BY c.nombre
+        """)
+        saldos = cur.fetchall()
+    return render_template("cuenta_corriente.html", saldos=saldos)

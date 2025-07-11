@@ -7,8 +7,11 @@ bp_pedidos = Blueprint("pedidos", __name__, url_prefix="/pedidos")
 
 @bp_pedidos.route('/nuevo', methods=['GET'])
 def nuevo_pedido():
-    hoy = date.today().isoformat()  
+    hoy = date.today().isoformat()
+    with get_conn() as conn, conn.cursor() as cur:
+        clientes, productos = obtener_clientes_productos(cur)
     return render_template("nuevo_pedido.html", clientes=clientes, productos=productos, fecha_hoy=hoy)
+
 
 
 @bp_pedidos.route("/nuevo", methods=["GET", "POST"])

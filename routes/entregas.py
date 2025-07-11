@@ -49,9 +49,15 @@ def obtener_productos(excluir_ids=None):
     params = []
 
     if excluir_ids:
+<<<<<<< HEAD
+        placeholders = ','.join(['%s'] * len(excluir_ids))
+        query += f" WHERE id_producto NOT IN ({placeholders})"
+        params.extend(excluir_ids)
+=======
         placeholders = sql.SQL(', ').join(sql.Placeholder() * len(excluir_ids))
         where_clause = sql.SQL(" WHERE id_producto NOT IN ({})").format(placeholders)
         params.extend(excluir_ids)
+>>>>>>> ede2d276ac93165f5a0b4076b58ca4b6487dc5e4
 
     final_query = base_query + where_clause + order_clause
 
@@ -59,8 +65,11 @@ def obtener_productos(excluir_ids=None):
         cur.execute(final_query, params)
         return cur.fetchall()
 
+<<<<<<< HEAD
+=======
 
 
+>>>>>>> ede2d276ac93165f5a0b4076b58ca4b6487dc5e4
 @bp_entregas.route("/<id_pedido>/remito", methods=["GET", "POST"])
 def remito(id_pedido):
     with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
@@ -227,17 +236,20 @@ def remito(id_pedido):
         """, (id_pedido,))
         info_cliente = cur.fetchone()
 
+        # Excluir productos ya cargados
+        cur.execute("SELECT id_producto FROM detalle_pedido WHERE id_pedido = %s", (id_pedido,))
+        ids_ya_cargados = [row["id_producto"] for row in cur.fetchall()]
+        productos_disponibles = obtener_productos(excluir_ids=ids_ya_cargados)
+
     return render_template(
         "remito_confirmar.html",
         detalles=detalles,
-        productos=obtener_productos(),
+        productos=productos_disponibles,
         id_pedido=id_pedido,
         saldo_anterior=saldo_anterior,
         cliente_nombre=info_cliente["cliente_nombre"],
         fecha_entrega=info_cliente["fecha_entrega"]
     )
-
-
 
 @bp_entregas.route("/remito/pdf/<int:id_remito>")
 def remito_pdf(id_remito):
@@ -286,11 +298,9 @@ def remito_pdf(id_remito):
 def visualizador_pdf_remito(id_remito):
     return render_template("visor_pdf_remito.html", id_remito=id_remito)
 
-
 @bp_entregas.route("/<id_pedido>/cancelar", methods=["POST"])
 def cancelar_pedido(id_pedido):
     with get_conn() as conn, conn.cursor() as cur:
-        # Verificar si el pedido existe y no fue entregado aún
         cur.execute("SELECT estado FROM pedidos WHERE id_pedido = %s", (id_pedido,))
         pedido = cur.fetchone()
         if not pedido:
@@ -304,4 +314,3 @@ def cancelar_pedido(id_pedido):
             flash("Pedido cancelado exitosamente.", "success")
 
     return redirect(url_for("entregas.lista_entregas"))
-

@@ -43,26 +43,18 @@ def lista_entregas():
 from psycopg2 import sql
 
 def obtener_productos(excluir_ids=None):
-    base_query = sql.SQL("SELECT id_producto, descripcion, unidad_base, precio FROM productos")
-    where_clause = sql.SQL("")
-    order_clause = sql.SQL(" ORDER BY descripcion")
+    query = "SELECT id_producto, descripcion, unidad_base, precio FROM productos"
     params = []
 
     if excluir_ids:
-
         placeholders = ','.join(['%s'] * len(excluir_ids))
         query += f" WHERE id_producto NOT IN ({placeholders})"
         params.extend(excluir_ids)
 
-        placeholders = sql.SQL(', ').join(sql.Placeholder() * len(excluir_ids))
-        where_clause = sql.SQL(" WHERE id_producto NOT IN ({})").format(placeholders)
-        params.extend(excluir_ids)
-
-
-    final_query = base_query + where_clause + order_clause
+    query += " ORDER BY descripcion"
 
     with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
-        cur.execute(final_query, params)
+        cur.execute(query, params)
         return cur.fetchall()
 
 

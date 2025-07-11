@@ -5,6 +5,7 @@ bp_cuenta_corriente = Blueprint("cuenta_corriente", __name__, url_prefix="/cuent
 
 
 @bp_cuenta_corriente.route("/", methods=["GET"])
+
 def cuenta_corriente():
     cliente_id = request.args.get("cliente_id")
     fecha_desde = request.args.get("desde")

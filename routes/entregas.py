@@ -49,15 +49,15 @@ def obtener_productos(excluir_ids=None):
     params = []
 
     if excluir_ids:
-<<<<<<< HEAD
+
         placeholders = ','.join(['%s'] * len(excluir_ids))
         query += f" WHERE id_producto NOT IN ({placeholders})"
         params.extend(excluir_ids)
-=======
+
         placeholders = sql.SQL(', ').join(sql.Placeholder() * len(excluir_ids))
         where_clause = sql.SQL(" WHERE id_producto NOT IN ({})").format(placeholders)
         params.extend(excluir_ids)
->>>>>>> ede2d276ac93165f5a0b4076b58ca4b6487dc5e4
+
 
     final_query = base_query + where_clause + order_clause
 
@@ -65,11 +65,7 @@ def obtener_productos(excluir_ids=None):
         cur.execute(final_query, params)
         return cur.fetchall()
 
-<<<<<<< HEAD
-=======
 
-
->>>>>>> ede2d276ac93165f5a0b4076b58ca4b6487dc5e4
 @bp_entregas.route("/<id_pedido>/remito", methods=["GET", "POST"])
 def remito(id_pedido):
     with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:

@@ -45,9 +45,7 @@
     </tr>
   </thead>
   <tbody>
-    {% set total = 0 %}
     {% for m in movimientos %}
-    {% set total = total + m[4] %}
     <tr>
       <td>{{ m[2].strftime('%Y-%m-%d') }}</td>
       <td>{{ m[1] }}</td>
@@ -60,13 +58,14 @@
     {% endfor %}
     {% if saldo_actual is not none %}
     <tr class="fw-bold border-top border-light">
-      <td colspan="3" class="text-end">Saldo actual en cuenta corriente:</td>
+      <td colspan="3" class="text-end">Saldo actual:</td>
       <td colspan="2" class="{% if saldo_actual < 0 %}text-danger{% elif saldo_actual > 0 %}text-success{% endif %}">
         ${{ "%.2f"|format(saldo_actual) }}
       </td>
     </tr>
     {% endif %}
   </tbody>
+
 </table>
 {% else %}
 <p class="text-muted fst-italic">No hay movimientos registrados en este rango.</p>

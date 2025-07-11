@@ -341,6 +341,7 @@ input.precio-input {
 input[type="number"] {
   text-align: right;
 }
+
 /* ————————— Pollería Achabal ————————— */
 :root {
   --polleria-primary: #f08c00;
@@ -358,10 +359,12 @@ input[type="number"] {
   border-radius: 0 0 2rem 2rem;
   margin-bottom: 2rem;
 }
+
 .hero-title {
   font-size: 2.5rem;
   font-weight: 700;
 }
+
 .hero-subtitle {
   font-size: 1.2rem;
   margin-bottom: 1.5rem;
@@ -389,13 +392,15 @@ input[type="number"] {
   color: var(--polleria-dark);
   border: none;
   border-radius: 1rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s, box-shadow 0.2s;
 }
+
 .card-polleria:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
+
 .card-polleria .card-title,
 .card-polleria .card-text {
   color: var(--polleria-dark);
@@ -406,20 +411,25 @@ input[type="number"] {
   background-color: var(--polleria-dark);
   border: none;
 }
+
 .btn-primary:hover {
   background-color: #1f2a38;
 }
+
 .btn-success {
   background-color: var(--polleria-primary);
   border: none;
 }
+
 .btn-success:hover {
   background-color: #e07e00;
 }
+
 .btn-danger {
   background-color: var(--polleria-accent);
   border: none;
 }
+
 .btn-danger:hover {
   background-color: #b34700;
 }
@@ -433,10 +443,12 @@ input[type="number"] {
 .modal-content {
   border-radius: 1rem;
 }
+
 .modal-header,
 .modal-footer {
   border: none;
 }
+
 .card-action .display-6 {
   font-size: 2.5rem;
   transition: transform 0.3s ease, color 0.3s ease;
@@ -444,7 +456,8 @@ input[type="number"] {
 
 .card-action:hover .display-6 {
   transform: scale(1.2) rotate(-5deg);
-  color: #22c55e; /* Verde éxito */
+  color: #22c55e;
+  /* Verde éxito */
 }
 
 .card-action p {
@@ -464,11 +477,23 @@ input[type="number"] {
   box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
   cursor: pointer;
 }
+
 /* Animación de pulso suave */
 @keyframes pulse {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.15); opacity: 0.85; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.15);
+    opacity: 0.85;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .pulse-icon {
@@ -483,4 +508,39 @@ input[type="number"] {
 .card-action:hover {
   transform: translateY(-4px);
   box-shadow: 0 6px 15px rgba(255, 255, 255, 0.08);
+}
+
+/* Menú lateral: hover y foco */
+.offcanvas-body .nav-link {
+  transition: background-color 0.3s ease, color 0.3s ease;
+  border-radius: 0 25px 25px 0;
+}
+
+.offcanvas-body .nav-link:hover,
+.offcanvas-body .nav-link:focus {
+  background-color: #3a3f47;
+  /* gris oscuro suave */
+  color: #f8f9fa !important;
+  /* texto claro */
+  text-decoration: none;
+}
+
+/* Link activo (por ej. con clase 'active' que podés setear desde Flask o JS) */
+.offcanvas-body .nav-link.active {
+  background-color: #1f2937;
+  /* más oscuro */
+  color: #17a2b8 !important;
+  /* color celeste para destacar */
+  font-weight: 600;
+  box-shadow: inset 4px 0 0 0 #17a2b8;
+}
+
+/* Íconos tamaño un poco mayor */
+.offcanvas-body .nav-link i {
+  font-size: 1.25rem;
+}
+
+/* Para separar texto e ícono */
+.offcanvas-body .nav-link span {
+  margin-left: 0.5rem;
 }

@@ -25,6 +25,7 @@ def lista():
             SELECT pg.id_pago, c.nombre, pg.monto_pagado, pg.fecha_pago, pg.medio_pago 
             FROM pagos pg 
             JOIN clientes c ON c.id_cliente = pg.id_cliente 
+            LIMIT 5
             ORDER BY pg.fecha_pago DESC
         """)
         pagos = cur.fetchall()

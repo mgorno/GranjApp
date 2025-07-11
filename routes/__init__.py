@@ -9,7 +9,7 @@ def register_all_blueprints(app):
     from .pedidos import bp_pedidos
     from .productos import bp_productos
     from .entregas import bp_entregas  
-    from .entregas import bp_cuenta_corriente
+    from .cuenta_corriente import bp_cuenta_corriente
 
     app.register_blueprint(bp_clientes, url_prefix='/clientes')
     app.register_blueprint(bp_main)

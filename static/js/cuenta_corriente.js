@@ -13,6 +13,6 @@ document.getElementById("btn-exportar-excel").addEventListener("click", function
 
     // Redirigir después de 2 segundos (opcional)
     setTimeout(() => {
-        window.location.href = "{{ url_for('cuenta_corriente.cuenta_corriente') }}";
+        window.location.href = "{{ url_for('cuenta_corriente.html') }}";
     }, 2000);
 });

@@ -31,14 +31,14 @@
     <input type="date" name="hasta" class="form-control bg-dark text-light border-secondary"
            value="{{ request.args.get('hasta', '') }}">
   </div>
-  <div class="col-md-2">
+  <div class="col-md-1">
     <button class="btn btn-outline-light w-100" type="submit">
       <i class="bi bi-funnel me-1"></i> Filtrar
     </button>
   </div>
-  <div class="col-md-2">
+  <div class="col-md-1">
     <button id="btn-exportar-excel" class="btn btn-outline-success w-100" type="button">
-      <i class="bi bi-file-earmark-excel me-1"></i> Exportar a Excel
+      <i class="bi bi-file-earmark-excel me-1"></i> Excel
     </button>
   </div>
 </form>
@@ -49,6 +49,18 @@
   <input type="hidden" name="desde" value="{{ request.args.get('desde', '') }}">
   <input type="hidden" name="hasta" value="{{ request.args.get('hasta', '') }}">
 </form>
+
+<!-- Saldo actual visual -->
+{% if saldo_actual is not none %}
+<div class="d-flex justify-content-end mb-3">
+  <div class="border rounded px-3 py-2 bg-dark text-white border-secondary">
+    <strong>Saldo actual:</strong>
+    <span class="{% if saldo_actual < 0 %}text-danger{% elif saldo_actual > 0 %}text-success{% endif %}">
+      ${{ "%.2f"|format(saldo_actual) }}
+    </span>
+  </div>
+</div>
+{% endif %}
 
 {% if movimientos %}
 <table class="table table-dark table-bordered border-secondary align-middle">
@@ -73,14 +85,6 @@
       <td>{{ m[5] or '-' }}</td>
     </tr>
     {% endfor %}
-    {% if saldo_actual is not none %}
-    <tr class="fw-bold border-top border-light">
-      <td colspan="3" class="text-end">Saldo actual:</td>
-      <td colspan="2" class="{% if saldo_actual < 0 %}text-danger{% elif saldo_actual > 0 %}text-success{% endif %}">
-        ${{ "%.2f"|format(saldo_actual) }}
-      </td>
-    </tr>
-    {% endif %}
   </tbody>
 </table>
 {% else %}

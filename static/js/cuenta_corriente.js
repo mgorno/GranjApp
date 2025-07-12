@@ -24,7 +24,7 @@ document.getElementById("btn-exportar-excel").addEventListener("click", function
 function formatoPrecioArg(valor) {
     let numero = valor.replace(/\D/g, ''); // Elimina todo lo que no sea dígito
     if (!numero) return '';
-    return '$' + numero.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return numero.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
 
 // Función auxiliar para limpiar puntos y signo $

@@ -7,8 +7,7 @@ app = Flask(__name__)
 init_db()
 app.secret_key = os.environ.get("SECRET_KEY", "dev-key")
 register_all_blueprints(app)
-for rule in app.url_map.iter_rules():
-    print(rule.endpoint, "->", rule)
+
 def formato_cantidad(n):
     try:
         n = float(n)

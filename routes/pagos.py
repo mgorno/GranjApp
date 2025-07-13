@@ -41,21 +41,21 @@ def lista():
                     VALUES (%s, %s, %s, %s)
                 """, (id_cliente, monto_pagado, medio_pago, observaciones))
 
-                # 2. Insertar movimiento en cuenta corriente
+                # 2. Insertar movimiento en cuenta corriente con importe NEGATIVO (pago resta deuda)
                 id_movimiento = str(uuid.uuid4())
                 cur.execute("""
                     INSERT INTO movimientos_cuenta_corriente (
                         id_movimiento, id_cliente, fecha, tipo_mov, importe, forma_pago
                     ) VALUES (%s, %s, CURRENT_DATE, 'pago', %s, %s)
-                """, (id_movimiento, id_cliente, monto_pagado, medio_pago))
+                """, (id_movimiento, id_cliente, -monto_pagado, medio_pago))
 
-                # 3. Actualizar saldo (sumar el pago al saldo actual)
+                # 3. Actualizar saldo restando el pago (importe negativo)
                 cur.execute("""
                     INSERT INTO clientes_cuenta_corriente (id_cliente, saldo)
                     VALUES (%s, %s)
                     ON CONFLICT (id_cliente)
                     DO UPDATE SET saldo = clientes_cuenta_corriente.saldo + EXCLUDED.saldo
-                """, (id_cliente, monto_pagado))
+                """, (id_cliente, -monto_pagado))
 
                 conn.commit()
                 flash("Pago registrado correctamente", "success")

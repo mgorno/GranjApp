@@ -61,8 +61,8 @@
       ) || 0;
       total += subtotalNum;
     });
-    totalRemitoEl.textContent = formatoPrecio(total);
-    saldoTotalEl.textContent = formatoPrecio(total - saldoAnterior);
+    totalRemitoEl.textContent = formatoPrecio(total);         
+    saldoTotalEl.textContent = formatoPrecio(saldoAnterior + total);
   };
 
   // Crea una fila vacía para agregar

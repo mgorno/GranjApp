@@ -1,3 +1,13 @@
+function habilitarEdicionClienteFecha() {
+  document.getElementById("bloque-cliente-fecha-modo-vista").style.display = "none";
+  document.getElementById("bloque-cliente-fecha-edicion").style.display = "block";
+}
+
+function cancelarEdicionClienteFecha() {
+  document.getElementById("bloque-cliente-fecha-edicion").style.display = "none";
+  document.getElementById("bloque-cliente-fecha-modo-vista").style.display = "block";
+}
+
 (() => {
   const tabla = document.getElementById("tabla-remito");
   if (!tabla) return; // por si el script se carga en otra vista
@@ -140,13 +150,6 @@
       recalcularTotales();
     });
   }
-  function habilitarEdicionClienteFecha() {
-    document.getElementById("bloque-cliente-fecha-modo-vista").style.display = "none";
-    document.getElementById("bloque-cliente-fecha-edicion").style.display = "block";
-  }
 
-  function cancelarEdicionClienteFecha() {
-    document.getElementById("bloque-cliente-fecha-edicion").style.display = "none";
-    document.getElementById("bloque-cliente-fecha-modo-vista").style.display = "block";
-  }
+
 })();

@@ -107,7 +107,7 @@
         <div class="card-body">
           <p class="d-flex justify-content-between mb-2">
             <span>Total remito:</span>
-            <strong id="total-remito">0.00</strong>
+            <strong id="total-remito">0</strong>
           </p>
           <p class="d-flex justify-content-between mb-2">
             <span>Saldo anterior:</span>
@@ -115,7 +115,7 @@
           </p>
           <p class="d-flex justify-content-between mb-2">
             <span>Saldo total:</span>
-            <strong id="saldo-total">0.00</strong>
+            <strong id="saldo-total">0</strong>
           </p>
         </div>
       </div>
@@ -125,7 +125,7 @@
   <!-- Botones -->
   <div class="d-flex gap-2">
     <a href="{{ url_for('entregas.lista_entregas') }}" class="btn btn-secondary">
-      <i class="bi bi-arrow-left me-1"></i>Cancelar
+      <i class="bi bi-arrow-left me-1"></i>Volver
     </a>
     <button type="submit" name="accion" value="confirmar" class="btn btn-success">
       <i class="bi bi-check2-circle me-1"></i>Confirmar

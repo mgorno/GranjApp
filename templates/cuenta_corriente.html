@@ -55,7 +55,7 @@
 <div class="d-flex justify-content-end mb-3">
   <div class="border rounded px-3 py-2 bg-dark text-white border-secondary">
     <strong>Saldo actual:</strong>
-    <span class="{% if saldo_actual < 0 %}text-danger{% elif saldo_actual > 0 %}text-success{% endif %}">
+    <span class="{% if saldo_actual > 0 %}text-danger{% elif saldo_actual < 0 %}text-success{% endif %}">
       {{ saldo_actual | formato_precio_arg }}
     </span>
   </div>
@@ -79,7 +79,7 @@
       <td>{{ m[2].strftime('%Y-%m-%d') }}</td>
       <td>{{ m[1] }}</td>
       <td>{{ m[3] }}</td>
-      <td class="{% if m[4] < 0 %}text-danger{% elif m[4] > 0 %}text-success{% endif %}">
+      <td class="{% if m[4] > 0 %}text-danger{% elif m[4] < 0 %}text-success{% endif %}">
         {{ m[4] | formato_precio_arg }}
       </td>
       <td>{{ m[5] or '-' }}</td>

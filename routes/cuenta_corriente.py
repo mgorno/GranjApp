@@ -63,6 +63,9 @@ def exportar_excel():
     fecha_desde = request.args.get("desde")
     fecha_hasta = request.args.get("hasta")
 
+    # Valor por defecto del nombre del archivo
+    nombre_archivo = "movimientos_cuenta_corriente.xlsx"
+
     query = """
         SELECT 
             m.id_movimiento,
@@ -105,7 +108,6 @@ def exportar_excel():
     df = pd.DataFrame(rows, columns=["ID Movimiento", "Cliente", "Fecha", "Tipo", "Importe", "Forma de pago"])
     df["Fecha"] = df["Fecha"].apply(lambda x: x.strftime("%Y-%m-%d") if x else "")
 
-    # Generar Excel en memoria
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
         df.to_excel(writer, index=False, sheet_name="Movimientos")
@@ -116,5 +118,5 @@ def exportar_excel():
         output,
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         as_attachment=True,
-        download_name=nombre_archivo
+        download_name=nombre_archivo  # Siempre definida
     )

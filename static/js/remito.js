@@ -61,7 +61,7 @@
       ) || 0;
       total += subtotalNum;
     });
-    totalRemitoEl.textContent = formatoPrecio(total);         
+    totalRemitoEl.textContent = formatoPrecio(total);          // Muestra total positivo o negativo según corresponda
     saldoTotalEl.textContent = formatoPrecio(saldoAnterior + total);
   };
 
@@ -139,5 +139,14 @@
       tbody.appendChild(nuevaFila);
       recalcularTotales();
     });
+  }
+  function habilitarEdicionClienteFecha() {
+    document.getElementById("bloque-cliente-fecha-modo-vista").style.display = "none";
+    document.getElementById("bloque-cliente-fecha-edicion").style.display = "block";
+  }
+
+  function cancelarEdicionClienteFecha() {
+    document.getElementById("bloque-cliente-fecha-edicion").style.display = "none";
+    document.getElementById("bloque-cliente-fecha-modo-vista").style.display = "block";
   }
 })();

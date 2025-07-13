@@ -43,13 +43,17 @@
           <td>{{ pedido.cantidad_items }}</td>
           <td>
             <div class="d-flex align-items-center">
+
               <a href="{{ url_for('entregas.remito', id_pedido=pedido.id_pedido) }}"
                 class="btn btn-sm btn-outline-success d-inline-flex align-items-center btn-pequeño">
                 <i class="bi bi-file-earmark-text me-1"></i> Detalle Entrega
               </a>
 
-              <!-- Botón que abre el modal -->  
-              <button type="button" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center ms-2 btn-pequeño"
+
+
+              <!-- Botón que abre el modal -->
+              <button type="button"
+                class="btn btn-sm btn-outline-danger d-inline-flex align-items-center ms-2 btn-pequeño"
                 data-bs-toggle="modal" data-bs-target="#modalCancelar{{ pedido.id_pedido }}">
                 <i class="bi bi-x-circle me-1"></i> Cancelar Pedido
               </button>
@@ -76,7 +80,6 @@
                 </div>
               </div>
             </div>
-
           </td>
         </tr>
         {% endfor %}

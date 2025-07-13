@@ -10,10 +10,13 @@
 
   // Formatea número a $ 1.234 (sin decimales, punto como separador de miles)
   const formatoPrecio = (num) => {
-    return "$ " + num
+    const esNegativo = num < 0;
+    const valor = Math.abs(num)
       .toFixed(0)
       .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    return (esNegativo ? "-$ " : "$ ") + valor;
   };
+
 
   // Formatea cantidad con hasta 3 decimales, usa coma decimal y punto miles
   const formatoCantidad = (num) => {

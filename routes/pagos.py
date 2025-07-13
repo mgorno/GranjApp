@@ -11,7 +11,8 @@ def lista():
         with conn.cursor() as cur:
             if request.method == "POST":
                 id_cliente = request.form['id_cliente']
-                monto_pagado = float(request.form['monto_pagado'])
+                monto_raw = request.form.get("monto_pagado", "0")
+                monto_pagado = float(monto_raw.replace(".", "").replace("$", "").replace(",", "."))
                 medio_pago = request.form['medio_pago']
                 observaciones = request.form.get('observaciones') or ""
 

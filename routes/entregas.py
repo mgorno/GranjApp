@@ -230,6 +230,9 @@ def remito(id_pedido):
         fecha_entrega_str = info_cliente["fecha_entrega"].strftime("%Y-%m-%d")
         fecha_hoy_str = date.today().strftime("%Y-%m-%d")
 
+        cur.execute("SELECT id_cliente, nombre FROM clientes ORDER BY nombre")
+        clientes = cur.fetchall()
+
     return render_template(
         "remito_confirmar.html",
         detalles=detalles,
@@ -238,7 +241,8 @@ def remito(id_pedido):
         saldo_anterior=saldo_anterior,
         cliente_nombre=info_cliente["cliente_nombre"],
         fecha_entrega=fecha_entrega_str,
-        fecha_hoy=fecha_hoy_str
+        fecha_hoy=fecha_hoy_str,
+        clientes=clientes,
     )
 
 @bp_entregas.route("/remito/pdf/<int:id_remito>")

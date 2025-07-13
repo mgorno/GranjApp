@@ -93,6 +93,14 @@ def exportar_excel():
         cur.execute(query, tuple(params))
         rows = cur.fetchall()
 
+        # Obtener el nombre del cliente si se filtró uno
+        if cliente_id:
+            cur.execute("SELECT nombre FROM clientes WHERE id_cliente = %s", (cliente_id,))
+            row = cur.fetchone()
+            if row:
+                nombre_cliente = row[0].strip().lower().replace(" ", "_")
+                nombre_archivo = f"{nombre_cliente}_cuenta_corriente.xlsx"
+
     # Convertir a DataFrame de pandas
     df = pd.DataFrame(rows, columns=["ID Movimiento", "Cliente", "Fecha", "Tipo", "Importe", "Forma de pago"])
     df["Fecha"] = df["Fecha"].apply(lambda x: x.strftime("%Y-%m-%d") if x else "")
@@ -108,5 +116,5 @@ def exportar_excel():
         output,
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         as_attachment=True,
-        download_name="movimientos_cuenta_corriente.xlsx"
+        download_name=nombre_archivo
     )

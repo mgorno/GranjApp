@@ -1,18 +1,32 @@
-document.getElementById("btn-exportar-excel").addEventListener("click", function () {
-    const form = document.getElementById("form-exportar");
-    const url = new URL(form.action, window.location.origin);
-    const params = new URLSearchParams(new FormData(form));
-    url.search = params;
+document.addEventListener('DOMContentLoaded', () => {
+  const btnExcel = document.getElementById("btn-exportar-excel");
 
-    const link = document.createElement("a");
-    link.href = url.toString();
-    link.download = "movimientos_cuenta_corriente.xlsx";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  if (btnExcel) {
+    btnExcel.addEventListener("click", function () {
+      const form = document.getElementById("form-exportar");
 
-    // Redirigir después de 2 segundos (opcional)
-    setTimeout(() => {
-        window.location.href = "{{ url_for('cuenta_corriente.html') }}";
-    }, 2000);
+      // Crear una URL con los parámetros del formulario oculto
+      const params = new URLSearchParams(new FormData(form));
+
+      fetch(form.action + "?" + params.toString())
+        .then(response => {
+          if (!response.ok) throw new Error("Error al generar el Excel");
+          return response.blob();
+        })
+        .then(blob => {
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "movimientos_cuenta_corriente.xlsx";
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
+        })
+        .catch(error => {
+          console.error("Error al descargar el archivo:", error);
+          alert("No se pudo descargar el archivo Excel.");
+        });
+    });
+  }
 });

@@ -66,6 +66,25 @@ def remito(id_pedido):
         if request.method == "POST":
             accion = request.form.get("accion")
 
+            if accion == "editar_cliente_fecha":
+                nuevo_cliente = request.form.get("nuevo_cliente")
+                nueva_fecha_entrega = request.form.get("nueva_fecha_entrega")
+
+                if nuevo_cliente and nueva_fecha_entrega:
+                    try:
+                        cur.execute("""
+                            UPDATE pedidos
+                            SET id_cliente = %s,
+                                fecha_entrega = %s
+                            WHERE id_pedido = %s
+                        """, (nuevo_cliente, nueva_fecha_entrega, id_pedido))
+                        conn.commit()
+                        flash("Cliente y fecha de entrega actualizados correctamente.", "success")
+                    except Exception as e:
+                        flash(f"Error al actualizar cliente o fecha: {e}", "danger")
+
+                return redirect(url_for("entregas.remito", id_pedido=id_pedido))
+
             if accion == "agregar":
                 nuevo_id_producto = request.form.get("nuevo_id_producto")
                 nueva_cantidad = request.form.get("nuevo_cantidad")

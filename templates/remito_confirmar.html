@@ -8,27 +8,25 @@ block head_extra %} {{ super() }}
   <i class="bi bi-clipboard-check me-2 text-warning"></i>Confirmar Cantidades
 </h1>
 <div class="mb-4 text-white border rounded p-3 bg-dark position-relative">
-  <form method="POST" id="form-edicion-cliente-fecha">
-    <input type="hidden" name="accion" value="guardar_cambios">
+
+  <form method="POST" action="{{ url_for('entregas.remito', id_pedido=id_pedido) }}" id="form-edicion-cliente-fecha">
+    <input type="hidden" name="accion" value="editar_cliente_fecha">
 
     <div id="bloque-cliente-fecha-modo-vista">
-      <div class="row align-items-center mb-2">
-        <div class="col-12">
+      <div class="row align-items-center">
+        <div class="col-md-5">
           <p class="mb-0"><strong>Cliente:</strong> <span id="vista-cliente">{{ cliente_nombre }}</span></p>
         </div>
-      </div>
-      <div class="row align-items-center">
-        <div class="col-md-7">
+        <div class="col-md-5">
           <p class="mb-0"><strong>Fecha de entrega:</strong> <span id="vista-fecha">{{ fecha_entrega }}</span></p>
         </div>
-        <div class="col-md-5 text-start">
+        <div class="col-md-2 text-start">
           <button type="button" class="btn btn-outline-secondary btn-sm" onclick="habilitarEdicionClienteFecha()">
             <i class="bi bi-pencil-square me-1"></i>Editar
           </button>
         </div>
       </div>
     </div>
-
 
     <div id="bloque-cliente-fecha-edicion" style="display: none;" class="mt-3">
       <div class="row g-3 align-items-end mt-3">

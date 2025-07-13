@@ -228,6 +228,8 @@ def remito(id_pedido):
         cur.execute("SELECT id_producto FROM detalle_pedido WHERE id_pedido = %s", (id_pedido,))
         ids_ya_cargados = [row["id_producto"] for row in cur.fetchall()]
         productos_disponibles = obtener_productos(excluir_ids=ids_ya_cargados)
+        fecha_entrega_str = info_cliente["fecha_entrega"].strftime("%Y-%m-%d")
+        fecha_hoy_str = date.today().strftime("%Y-%m-%d")
 
     return render_template(
         "remito_confirmar.html",
@@ -236,7 +238,8 @@ def remito(id_pedido):
         id_pedido=id_pedido,
         saldo_anterior=saldo_anterior,
         cliente_nombre=info_cliente["cliente_nombre"],
-        fecha_entrega=info_cliente["fecha_entrega"]
+        fecha_entrega=fecha_entrega_str,
+        fecha_hoy=fecha_hoy_str
     )
 
 @bp_entregas.route("/remito/pdf/<int:id_remito>")

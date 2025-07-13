@@ -15,7 +15,8 @@ def formato_precio(n):
 
 def formato_precio_arg(value):
     try:
-        s = f"${int(value):,}"
-        return s.replace(",", ".")
-    except (ValueError, TypeError):
-        return "$0"
+        signo = '-' if value < 0 else ''
+        return f"{signo}$ {abs(value):,.0f}".replace(",", ".")
+    except:
+        return "$ 0"
+

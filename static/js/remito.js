@@ -61,7 +61,7 @@
       ) || 0;
       total += subtotalNum;
     });
-    totalRemitoEl.textContent = formatoPrecio(-total);
+    totalRemitoEl.textContent = formatoPrecio(total);
     saldoTotalEl.textContent = formatoPrecio(total - saldoAnterior);
   };
 

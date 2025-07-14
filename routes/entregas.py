@@ -323,7 +323,46 @@ def remito_pdf(id_remito):
 
 @bp_entregas.route("/remito/visor/<int:id_remito>")
 def visualizador_pdf_remito(id_remito):
-    return render_template("visor_pdf_remito.html", id_remito=id_remito)
+    with get_conn() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
+        # Buscar remito
+        cur.execute("SELECT * FROM remitos WHERE id_remito = %s", (id_remito,))
+        remito = cur.fetchone()
+        if not remito:
+            abort(404, "Remito no encontrado")
+
+        # Traer datos del cliente y pedido
+        cur.execute("""
+            SELECT p.id_pedido, c.telefono, c.nombre AS cliente_nombre, p.fecha_entrega
+            FROM pedidos p
+            JOIN clientes c ON p.id_cliente = c.id_cliente
+            WHERE p.id_pedido = %s
+        """, (remito['id_pedido'],))
+        pedido_info = cur.fetchone()
+
+        # Traer los detalles del remito para calcular el total
+        cur.execute("""
+            SELECT cantidad AS cantidad_real, precio
+            FROM detalle_remito
+            WHERE id_remito = %s
+        """, (id_remito,))
+        detalles = cur.fetchall()
+
+        total_remito = sum(float(d['cantidad_real']) * float(d['precio']) for d in detalles)
+        saldo_anterior = remito.get("saldo_anterior", 0)
+        saldo_total = saldo_anterior + total_remito
+
+        fecha_entrega_str = pedido_info["fecha_entrega"].strftime("%Y-%m-%d")
+
+    return render_template(
+        "visor_pdf_remito.html",
+        id_remito=id_remito,
+        telefono=pedido_info["telefono"],
+        total_remito=total_remito,
+        saldo_anterior=saldo_anterior,
+        saldo_total=saldo_total,
+        fecha_entrega=fecha_entrega_str
+    )
+
 
 @bp_entregas.route("/<id_pedido>/cancelar", methods=["POST"])
 def cancelar_pedido(id_pedido):

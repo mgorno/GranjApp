@@ -332,22 +332,23 @@ def cancelar_pedido(id_pedido):
 @bp_entregas.route("/api/eliminar_item", methods=["POST"])
 def api_eliminar_item():
     data = request.get_json()
+    id_detalle = data.get("id_detalle")  # ⚠️ CAMBIO DE NOMBRE
     id_pedido = data.get("id_pedido")
-    id_item = data.get("id_item")
 
     conn = get_conn()
     cur = conn.cursor()
 
-    cur.execute("SELECT COUNT(*) FROM pedido_detalle WHERE id_pedido = %s", (id_pedido,))
+    cur.execute("SELECT COUNT(*) FROM detalle_pedido WHERE id_pedido = %s", (id_pedido,))
     cantidad = cur.fetchone()[0]
 
     if cantidad <= 1:
         response = {"ok": False, "error": "No se puede eliminar el último producto del pedido"}
     else:
-        cur.execute("DELETE FROM pedido_detalle WHERE id = %s AND id_pedido = %s", (id_item, id_pedido))
+        cur.execute("DELETE FROM detalle_pedido WHERE id_detalle = %s AND id_pedido = %s", (id_detalle, id_pedido))
         conn.commit()
         response = {"ok": True}
 
     cur.close()
     conn.close()
     return jsonify(response)
+

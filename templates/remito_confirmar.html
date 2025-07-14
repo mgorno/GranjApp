@@ -101,20 +101,20 @@ block head_extra %} {{ super() }}
       {{ ((item.precio or 0) * (item.cantidad_real or 0)) | formato_precio }}
     </td>
 
-    <td class="text-center">
-      {% if item.id_detalle %}
-      <button type="button"
-              class="btn btn-outline-danger btn-sm btn-eliminar"
-              title="Eliminar producto"
-              data-id-item="{{ item.id_detalle }}"
-              data-id-pedido="{{ pedido.id }}">
-        <i class="bi bi-trash"></i>
-      </button>
-      {% else %}
-      <i class="bi bi-lock-fill text-secondary" title="No se puede eliminar"></i>
-      {% endif %}
-    </td>
-  </tr>
+<td class="text-center">
+  {% if item.id_detalle|string == "0" %}
+  <button type="button"
+          class="btn btn-outline-danger btn-sm eliminar-fila"
+          title="Eliminar fila"
+          data-id-pedido="{{ id_pedido }}"
+          data-id-detalle="{{ item.id_detalle }}">
+    <i class="bi bi-trash"></i>
+  </button>
+  {% else %}
+  <i class="bi bi-lock-fill text-secondary" title="No se puede eliminar"></i>
+  {% endif %}
+</td>
+
   {% endfor %}
 </tbody>
 

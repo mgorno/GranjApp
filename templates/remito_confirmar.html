@@ -77,43 +77,47 @@ block head_extra %} {{ super() }}
         </tr>
       </thead>
       <tbody>
-        {% for item in detalles %}
-        <tr>
-          <td>
-            {{ item.descripcion }} ({{ item.unidad_base }})
-            <input type="hidden" name="id_producto[]" value="{{ item.id_producto }}" />
-            <input type="hidden" name="id_detalle[]" value="{{ item.id_detalle }}" />
-          </td>
+  {% for item in detalles %}
+  <tr>
+    <td>
+      {{ item.descripcion }} ({{ item.unidad_base }})
+      <input type="hidden" name="id_producto[]" value="{{ item.id_producto }}" />
+      <input type="hidden" name="id_detalle[]" value="{{ item.id_detalle }}" />
+    </td>
 
-          <td class="text-end">{{ item.cantidad | formato_cantidad }}</td>
+    <td class="text-end">{{ item.cantidad | formato_cantidad }}</td>
 
-          <td class="text-end">
-            <input type="number" step="0.01" name="precio[]" value="{{ (item.precio or 0) | formato_precio_sin_signo }}"
-              class="form-control text-end bg-dark text-light border-secondary table-input precio-input" required />
-          </td>
+    <td class="text-end">
+      <input type="number" step="0.01" name="precio[]" value="{{ (item.precio or 0) | formato_precio_sin_signo }}"
+        class="form-control text-end bg-dark text-light border-secondary table-input precio-input" required />
+    </td>
 
-          <td class="text-end">
-            <input type="number" step="0.01" name="cantidad_real[]" value="{{ (item.cantidad_real or 0)|float }}"
-              class="form-control text-end bg-dark text-light border-secondary table-input cantidad-input" required />
-          </td>
+    <td class="text-end">
+      <input type="number" step="0.01" name="cantidad_real[]" value="{{ (item.cantidad_real or 0)|float }}"
+        class="form-control text-end bg-dark text-light border-secondary table-input cantidad-input" required />
+    </td>
 
-          <td class="text-end subtotal-cell">
-            {{ ((item.precio or 0) * (item.cantidad_real or 0)) | formato_precio
-            }}
-          </td>
+    <td class="text-end subtotal-cell">
+      {{ ((item.precio or 0) * (item.cantidad_real or 0)) | formato_precio }}
+    </td>
 
-          <td class="text-center">
-            {% if item.id_detalle|string == "0" %}
-            <button type="button" class="btn btn-outline-danger btn-sm eliminar-fila" title="Eliminar fila">
-              <i class="bi bi-trash"></i>
-            </button>
-            {% else %}
-            <i class="bi bi-lock-fill text-secondary" title="No se puede eliminar"></i>
-            {% endif %}
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
+    <td class="text-center">
+      {% if item.id_detalle %}
+      <button type="button"
+              class="btn btn-outline-danger btn-sm btn-eliminar"
+              title="Eliminar producto"
+              data-id-item="{{ item.id_detalle }}"
+              data-id-pedido="{{ pedido.id }}">
+        <i class="bi bi-trash"></i>
+      </button>
+      {% else %}
+      <i class="bi bi-lock-fill text-secondary" title="No se puede eliminar"></i>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</tbody>
+
     </table>
     <hr class="my-4" />
 

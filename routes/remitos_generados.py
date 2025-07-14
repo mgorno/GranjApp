@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from models import get_conn
 
-bp_remitos = Blueprint("remitos_generados", __name__, url_prefix="/remitos-generados")
+bp_remitos = Blueprint("remitos_generados", __name__, url_prefix="/remitos_generados")
 
 @bp_remitos.route("/", methods=["GET"])
 def lista_remitos():

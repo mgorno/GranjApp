@@ -347,7 +347,10 @@ def visualizador_pdf_remito(id_remito):
         """, (id_remito,))
         detalles = cur.fetchall()
 
-        total_remito = sum(float(d['cantidad_real']) * float(d['precio']) for d in detalles)
+        total_remito = sum(
+            Decimal(str(d['cantidad_real'])) * Decimal(str(d['precio']))
+            for d in detalles
+        )
         saldo_anterior = remito.get("saldo_anterior", 0)
         saldo_total = saldo_anterior + total_remito
 

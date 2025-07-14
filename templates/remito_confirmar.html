@@ -102,15 +102,18 @@ block head_extra %} {{ super() }}
     </td>
 
 <td class="text-center">
- 
-  <button type="button"
-          class="btn btn-outline-danger btn-sm eliminar-fila"
-          title="Eliminar fila"
-          data-id-pedido="{{ id_pedido }}"
-          data-id-detalle="{{ item.id_detalle }}">
-    <i class="bi bi-trash"></i>
-  </button>
+  {% if cantidad_items > 1 %}
+    <button type="button"
+              class="btn btn-outline-danger btn-sm eliminar-fila"
+              title="Eliminar fila"
+              data-id-pedido="{{ id_pedido }}"
+              data-id-detalle="{{ item.id_detalle }}">
+        <i class="bi bi-trash"></i>
+    </button>
+  {% else %}
+  <i class="bi bi-lock-fill text-secondary" title="No se puede eliminar"></i>
 
+ {% endif %}
 </td>
 
   {% endfor %}

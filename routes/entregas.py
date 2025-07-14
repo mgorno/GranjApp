@@ -166,8 +166,8 @@ def remito(id_pedido):
                     id_remito = remito_existente["id_remito"]
                 else:
                     cur.execute("""
-                        INSERT INTO remitos (id_pedido, fecha, total, saldo_anterior)
-                        VALUES (%s, NOW(), %s, %s)
+                        INSERT INTO remitos (id_pedido, fecha, total, saldo_anterior, estado)
+                        VALUES (%s, NOW(), %s, %s, 'emitido')
                         RETURNING id_remito
                     """, (id_pedido, total, saldo_anterior))
                     id_remito = cur.fetchone()["id_remito"]
@@ -179,7 +179,7 @@ def remito(id_pedido):
                             VALUES (%s, %s, %s, %s)
                         """, (id_remito, row['id_producto'], cant_real, float(row['precio'] or 0)))
 
-                    cur.execute("UPDATE pedidos SET estado = 'entregado' WHERE id_pedido = %s", (id_pedido,))
+                    cur.execute("UPDATE pedidos SET estado = 'preparado' WHERE id_pedido = %s", (id_pedido,))
 
    
 

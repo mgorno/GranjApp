@@ -16,9 +16,9 @@ function enviarPorWhatsapp() {
   const formatoPesos = n => n.toLocaleString('es-AR'); 
 
   const mensaje = `Buenas! Envío remito N.º ${id_remito} correspondiente a tu compra.\n\n` +
-                  `📄 Total del remito: $${formatoPesos(total_remito)}\n` +
-                  `💰 Saldo anterior: $${formatoPesos(saldo_anterior)}\n` +
-                  `🧾 Saldo total actualizado: $${formatoPesos(saldo_total)}\n\n` +
+                  `- Total del remito: $${formatoPesos(total_remito)}\n` +
+                  `- Saldo anterior: $${formatoPesos(saldo_anterior)}\n` +
+                  `- Saldo total actualizado: $${formatoPesos(saldo_total)}\n\n` +
                   `Podés descargar el remito desde el siguiente link:\n${window.location.origin + pdf_url}\n\n` +
                   `En un rato vamos a estar por ahí dejándote la mercadería.`;
 

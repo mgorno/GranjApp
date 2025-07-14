@@ -235,7 +235,7 @@ def remito(id_pedido):
         saldo_anterior = cur.fetchone()["saldo"] if cur.rowcount else 0
 
         cur.execute("""
-            SELECT c.nombre AS cliente_nombre, p.fecha_entrega
+            SELECT c.nombre AS cliente_nombre, p.fecha_entrega, c.telefono
             FROM pedidos p
             JOIN clientes c ON p.id_cliente = c.id_cliente
             WHERE p.id_pedido = %s
@@ -253,6 +253,13 @@ def remito(id_pedido):
         clientes = cur.fetchall()
         cur.execute("SELECT COUNT(*) AS cantidad FROM detalle_pedido WHERE id_pedido = %s", (id_pedido,))
         cantidad_items = cur.fetchone()["cantidad"]
+        total_remito = sum(
+            float(row['cantidad_real'] or row['cantidad']) * float(row['precio'] or 0)
+            for row in detalles_raw 
+        )
+            
+        saldo_total = saldo_anterior + total_remito    
+
 
     return render_template(
         "remito_confirmar.html",
@@ -260,11 +267,13 @@ def remito(id_pedido):
         productos=productos_disponibles,
         id_pedido=id_pedido,
         saldo_anterior=saldo_anterior,
+        saldo_total = saldo_total
         cliente_nombre=info_cliente["cliente_nombre"],
+        telefono=info_cliente["telefono"],
         fecha_entrega=fecha_entrega_str,
         fecha_hoy=fecha_hoy_str,
         clientes=clientes,
-        cantidad_items=cantidad_items,
+        cantidad_items=cantidad_items
     )
 
 @bp_entregas.route("/remito/pdf/<int:id_remito>")

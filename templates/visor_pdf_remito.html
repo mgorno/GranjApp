@@ -2,6 +2,11 @@
 
 {% block title %}Remito #{{ id_remito }}{% endblock %}
 
+{% block head_extra %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/visor_pdf.js') }}" defer></script>
+{% endblock %}
+
 {% block content %}
 <h2 class="mb-4">Remito #{{ id_remito }}</h2>
 

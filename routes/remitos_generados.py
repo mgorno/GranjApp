@@ -1,9 +1,9 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from models import get_conn
 
-bp_remitos = Blueprint("remitos_generados", __name__, url_prefix="/remitos_generados")
+bp_remitos_generados = Blueprint("remitos_generados", __name__, url_prefix="/remitos_generados")
 
-@bp_remitos.route("/", methods=["GET"])
+@bp_remitos_generados.route("/", methods=["GET"])
 def lista_remitos():
     cliente = request.args.get("cliente")
     fecha = request.args.get("fecha")
@@ -33,7 +33,7 @@ def lista_remitos():
     return render_template("remitos_generados.html", remitos=remitos, columnas=columnas)
 
 
-@bp_remitos.route("/entregar/<int:id_remito>")
+@bp_remitos_generados.route("/entregar/<int:id_remito>")
 def entregar_remito(id_remito):
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -59,7 +59,7 @@ def entregar_remito(id_remito):
     return redirect(url_for("remitos_generados.lista_remitos"))
 
 
-@bp_remitos.route("/cancelar/<int:id_remito>")
+@bp_remitos_generados.route("/cancelar/<int:id_remito>")
 def cancelar_remito(id_remito):
     with get_conn() as conn:
         with conn.cursor() as cur:

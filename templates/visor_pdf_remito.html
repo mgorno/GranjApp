@@ -35,12 +35,4 @@
 </div>
 {% endblock %}
 
-{% block scripts %}
-<script>
-  function enviarPorWhatsapp() {
-    const pdfUrl = window.location.origin + "{{ url_for('entregas.remito_pdf', id_remito=id_remito) }}";
-    const text = encodeURIComponent("Hola, te comparto el remito #{{ id_remito }}: " + pdfUrl);
-    window.open("https://wa.me/?text=" + text, "_blank");
-  }
-</script>
-{% endblock %}
+

@@ -6,6 +6,7 @@ from datetime import datetime, date
 import uuid
 from collections import defaultdict
 from utils.generar_remito import generar_pdf_remito
+from decimal import Decimal
 
 bp_entregas = Blueprint("entregas", __name__, url_prefix="/entregas")
 
@@ -258,7 +259,8 @@ def remito(id_pedido):
             for row in detalles_raw 
         )
             
-        saldo_total = saldo_anterior + total_remito    
+        saldo_total = saldo_anterior + Decimal(total_remito)
+    
 
 
     return render_template(

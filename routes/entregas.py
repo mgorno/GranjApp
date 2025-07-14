@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, send_file
+from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, send_file, jsonify
 from models import get_conn
 from psycopg2 import sql
 from psycopg2.extras import RealDictCursor
@@ -6,6 +6,7 @@ from datetime import datetime, date
 import uuid
 from collections import defaultdict
 from utils.generar_remito import generar_pdf_remito
+import 
 
 bp_entregas = Blueprint("entregas", __name__, url_prefix="/entregas")
 
@@ -327,3 +328,27 @@ def cancelar_pedido(id_pedido):
             flash("Pedido cancelado exitosamente.", "success")
 
     return redirect(url_for("entregas.lista_entregas"))
+
+
+@bp_entregas.route("/api/eliminar_item", methods=["POST"])
+def api_eliminar_item():
+    data = request.get_json()
+    id_pedido = data.get("id_pedido")
+    id_item = data.get("id_item")
+
+    conn = get_conn()
+    cur = conn.cursor()
+
+    cur.execute("SELECT COUNT(*) FROM pedido_detalle WHERE id_pedido = %s", (id_pedido,))
+    cantidad = cur.fetchone()[0]
+
+    if cantidad <= 1:
+        response = {"ok": False, "error": "No se puede eliminar el último producto del pedido"}
+    else:
+        cur.execute("DELETE FROM pedido_detalle WHERE id = %s AND id_pedido = %s", (id_item, id_pedido))
+        conn.commit()
+        response = {"ok": True}
+
+    cur.close()
+    conn.close()
+    return jsonify(response)

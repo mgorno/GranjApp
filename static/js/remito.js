@@ -1,11 +1,15 @@
 function habilitarEdicionClienteFecha() {
-  document.getElementById("bloque-cliente-fecha-modo-vista").style.display = "none";
-  document.getElementById("bloque-cliente-fecha-edicion").style.display = "block";
+  document.getElementById("bloque-cliente-fecha-modo-vista").style.display =
+    "none";
+  document.getElementById("bloque-cliente-fecha-edicion").style.display =
+    "block";
 }
 
 function cancelarEdicionClienteFecha() {
-  document.getElementById("bloque-cliente-fecha-edicion").style.display = "none";
-  document.getElementById("bloque-cliente-fecha-modo-vista").style.display = "block";
+  document.getElementById("bloque-cliente-fecha-edicion").style.display =
+    "none";
+  document.getElementById("bloque-cliente-fecha-modo-vista").style.display =
+    "block";
 }
 
 (() => {
@@ -16,7 +20,9 @@ function cancelarEdicionClienteFecha() {
   const tbody = tabla.querySelector("tbody");
   const totalRemitoEl = document.getElementById("total-remito");
   const saldoTotalEl = document.getElementById("saldo-total");
-  const saldoAnterior = parseFloat(form?.dataset?.saldoAnterior || window.SALDO_ANTERIOR || 0);
+  const saldoAnterior = parseFloat(
+    form?.dataset?.saldoAnterior || window.SALDO_ANTERIOR || 0
+  );
 
   // Formatea número a $ 1.234 (sin decimales, punto como separador de miles)
   const formatoPrecio = (num) => {
@@ -26,7 +32,6 @@ function cancelarEdicionClienteFecha() {
       .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     return (esNegativo ? "-$ " : "$ ") + valor;
   };
-
 
   // Formatea cantidad con hasta 3 decimales, usa coma decimal y punto miles
   const formatoCantidad = (num) => {
@@ -62,23 +67,25 @@ function cancelarEdicionClienteFecha() {
     tbody.querySelectorAll("tr").forEach((fila) => {
       const textoSubtotal = fila.querySelector(".subtotal-cell").textContent;
       // Quitar $ y espacios, quitar puntos, cambiar coma por punto para parsear
-      const subtotalNum = parseFloat(
-        textoSubtotal
-          .replace("$", "")
-          .replace(/\./g, "")
-          .replace(",", ".")
-          .trim()
-      ) || 0;
+      const subtotalNum =
+        parseFloat(
+          textoSubtotal
+            .replace("$", "")
+            .replace(/\./g, "")
+            .replace(",", ".")
+            .trim()
+        ) || 0;
       total += subtotalNum;
     });
-    totalRemitoEl.textContent = formatoPrecio(total);          // Muestra total positivo o negativo según corresponda
+    totalRemitoEl.textContent = formatoPrecio(total); // Muestra total positivo o negativo según corresponda
     saldoTotalEl.textContent = formatoPrecio(saldoAnterior + total);
   };
 
   // Crea una fila vacía para agregar
   const crearFilaVacia = () => {
     const tr = document.createElement("tr");
-    const opciones = document.querySelector(".producto-select")?.innerHTML || "";
+    const opciones =
+      document.querySelector(".producto-select")?.innerHTML || "";
 
     tr.innerHTML = `
       <td>
@@ -107,12 +114,15 @@ function cancelarEdicionClienteFecha() {
   };
 
   // Formatear subtotales actuales al cargar
-  tbody.querySelectorAll("tr").forEach(fila => actualizarSubtotalFila(fila));
+  tbody.querySelectorAll("tr").forEach((fila) => actualizarSubtotalFila(fila));
   recalcularTotales();
 
   // Eventos delegados en tbody
   tbody.addEventListener("input", (e) => {
-    if (e.target.classList.contains("precio-input") || e.target.classList.contains("cantidad-input")) {
+    if (
+      e.target.classList.contains("precio-input") ||
+      e.target.classList.contains("cantidad-input")
+    ) {
       const fila = e.target.closest("tr");
 
       // Opcional: formatear cantidad en el input con formato argentino
@@ -150,6 +160,33 @@ function cancelarEdicionClienteFecha() {
       recalcularTotales();
     });
   }
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".btn-eliminar").forEach((btn) => {
+      btn.addEventListener("click", async function (e) {
+        e.preventDefault();
 
+        const idItem = this.dataset.idItem;
+        const idPedido = this.dataset.idPedido;
 
+        if (!confirm("¿Estás seguro de eliminar este producto?")) return;
+
+        const response = await fetch("/entregas/api/eliminar_item", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id_item: idItem, id_pedido: idPedido }),
+        });
+
+        const result = await response.json();
+
+        if (result.ok) {
+          const row = this.closest("tr");
+          row.remove();
+        } else {
+          alert(result.error || "Error al eliminar producto");
+        }
+      });
+    });
+  });
 })();

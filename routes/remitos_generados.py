@@ -14,23 +14,27 @@ def lista_remitos():
         FROM remitos r
         JOIN pedidos p ON r.id_pedido = p.id_pedido
         JOIN clientes c ON p.id_cliente = c.id_cliente
-        WHERE (%(cliente)s IS NULL OR c.nombre ILIKE %(cliente_like)s)
+        WHERE (%(cliente)s IS NULL OR c.id_cliente = %(cliente)s)
           AND (%(fecha)s IS NULL OR DATE(r.fecha) = %(fecha)s)
         ORDER BY r.fecha DESC
     """
     params = {
         "cliente": cliente,
-        "cliente_like": f"%{cliente}%" if cliente else None,
         "fecha": fecha
     }
 
     with get_conn() as conn:
         with conn.cursor() as cur:
+            # Ejecutar consulta de remitos
             cur.execute(query, params)
             remitos = cur.fetchall()
             columnas = [desc[0] for desc in cur.description]
 
-    return render_template("remitos_generados.html", remitos=remitos, columnas=columnas)
+            # Obtener lista de clientes para el select
+            cur.execute("SELECT id_cliente, nombre FROM clientes ORDER BY nombre")
+            clientes = cur.fetchall()
+
+    return render_template("remitos_generados.html", remitos=remitos, columnas=columnas, clientes=clientes, cliente_seleccionado=cliente, fecha=fecha)
 
 
 @bp_remitos_generados.route("/entregar/<int:id_remito>")

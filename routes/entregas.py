@@ -332,9 +332,8 @@ def cancelar_pedido(id_pedido):
 @bp_entregas.route("/api/eliminar_item", methods=["POST"])
 def api_eliminar_item():
     data = request.get_json()
-    id_detalle = data.get("id_detalle")  # ⚠️ CAMBIO DE NOMBRE
     id_pedido = data.get("id_pedido")
-
+    id_detalle = data.get("id_item") 
     conn = get_conn()
     cur = conn.cursor()
 

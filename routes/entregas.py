@@ -6,7 +6,6 @@ from datetime import datetime, date
 import uuid
 from collections import defaultdict
 from utils.generar_remito import generar_pdf_remito
-import 
 
 bp_entregas = Blueprint("entregas", __name__, url_prefix="/entregas")
 

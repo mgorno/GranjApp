@@ -267,7 +267,7 @@ def remito(id_pedido):
         productos=productos_disponibles,
         id_pedido=id_pedido,
         saldo_anterior=saldo_anterior,
-        saldo_total = saldo_total
+        saldo_total = saldo_total,
         cliente_nombre=info_cliente["cliente_nombre"],
         telefono=info_cliente["telefono"],
         fecha_entrega=fecha_entrega_str,

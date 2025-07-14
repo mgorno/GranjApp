@@ -13,11 +13,13 @@ function enviarPorWhatsapp() {
     tel = "549" + tel;
   }
 
-  const mensaje = `Hola, te comparto el remito #${id_remito}.\n` +
-                  `Total remito: $${total_remito.toFixed(2)}\n` +
-                  `Saldo anterior: $${saldo_anterior.toFixed(2)}\n` +
-                  `Saldo total: $${saldo_total.toFixed(2)}\n` +
-                  `Descargalo acá: ${window.location.origin + pdf_url}`;
+const mensaje = `Buenas! envio remito N.º ${id_remito} correspondiente a tu compra.\n\n` +
+                `📄 Total del remito: $${total_remito.toFixed(2)}\n` +
+                `💰 Saldo anterior: $${saldo_anterior.toFixed(2)}\n` +
+                `🧾 Saldo total actualizado: $${saldo_total.toFixed(2)}\n\n` +
+                `Podés descargar el remito desde el siguiente link:\n${window.location.origin + pdf_url}`
+                `En un rato vamos a estar por ahi dejandote la mercaderia`;
+
 
   const texto = encodeURIComponent(mensaje);
   const url = `https://wa.me/${tel}?text=${texto}`;

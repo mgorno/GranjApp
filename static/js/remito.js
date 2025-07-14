@@ -160,33 +160,31 @@ function cancelarEdicionClienteFecha() {
       recalcularTotales();
     });
   }
-  document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll(".btn-eliminar").forEach((btn) => {
-      btn.addEventListener("click", async function (e) {
-        e.preventDefault();
+  document.querySelectorAll(".eliminar-fila").forEach((btn) => {
+    btn.addEventListener("click", async function (e) {
+      e.preventDefault();
 
-        const idItem = this.dataset.idItem;
-        const idPedido = this.dataset.idPedido;
+      const idItem = this.dataset.idDetalle;
+      const idPedido = this.dataset.idPedido;
 
-        if (!confirm("¿Estás seguro de eliminar este producto?")) return;
+      if (!confirm("¿Estás seguro de eliminar este producto?")) return;
 
-        const response = await fetch("/entregas/api/eliminar_item", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ id_item: idItem, id_pedido: idPedido }),
-        });
-
-        const result = await response.json();
-
-        if (result.ok) {
-          const row = this.closest("tr");
-          row.remove();
-        } else {
-          alert(result.error || "Error al eliminar producto");
-        }
+      const response = await fetch("/entregas/api/eliminar_item", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id_item: idItem, id_pedido: idPedido }),
       });
+
+      const result = await response.json();
+
+      if (result.ok) {
+        const row = this.closest("tr");
+        row.remove();
+      } else {
+        alert(result.error || "Error al eliminar producto");
+      }
     });
   });
 })();

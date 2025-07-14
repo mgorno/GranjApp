@@ -251,8 +251,8 @@ def remito(id_pedido):
 
         cur.execute("SELECT id_cliente, nombre FROM clientes ORDER BY nombre")
         clientes = cur.fetchall()
-        cur.execute("SELECT COUNT(*) FROM detalle_pedido WHERE id_pedido = %s", (id_pedido,))
-        cantidad_items = cur.fetchone()[0]
+        cur.execute("SELECT COUNT(*) AS cantidad FROM detalle_pedido WHERE id_pedido = %s", (id_pedido,))
+        cantidad_items = cur.fetchone()["cantidad"]
 
     return render_template(
         "remito_confirmar.html",

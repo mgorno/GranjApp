@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Remitos Generados{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">📄 Remitos Generados</h1>
+
+<form method="get" class="mb-4">
+  <label style="margin-right: 10px;">
+    Cliente: <input type="text" name="cliente" value="{{ request.args.cliente or '' }}">
+  </label>
+  <label style="margin-right: 10px;">
+    Fecha: <input type="date" name="fecha" value="{{ request.args.fecha or '' }}">
+  </label>
+  <button type="submit">🔍 Buscar</button>
+</form>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+  <thead style="background-color: #f2f2f2;">
+    <tr>
+      <th>ID</th>
+      <th>Cliente</th>
+      <th>Fecha</th>
+      <th>Total</th>
+      <th>Estado</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in remitos %}
+    <tr>
+      <td>{{ r[0] }}</td>
+      <td>{{ r[4] }}</td>
+      <td>{{ r[1].strftime("%Y-%m-%d") }}</td>
+      <td>${{ "{:,.0f}".format(r[2]) }}</td>
+      <td>
+        {% if r[3] == 'emitido' %}
+          <span style="color: orange; font-weight: bold;">Emitido</span>
+        {% elif r[3] == 'entregado' %}
+          <span style="color: green; font-weight: bold;">Entregado</span>
+        {% elif r[3] == 'cancelado' %}
+          <span style="color: red; font-weight: bold;">Cancelado</span>
+        {% else %}
+          <span style="color: gray;">{{ r[3] }}</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if r[3] == 'emitido' %}
+          <a href="{{ url_for('remitos_generados.entregar_remito', id_remito=r[0]) }}">✅ Entregar</a> |
+          <a href="{{ url_for('remitos_generados.cancelar_remito', id_remito=r[0]) }}">❌ Cancelar</a>
+        {% else %}
+          <em style="color: #777;">Sin acciones</em>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -251,6 +251,8 @@ def remito(id_pedido):
 
         cur.execute("SELECT id_cliente, nombre FROM clientes ORDER BY nombre")
         clientes = cur.fetchall()
+        cur.execute("SELECT COUNT(*) FROM detalle_pedido WHERE id_pedido = %s", (id_pedido,))
+        cantidad_items = cur.fetchone()[0]
 
     return render_template(
         "remito_confirmar.html",
@@ -261,7 +263,8 @@ def remito(id_pedido):
         cliente_nombre=info_cliente["cliente_nombre"],
         fecha_entrega=fecha_entrega_str,
         fecha_hoy=fecha_hoy_str,
-        clientes=clientes,
+        clientes=clientes
+        cantidad_items=cantidad_items,
     )
 
 @bp_entregas.route("/remito/pdf/<int:id_remito>")

@@ -73,7 +73,16 @@ block head_extra %} {{ super() }}
           <th style="width: 10%" class="text-end">Precio</th>
           <th style="width: 10%" class="text-end">Cant. Ajustada</th>
           <th style="width: 10%" class="text-end">Subtotal</th>
-          <th style="width: 5%"></th>
+          <th style="width: 5%">
+            <button
+              type="button"
+              class="btn btn-danger btn-sm btn-eliminar"
+              data-id-item="{{ item.id }}"
+              data-id-pedido="{{ id_pedido }}"
+            >
+              <i class="bi bi-trash"></i> Eliminar
+            </button>
+          </th>
         </tr>
       </thead>
       <tbody>

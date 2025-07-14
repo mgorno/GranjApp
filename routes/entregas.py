@@ -263,7 +263,7 @@ def remito(id_pedido):
         cliente_nombre=info_cliente["cliente_nombre"],
         fecha_entrega=fecha_entrega_str,
         fecha_hoy=fecha_hoy_str,
-        clientes=clientes
+        clientes=clientes,
         cantidad_items=cantidad_items,
     )
 

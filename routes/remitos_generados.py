@@ -8,6 +8,11 @@ def lista_remitos():
     cliente = request.args.get("cliente")
     fecha = request.args.get("fecha")
 
+    if cliente == "":
+        cliente = None
+    if fecha == "":
+        fecha = None
+
     query = """
         SELECT r.id_remito, r.fecha, r.total, r.estado,
                c.nombre AS cliente, r.id_pedido
@@ -25,16 +30,15 @@ def lista_remitos():
 
     with get_conn() as conn:
         with conn.cursor() as cur:
-            # Ejecutar consulta de remitos
+            cur.execute("SELECT id_cliente, nombre FROM clientes ORDER BY nombre;")
+            clientes = cur.fetchall()
+
             cur.execute(query, params)
             remitos = cur.fetchall()
             columnas = [desc[0] for desc in cur.description]
 
-            # Obtener lista de clientes para el select
-            cur.execute("SELECT id_cliente, nombre FROM clientes ORDER BY nombre")
-            clientes = cur.fetchall()
+    return render_template("remitos_generados.html", remitos=remitos, columnas=columnas, clientes=clientes)
 
-    return render_template("remitos_generados.html", remitos=remitos, columnas=columnas, clientes=clientes, cliente_seleccionado=cliente, fecha=fecha)
 
 
 @bp_remitos_generados.route("/entregar/<int:id_remito>")

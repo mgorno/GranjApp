@@ -4,6 +4,17 @@
 
 {% block head_extra %}
 {{ super() }}
+{% block scripts %}
+<script>
+  window.REMITO_INFO = {
+    telefono: {{ telefono|default('')|tojson }},
+    total_remito: {{ total_remito|default(0)|round(2) }},
+    saldo_anterior: {{ saldo_anterior|default(0)|round(2) }},
+    saldo_total: {{ saldo_total|default(0)|round(2) }},
+    id_remito: {{ id_remito|tojson }},
+    pdf_url: "{{ url_for('entregas.remito_pdf', id_remito=id_remito) }}"
+  };
+</script>
 <script src="{{ url_for('static', filename='js/visor_pdf.js') }}" defer></script>
 {% endblock %}
 

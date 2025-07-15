@@ -2,7 +2,8 @@ import os
 from flask import Flask
 from flask_login import LoginManager
 from models import init_db, get_conn
-from routes import register_all_blueprints, Usuario
+from routes import register_all_blueprints
+from routes.auth import Usuario, auth
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-key")

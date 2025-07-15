@@ -25,26 +25,4 @@ def register_all_blueprints(app):
     app.register_blueprint(bp_entregas)
     app.register_blueprint(auth)
 
-def create_app():
-    app = Flask(__name__)
-    app.secret_key = "una_clave_segura"  # ¡cambiá esto en producción!
 
-    # Configurar el login manager
-    login_manager = LoginManager()
-    login_manager.init_app(app)
-    login_manager.login_view = "auth.login"  # Redirige a esta vista si no está logueado
-
-    @login_manager.user_loader
-    def load_user(user_id):
-        with get_conn() as conn:
-            with conn.cursor() as cur:
-                cur.execute("SELECT usuario FROM usuarios WHERE id_usuario = %s", (user_id,))
-                row = cur.fetchone()
-                if row:
-                    return Usuario(user_id, row[0])
-        return None
-
-    # Registrar todos los blueprints
-    register_all_blueprints(app)
-
-    return app

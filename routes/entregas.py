@@ -248,7 +248,7 @@ def remito(id_pedido):
         saldo_anterior = cur.fetchone()["saldo"] if cur.rowcount else 0
 
         cur.execute("""
-            SELECT c.nombre AS cliente_nombre, p.fecha_entrega, c.telefono
+            SELECT c.nombre AS cliente_nombre, p.fecha_entrega, c.telefono, p.estado
             FROM pedidos p
             JOIN clientes c ON p.id_cliente = c.id_cliente
             WHERE p.id_pedido = %s
@@ -288,6 +288,7 @@ def remito(id_pedido):
         saldo_total = saldo_total,
         cliente_nombre=info_cliente["cliente_nombre"],
         telefono=info_cliente["telefono"],
+        estado=info_cliente["estado"],
         fecha_entrega=fecha_entrega_str,
         fecha_hoy=fecha_hoy_str,
         clientes=clientes,

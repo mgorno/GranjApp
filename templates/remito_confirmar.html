@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Confirmar Cantidades{% endblock %}
+{% block title %}Detalle Pedido{% endblock %}
 
 {% block head_extra %}
   {{ super() }}
@@ -22,6 +22,7 @@
         <div class="col-md-10">
           <p class="mb-1"><strong>Cliente:</strong> {{ cliente_nombre }}</p>
           <p class="mb-0"><strong>Fecha de entrega:</strong> {{ fecha_entrega }}</p>
+          <p class="mb-0"><strong>Estado:</strong> {{ estado }}</p>
         </div>
         <div class="col-md-2 d-flex justify-content-end align-items-start">
           {% if not remito_generado %}
@@ -173,7 +174,7 @@
 
     {% if remito_generado %}
     <a href="{{ url_for('entregas.remito_pdf', id_remito=id_remito) }}" target="_blank" class="btn btn-outline-light">
-      <i class="bi bi-file-earmark-pdf me-1"></i>Ver PDF
+      <i class="bi bi-file-earmark-pdf me-1"></i>Ver Remito
     </a>
     {% endif %}
   </div>

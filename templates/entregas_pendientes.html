@@ -50,36 +50,39 @@
               </a>
 
 
-
+              {% if not pedido.tiene_remito %}
               <!-- Botón que abre el modal -->
               <button type="button"
                 class="btn btn-sm btn-outline-danger d-inline-flex align-items-center ms-2 btn-pequeño"
                 data-bs-toggle="modal" data-bs-target="#modalCancelar{{ pedido.id_pedido }}">
                 <i class="bi bi-x-circle me-1"></i> Cancelar Pedido
               </button>
-            </div>
 
-            <!-- Modal de confirmación -->
-            <div class="modal fade" id="modalCancelar{{ pedido.id_pedido }}" tabindex="-1" aria-hidden="true">
-              <div class="modal-dialog modal-dialog-centered modal-sm">
-                <div class="modal-content bg-dark text-light border border-danger">
-                  <div class="modal-header py-2">
-                    <h5 class="modal-title fs-6">Confirmar cancelación</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                  </div>
-                  <div class="modal-body p-3">
-                    ¿Seguro que querés cancelar este pedido?
-                  </div>
-                  <div class="modal-footer py-2">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">No</button>
-                    <form action="{{ url_for('entregas.cancelar_pedido', id_pedido=pedido.id_pedido) }}" method="POST"
-                      class="d-inline">
-                      <button type="submit" class="btn btn-danger btn-sm">Sí, Cancelar</button>
-                    </form>
+              <!-- Modal de confirmación -->
+              <div class="modal fade" id="modalCancelar{{ pedido.id_pedido }}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-sm">
+                  <div class="modal-content bg-dark text-light border border-danger">
+                    <div class="modal-header py-2">
+                      <h5 class="modal-title fs-6">Confirmar cancelación</h5>
+                      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-3">
+                      ¿Seguro que querés cancelar este pedido?
+                    </div>
+                    <div class="modal-footer py-2">
+                      <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">No</button>
+                      <form action="{{ url_for('entregas.cancelar_pedido', id_pedido=pedido.id_pedido) }}" method="POST"
+                        class="d-inline">
+                        <button type="submit" class="btn btn-danger btn-sm">Sí, Cancelar</button>
+                      </form>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+              {% else %}
+              <span class="text-muted ms-2">Remito generado</span>
+              {% endif %}
+
           </td>
         </tr>
         {% endfor %}

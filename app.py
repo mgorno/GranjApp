@@ -1,7 +1,6 @@
 import os
 from flask import Flask
 from flask_login import LoginManager
-from auth import auth, Usuario  # auth: blueprint / Usuario: clase UserMixin
 from models import init_db, get_conn
 from routes import register_all_blueprints
 

@@ -6,6 +6,6 @@ bp_main = Blueprint("main", __name__)
 @bp_main.route("/inicio")
 @login_required
 def inicio():
-    return render_template("inicio.html")
+    return render_template("index.html")
 
 

@@ -38,7 +38,7 @@ def inject_user():
 @app.route("/")
 def root():
     if current_user.is_authenticated:
-        return redirect(url_for("remitos_generados.lista_remitos"))
+        return redirect(url_for("main.index"))
     else:
         return redirect(url_for("auth.login"))
 

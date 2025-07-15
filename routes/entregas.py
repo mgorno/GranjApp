@@ -7,7 +7,7 @@ import uuid
 from collections import defaultdict
 from utils.generar_remito import generar_pdf_remito
 from decimal import Decimal
-from psycopg2 import sql
+
 
 bp_entregas = Blueprint("entregas", __name__, url_prefix="/entregas")
 
@@ -291,7 +291,7 @@ def remito(id_pedido):
         fecha_entrega=fecha_entrega_str,
         fecha_hoy=fecha_hoy_str,
         clientes=clientes,
-        cantidad_items=cantidad_items
+        cantidad_items=cantidad_items,
         id_remito=id_remito,
         remito_generado=bool(id_remito)
     )

@@ -13,7 +13,9 @@ init_db()
 
 register_all_blueprints(app)
 
-
+print("Blueprints registrados:")
+for name, blueprint in app.blueprints.items():
+    print(f"- {name}: {blueprint.url_prefix}")
 # Configurar Flask-Login
 login_manager = LoginManager()
 login_manager.login_view = "auth.login" 

@@ -7,6 +7,7 @@ import uuid
 from collections import defaultdict
 from utils.generar_remito import generar_pdf_remito
 from decimal import Decimal
+from psycopg2 import sql
 
 bp_entregas = Blueprint("entregas", __name__, url_prefix="/entregas")
 
@@ -17,11 +18,17 @@ def lista_entregas():
             SELECT p.id_pedido,
                    c.nombre,
                    p.fecha_entrega,
-                   COUNT(pd.id_detalle) AS cantidad_items
+                   COUNT(pd.id_detalle) AS cantidad_items,
+                   EXISTS (
+                     SELECT 1 FROM remitos r WHERE r.id_pedido = p.id_pedido
+                   ) AS tiene_remito,
+                   (
+                     SELECT id_remito FROM remitos r WHERE r.id_pedido = p.id_pedido LIMIT 1
+                   ) AS id_remito
             FROM pedidos p
             JOIN clientes c     ON p.id_cliente  = c.id_cliente
             JOIN detalle_pedido pd ON pd.id_pedido = p.id_pedido
-            WHERE p.estado = 'pendiente'
+            WHERE p.estado in ('pendiente', 'preparado')
             GROUP BY p.id_pedido, c.nombre, p.fecha_entrega
             ORDER BY p.fecha_entrega
         """)
@@ -33,12 +40,17 @@ def lista_entregas():
             "id_pedido":      row["id_pedido"],
             "cliente":        row["nombre"],
             "fecha_entrega":  row["fecha_entrega"].strftime("%Y-%m-%d"),
-            "cantidad_items": row["cantidad_items"]
+            "cantidad_items": row["cantidad_items"],
+            "tiene_remito":   row["tiene_remito"],
+            "id_remito":      row["id_remito"],
         })
+
     fecha_hoy = date.today().strftime("%Y-%m-%d")
+
     return render_template("entregas_pendientes.html", entregas=entregas_por_fecha, fecha_hoy=fecha_hoy)
 
-from psycopg2 import sql
+
+
 
 def obtener_productos(excluir_ids=None):
     query = "SELECT id_producto, descripcion, unidad_base, precio FROM productos"
@@ -261,6 +273,10 @@ def remito(id_pedido):
             
         saldo_total = saldo_anterior + Decimal(total_remito)
     
+        # Si existe un remito ya generado
+        cur.execute("SELECT id_remito FROM remitos WHERE id_pedido = %s", (id_pedido,))
+        remito_generado = cur.fetchone()
+        id_remito = remito_generado["id_remito"] if remito_generado else None
 
 
     return render_template(
@@ -276,6 +292,8 @@ def remito(id_pedido):
         fecha_hoy=fecha_hoy_str,
         clientes=clientes,
         cantidad_items=cantidad_items
+        id_remito=id_remito,
+        remito_generado=bool(id_remito)
     )
 
 @bp_entregas.route("/remito/pdf/<int:id_remito>")

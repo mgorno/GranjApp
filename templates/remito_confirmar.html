@@ -1,12 +1,18 @@
-{% extends "base.html" %} {% block title %}Confirmar Cantidades{% endblock %} {%
-block head_extra %} {{ super() }}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/confirmar_remito.css') }}" />
-<script src="{{ url_for('static', filename='js/remito.js') }}" defer></script>
+{% extends "base.html" %}
+{% block title %}Confirmar Cantidades{% endblock %}
 
-{% endblock %} {% block content %}
+{% block head_extra %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/confirmar_remito.css') }}" />
+  <script src="{{ url_for('static', filename='js/remito.js') }}" defer></script>
+{% endblock %}
+
+{% block content %}
 <h1 class="mb-4 text-white border-bottom pb-2" style="font-weight: 500">
   <i class="bi bi-clipboard-check me-2 text-warning"></i>Confirmar Cantidades
 </h1>
+
+<!-- Información de cliente y fecha -->
 <div class="mb-3 text-white border rounded p-2 bg-dark position-relative">
   <form method="POST" action="{{ url_for('entregas.remito', id_pedido=id_pedido) }}" id="form-edicion-cliente-fecha">
     <input type="hidden" name="accion" value="editar_cliente_fecha">
@@ -18,9 +24,11 @@ block head_extra %} {{ super() }}
           <p class="mb-0"><strong>Fecha de entrega:</strong> {{ fecha_entrega }}</p>
         </div>
         <div class="col-md-2 d-flex justify-content-end align-items-start">
+          {% if not remito_generado %}
           <button type="button" class="btn btn-outline-secondary btn-sm" onclick="habilitarEdicionClienteFecha()">
             <i class="bi bi-pencil-square me-1"></i>Editar
           </button>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -31,7 +39,7 @@ block head_extra %} {{ super() }}
           <label class="form-label">Cliente</label>
           <select name="nuevo_cliente" class="form-select form-select-sm bg-dark text-light border-secondary" required>
             {% for cli in clientes %}
-            <option value="{{ cli.id_cliente }}" {% if cli.id_cliente==id_cliente %}selected{% endif %}>
+            <option value="{{ cli.id_cliente }}" {% if cli.id_cliente == id_cliente %}selected{% endif %}>
               {{ cli.nombre }}
             </option>
             {% endfor %}
@@ -39,19 +47,15 @@ block head_extra %} {{ super() }}
         </div>
         <div class="col-md-6">
           <label class="form-label">Fecha de entrega</label>
-          <input type="date" name="nueva_fecha_entrega"
-            class="form-control form-control-sm bg-dark text-light border-secondary"
-            value="{{ fecha_entrega }}" required>
+          <input type="date" name="nueva_fecha_entrega" class="form-control form-control-sm bg-dark text-light border-secondary" value="{{ fecha_entrega }}" required>
         </div>
       </div>
       <div class="row mt-2">
         <div class="col-md-12 d-flex gap-2 justify-content-end">
-          <button type="submit" class="btn btn-outline-success btn-sm"
-            style="font-size: 0.85rem; padding: 0.25rem 0.75rem;">
+          <button type="submit" class="btn btn-outline-success btn-sm">
             <i class="bi bi-save me-1"></i>Guardar
           </button>
-          <button type="button" class="btn btn-outline-light btn-sm"
-            style="font-size: 0.85rem; padding: 0.25rem 0.75rem;" onclick="cancelarEdicionClienteFecha()">
+          <button type="button" class="btn btn-outline-light btn-sm" onclick="cancelarEdicionClienteFecha()">
             Cancelar
           </button>
         </div>
@@ -60,124 +64,117 @@ block head_extra %} {{ super() }}
   </form>
 </div>
 
-
-<form action="{{ url_for('entregas.remito', id_pedido=id_pedido) }}" method="POST" id="form-remito"
-  data-saldo-anterior="{{ '%.2f'|format(saldo_anterior) }}">
-  <!-- Tabla de productos -->
+<!-- Tabla de productos -->
+<form action="{{ url_for('entregas.remito', id_pedido=id_pedido) }}" method="POST" id="form-remito" data-saldo-anterior="{{ '%.2f'|format(saldo_anterior) }}">
   <div class="table-responsive mb-4">
     <table class="table table-dark table-bordered align-middle" id="tabla-remito">
       <thead class="table-secondary text-dark">
         <tr>
-          <th style="width: 30%">Producto</th>
-          <th style="width: 10%" class="text-end">Cant. Pedida</th>
-          <th style="width: 10%" class="text-end">Precio</th>
-          <th style="width: 10%" class="text-end">Cant. Ajustada</th>
-          <th style="width: 10%" class="text-end">Subtotal</th>
-          <th style="width: 5%"></th>
+          <th>Producto</th>
+          <th class="text-end">Cant. Pedida</th>
+          <th class="text-end">Precio</th>
+          <th class="text-end">Cant. Ajustada</th>
+          <th class="text-end">Subtotal</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
-  {% for item in detalles %}
-  <tr>
-    <td>
-      {{ item.descripcion }} ({{ item.unidad_base }})
-      <input type="hidden" name="id_producto[]" value="{{ item.id_producto }}" />
-      <input type="hidden" name="id_detalle[]" value="{{ item.id_detalle }}" />
-    </td>
-
-    <td class="text-end">{{ item.cantidad | formato_cantidad }}</td>
-
-    <td class="text-end">
-      <input type="number" step="0.01" name="precio[]" value="{{ (item.precio or 0) | formato_precio_sin_signo }}"
-        class="form-control text-end bg-dark text-light border-secondary table-input precio-input" required />
-    </td>
-
-    <td class="text-end">
-      <input type="number" step="0.01" name="cantidad_real[]" value="{{ (item.cantidad_real or 0)|float }}"
-        class="form-control text-end bg-dark text-light border-secondary table-input cantidad-input" required />
-    </td>
-
-    <td class="text-end subtotal-cell">
-      {{ ((item.precio or 0) * (item.cantidad_real or 0)) | formato_precio }}
-    </td>
-
-<td class="text-center">
-  {% if cantidad_items > 1 %}
-    <button type="button"
-              class="btn btn-outline-danger btn-sm eliminar-fila"
-              title="Eliminar fila"
-              data-id-pedido="{{ id_pedido }}"
-              data-id-detalle="{{ item.id_detalle }}">
-        <i class="bi bi-trash"></i>
-    </button>
-  {% else %}
-  <i class="bi bi-lock-fill text-secondary" title="No se puede eliminar"></i>
-
- {% endif %}
-</td>
-
-  {% endfor %}
-</tbody>
-
+        {% for item in detalles %}
+        <tr>
+          <td>
+            {{ item.descripcion }} ({{ item.unidad_base }})
+            <input type="hidden" name="id_producto[]" value="{{ item.id_producto }}">
+            <input type="hidden" name="id_detalle[]" value="{{ item.id_detalle }}">
+          </td>
+          <td class="text-end">{{ item.cantidad | formato_cantidad }}</td>
+          <td class="text-end">
+            <input {% if remito_generado %}disabled{% endif %} type="number" step="0.01" name="precio[]" value="{{ item.precio | formato_precio_sin_signo }}" class="form-control text-end bg-dark text-light border-secondary table-input precio-input">
+          </td>
+          <td class="text-end">
+            <input {% if remito_generado %}disabled{% endif %} type="number" step="0.01" name="cantidad_real[]" value="{{ item.cantidad_real or 0 }}" class="form-control text-end bg-dark text-light border-secondary table-input cantidad-input">
+          </td>
+          <td class="text-end subtotal-cell">
+            {{ ((item.precio or 0) * (item.cantidad_real or 0)) | formato_precio }}
+          </td>
+          <td class="text-center">
+            {% if not remito_generado %}
+              {% if cantidad_items > 1 %}
+              <button type="button" class="btn btn-outline-danger btn-sm eliminar-fila" data-id-pedido="{{ id_pedido }}" data-id-detalle="{{ item.id_detalle }}">
+                <i class="bi bi-trash"></i>
+              </button>
+              {% else %}
+              <i class="bi bi-lock-fill text-secondary" title="No se puede eliminar"></i>
+              {% endif %}
+            {% else %}
+              <i class="bi bi-lock-fill text-secondary" title="Remito generado"></i>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
     </table>
-    <hr class="my-4" />
+  </div>
 
+  {% if not remito_generado %}
+  <!-- Agregar producto -->
+  <div class="mb-4">
     <h5 class="text-white mb-3">Agregar nuevo producto</h5>
-
-    <div class="row g-2 align-items-center mb-3">
-      <div class="col-8 col-md-6">
-        <select name="nuevo_id_producto" class="form-select form-select-sm" aria-label="Seleccionar producto nuevo">
+    <div class="row g-2 align-items-center">
+      <div class="col-md-6">
+        <select name="nuevo_id_producto" class="form-select form-select-sm">
           <option value="" selected>-- Seleccionar producto --</option>
           {% for p in productos %}
-          <option value="{{ p.id_producto }}">
-            {{ p.descripcion }} ({{ p.unidad_base }})
-          </option>
+          <option value="{{ p.id_producto }}">{{ p.descripcion }} ({{ p.unidad_base }})</option>
           {% endfor %}
         </select>
       </div>
-      <div class="col-4 col-md-2">
-        <input type="number" name="nuevo_cantidad" min="0.01" step="0.01" class="form-control form-control-sm"
-          placeholder="Cantidad" />
+      <div class="col-md-2">
+        <input type="number" name="nuevo_cantidad" min="0.01" step="0.01" class="form-control form-control-sm" placeholder="Cantidad">
       </div>
-      <div class="col-12 col-md-4">
+      <div class="col-md-4">
         <button type="submit" name="accion" value="agregar" class="btn btn-sm btn-outline-success">
           <i class="bi bi-plus-circle me-1"></i>Agregar producto
         </button>
       </div>
     </div>
   </div>
+  {% endif %}
 
-  <!-- Resumen de totales -->
+  <!-- Totales -->
   <div class="row g-3 mb-4">
     <div class="col-md-4 ms-auto">
       <div class="card bg-dark text-white border-secondary">
         <div class="card-body">
           <p class="d-flex justify-content-between mb-2">
-            <span>Total remito:</span>
-            <strong id="total-remito">0</strong>
+            <span>Total remito:</span><strong id="total-remito">0</strong>
           </p>
           <p class="d-flex justify-content-between mb-2">
-            <span>Saldo anterior:</span>
-            <strong>{{ saldo_anterior | formato_precio_arg }}</strong>
+            <span>Saldo anterior:</span><strong>{{ saldo_anterior | formato_precio_arg }}</strong>
           </p>
           <p class="d-flex justify-content-between mb-2">
-            <span>Saldo total:</span>
-            <strong id="saldo-total">0</strong>
+            <span>Saldo total:</span><strong id="saldo-total">0</strong>
           </p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Botones -->
+  <!-- Botones finales -->
   <div class="d-flex gap-2">
     <a href="{{ url_for('entregas.lista_entregas') }}" class="btn btn-secondary">
       <i class="bi bi-arrow-left me-1"></i>Volver
     </a>
-    {% if fecha_entrega == fecha_hoy %}
+
+    {% if not remito_generado and fecha_entrega == fecha_hoy %}
     <button type="submit" name="accion" value="confirmar" class="btn btn-success">
       <i class="bi bi-check2-circle me-1"></i>Generar Remito
     </button>
+    {% endif %}
+
+    {% if remito_generado %}
+    <a href="{{ url_for('entregas.remito_pdf', id_remito=id_remito) }}" target="_blank" class="btn btn-outline-light">
+      <i class="bi bi-file-earmark-pdf me-1"></i>Ver PDF
+    </a>
     {% endif %}
   </div>
 </form>

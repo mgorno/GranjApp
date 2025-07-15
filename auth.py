@@ -40,20 +40,26 @@ def logout():
     flash("Sesión cerrada.")
     return redirect(url_for("auth.login"))
 
-@auth.route("/register", methods=["GET", "POST"])
+@auth.route("/registrar_usuario", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
         usuario = request.form["usuario"]
         clave = request.form["clave"]
+
+        # Hash de la contraseña
+        from werkzeug.security import generate_password_hash
         clave_hash = generate_password_hash(clave)
 
         with get_conn() as conn:
             with conn.cursor() as cur:
-                # Validar si usuario existe antes (no incluido acá)
-                cur.execute("INSERT INTO usuarios (usuario, clave_hash) VALUES (%s, %s)", (usuario, clave_hash))
-                conn.commit()
+                try:
+                    cur.execute("INSERT INTO usuarios (usuario, clave_hash) VALUES (%s, %s)", (usuario, clave_hash))
+                    conn.commit()
+                    flash("Usuario registrado exitosamente.")
+                    return redirect(url_for("auth.login"))
+                except Exception as e:
+                    conn.rollback()
+                    flash("Error al registrar: " + str(e))
 
-        flash("Usuario registrado correctamente. Ya podés ingresar.")
-        return redirect(url_for("auth.login"))
+    return render_template("registrar_usuario.html")
 
-    return render_template("register.html")

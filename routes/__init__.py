@@ -22,5 +22,5 @@ def register_all_blueprints(app):
     app.register_blueprint(bp_entregas, url_prefix='/entregas') 
     app.register_blueprint(bp_cuenta_corriente, url_prefix='/cuenta_corriente') 
     app.register_blueprint(bp_remitos_generados, url_prefix='/remitos_generados') 
-    app.register_blueprint(auth)
+    app.register_blueprint(auth, url_prefix='/auth')
     app.register_blueprint(bp)

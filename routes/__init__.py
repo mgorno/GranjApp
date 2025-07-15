@@ -1,9 +1,5 @@
-from flask import Flask
-from flask_login import LoginManager
-from .auth import Usuario
-from models import get_conn
-
-# Importá y registrá todos los blueprints acá
+from flask import Blueprint
+bp = Blueprint('root', __name__)
 def register_all_blueprints(app):
     from .clientes import bp_clientes
     from .main import bp_main
@@ -14,6 +10,8 @@ def register_all_blueprints(app):
     from .remitos_generados import bp_remitos_generados
     from .entregas import bp_entregas
     from .auth import auth
+    from .main import bp_main
+
 
     app.register_blueprint(bp_clientes, url_prefix="/clientes")
     app.register_blueprint(bp_main)
@@ -24,5 +22,6 @@ def register_all_blueprints(app):
     app.register_blueprint(bp_remitos_generados)
     app.register_blueprint(bp_entregas)
     app.register_blueprint(auth)
+    app.register_blueprint(bp_main)
 
 

@@ -29,11 +29,11 @@ def login():
             user = Usuario(row[0], usuario)
             login_user(user)
             flash("Ingreso exitoso.")
-            return redirect(url_for("remitos_generados.lista_remitos"))
+            return redirect(url_for("main.inicio")) 
         else:
             flash("Usuario o clave incorrectos.")
 
-    return render_template("login.html")
+    return render_template("index.html")
 
 @auth.route("/auth/logout")
 def logout():

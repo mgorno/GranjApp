@@ -1,6 +1,6 @@
 import os
-from flask import Flask
-from flask_login import LoginManager
+from flask import Flask, redirect, url_for
+from flask_login import LoginManager, current_user
 from models import init_db, get_conn
 from routes import register_all_blueprints
 from routes.auth import Usuario
@@ -8,16 +8,9 @@ from routes.auth import Usuario
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-key")
 
-
 init_db()
-
 register_all_blueprints(app)
 
-print("\n Rutas registradas:")
-for rule in app.url_map.iter_rules():
-    print(f"{rule.endpoint:30s} {rule.methods} -> {rule.rule}")
-
-# Configurar Flask-Login
 login_manager = LoginManager()
 login_manager.login_view = "auth.login" 
 login_manager.init_app(app)
@@ -32,6 +25,14 @@ def load_user(user_id):
                 return Usuario(user_id, row[0])
     return None
 
+@app.route("/")
+def root():
+    if current_user.is_authenticated:
+        return redirect(url_for("remitos_generados.lista_remitos"))
+    else:
+        return redirect(url_for("auth.login"))
+
+# Filtros Jinja
 def formato_cantidad(n):
     try:
         n = float(n)
@@ -65,8 +66,7 @@ app.jinja_env.filters["formato_precio"] = formato_precio
 app.jinja_env.filters["formato_precio_sin_signo"] = formato_precio_sin_signo
 app.jinja_env.filters["formato_precio_arg"] = formato_precio_arg
 
-
 if __name__ == "__main__":
-    port  = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 5000))
     debug = os.environ.get("FLASK_DEBUG") == "1"
     app.run(host="0.0.0.0", port=port, debug=debug)

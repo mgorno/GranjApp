@@ -33,7 +33,8 @@ def login():
         else:
             flash("Usuario o clave incorrectos.")
 
-    return render_template("index.html")
+    return render_template("login.html")
+
 
 @auth.route("/auth/logout")
 def logout():

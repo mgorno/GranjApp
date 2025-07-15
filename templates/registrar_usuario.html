@@ -1,33 +1,22 @@
-<!-- templates/register.html -->
-<!doctype html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Registro</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-  <h2>Registrar nuevo usuario</h2>
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <ul>
-        {% for msg in messages %}
-          <li>{{ msg }}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-  {% endwith %}
+{% extends "base.html" %}
 
-  <form action="{{ url_for('auth.register') }}" method="POST">
-    <label for="usuario">Usuario:</label>
-    <input type="text" id="usuario" name="usuario" required>
+{% block title %}Registrarse{% endblock %}
 
-    <label for="clave">Contraseña:</label>
-    <input type="password" id="clave" name="clave" required>
+{% block content %}
+<div class="container mt-5" style="max-width: 400px;">
+  <h2 class="mb-4">Registro Usuario</h2>
 
-    <button type="submit">Registrar</button>
+  <form method="POST">
+    <div class="mb-3">
+      <label for="usuario" class="form-label">Usuario</label>
+      <input type="text" class="form-control" name="usuario" id="usuario" required>
+    </div>
+    <div class="mb-3">
+      <label for="clave" class="form-label">Clave</label>
+      <input type="password" class="form-control" name="clave" id="clave" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Registrar</button>
+    <a href="{{ url_for('auth.login') }}" class="btn btn-link">Ya tengo cuenta</a>
   </form>
-
-  <p><a href="{{ url_for('auth.login') }}">Volver al login</a></p>
-</body>
-</html>
+</div>
+{% endblock %}

@@ -40,26 +40,29 @@ def logout():
     flash("Sesión cerrada.")
     return redirect(url_for("auth.login"))
 
-@auth.route("/registrar_usuario", methods=["GET", "POST"])
+from werkzeug.security import generate_password_hash
+
+@auth.route("/registar_usuario", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
         usuario = request.form["usuario"]
         clave = request.form["clave"]
 
-        # Hash de la contraseña
-        from werkzeug.security import generate_password_hash
         clave_hash = generate_password_hash(clave)
 
         with get_conn() as conn:
             with conn.cursor() as cur:
-                try:
-                    cur.execute("INSERT INTO usuarios (usuario, clave_hash) VALUES (%s, %s)", (usuario, clave_hash))
-                    conn.commit()
-                    flash("Usuario registrado exitosamente.")
-                    return redirect(url_for("auth.login"))
-                except Exception as e:
-                    conn.rollback()
-                    flash("Error al registrar: " + str(e))
+                # Verificar si ya existe el usuario
+                cur.execute("SELECT id_usuario FROM usuarios WHERE usuario = %s", (usuario,))
+                if cur.fetchone():
+                    flash("El usuario ya existe.")
+                    return redirect(url_for("auth.register"))
+
+                # Insertar nuevo usuario
+                cur.execute("INSERT INTO usuarios (usuario, clave_hash) VALUES (%s, %s)", (usuario, clave_hash))
+                conn.commit()
+                flash("Usuario registrado correctamente. Ingresá con tus credenciales.")
+                return redirect(url_for("auth.login"))
 
     return render_template("registrar_usuario.html")
 

@@ -4,6 +4,8 @@ from flask_login import LoginManager, current_user
 from models import init_db, get_conn
 from routes import register_all_blueprints
 from routes.auth import Usuario
+from flask import request
+from flask_login import current_user
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-key")
@@ -65,6 +67,22 @@ app.jinja_env.filters["formato_cantidad"] = formato_cantidad
 app.jinja_env.filters["formato_precio"] = formato_precio
 app.jinja_env.filters["formato_precio_sin_signo"] = formato_precio_sin_signo
 app.jinja_env.filters["formato_precio_arg"] = formato_precio_arg
+
+@app.before_request
+def require_login():
+    rutas_publicas = (
+        "auth.login",
+        "auth.logout",
+        "auth.registrar_usuario",
+        "static",  # para permitir archivos estáticos
+    )
+
+    if request.endpoint is not None:
+        if request.endpoint.startswith("static") or request.endpoint in rutas_publicas:
+            return  # permitir
+
+    if not current_user.is_authenticated:
+        return redirect(url_for("auth.login"))
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))

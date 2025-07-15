@@ -1,9 +1,12 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from models import get_conn
+from decoradores import login_requerido, rol_requerido
 
 bp_remitos_generados = Blueprint("remitos_generados", __name__, url_prefix="/remitos_generados")
 
 @bp_remitos_generados.route("/", methods=["GET"])
+@login_requerido
+@rol_requerido("admin", "empleado")
 def lista_remitos():
     cliente = request.args.get("cliente")
     fecha = request.args.get("fecha")
@@ -40,12 +43,12 @@ def lista_remitos():
     return render_template("remitos_generados.html", remitos=remitos, columnas=columnas, clientes=clientes)
 
 
-
 @bp_remitos_generados.route("/entregar/<int:id_remito>")
+@login_requerido
+@rol_requerido("admin", "empleado")
 def entregar_remito(id_remito):
     with get_conn() as conn:
         with conn.cursor() as cur:
-            # Actualiza el estado del remito si está emitido
             cur.execute("""
                 UPDATE remitos
                 SET estado = 'entregado'
@@ -55,7 +58,6 @@ def entregar_remito(id_remito):
             result = cur.fetchone()
             if result:
                 id_pedido = result[0]
-                # También marcamos el pedido como entregado
                 cur.execute("""
                     UPDATE pedidos
                     SET estado = 'entregado'
@@ -68,14 +70,13 @@ def entregar_remito(id_remito):
 
 
 @bp_remitos_generados.route("/cancelar/<int:id_remito>", methods=["POST"])
+@login_requerido
+@rol_requerido("admin")
 def cancelar_remito(id_remito):
     try:
         with get_conn() as conn:
             with conn.cursor() as cur:
-                # Asegurarse de que autocommit esté desactivado
                 conn.autocommit = False
-
-                # Solo cancelar si el remito NO está entregado
                 cur.execute("""
                     UPDATE remitos
                     SET estado = 'cancelado'
@@ -88,15 +89,12 @@ def cancelar_remito(id_remito):
                     return redirect(url_for("remitos_generados.lista_remitos"))
 
                 id_pedido = result[0]
-
-                # Cancelar también el pedido asociado
                 cur.execute("""
                     UPDATE pedidos
                     SET estado = 'cancelado'
                     WHERE id_pedido = %s;
                 """, (id_pedido,))
 
-                # Buscar el movimiento de cuenta corriente
                 cur.execute("""
                     SELECT id_movimiento, id_cliente, importe
                     FROM movimientos_cuenta_corriente
@@ -106,15 +104,12 @@ def cancelar_remito(id_remito):
 
                 if mov:
                     id_movimiento, id_cliente, importe = mov
-
-                    # Revertir el saldo del cliente
                     cur.execute("""
                         UPDATE clientes_cuenta_corriente
                         SET saldo = saldo - %s
                         WHERE id_cliente = %s;
                     """, (importe, id_cliente))
 
-                    # Insertar movimiento inverso para dejar constancia
                     cur.execute("""
                         INSERT INTO movimientos_cuenta_corriente (
                             id_movimiento, id_cliente, fecha, tipo_mov, importe, forma_pago, id_remito
@@ -123,11 +118,9 @@ def cancelar_remito(id_remito):
                         );
                     """, (id_cliente, 'cancelacion_remito', -importe, 'cancelacion'))
 
-                # Si todo salió bien, confirmar la transacción
                 conn.commit()
                 flash("Remito cancelado y cuenta corriente ajustada.")
     except Exception as e:
-        # Si algo falla, deshacer todo
         conn.rollback()
         flash("Error al cancelar remito. No se aplicaron los cambios.")
         print(f"[ERROR] cancelar_remito: {e}")

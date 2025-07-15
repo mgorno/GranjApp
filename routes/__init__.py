@@ -12,7 +12,7 @@ def register_all_blueprints(app):
     from .cuenta_corriente import bp_cuenta_corriente
     from .remitos_generados import bp_remitos_generados
     from auth import auth
-
+    
 
     app.register_blueprint(bp_clientes, url_prefix='/clientes')
     app.register_blueprint(bp_main)

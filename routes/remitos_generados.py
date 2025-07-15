@@ -67,7 +67,7 @@ def entregar_remito(id_remito):
     return redirect(url_for("remitos_generados.lista_remitos"))
 
 
-@bp_remitos_generados.route("/cancelar/<int:id_remito>")
+@bp_remitos_generados.route("/cancelar/<int:id_remito>", methods=["POST"])
 def cancelar_remito(id_remito):
     try:
         with get_conn() as conn:

@@ -2,8 +2,8 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 from models import get_conn
+import uuid
 
-# Aquí quitamos url_prefix para poder hacer rutas sin /auth
 auth = Blueprint("auth", __name__)  
 
 class Usuario(UserMixin):
@@ -49,17 +49,20 @@ def registrar_usuario():
         clave = request.form["clave"]
 
         clave_hash = generate_password_hash(clave)
+        nuevo_id = str(uuid.uuid4())
+        nombre_default = usuario  # o podés cambiar por un valor fijo
 
         with get_conn() as conn:
             with conn.cursor() as cur:
-                # Verificar si ya existe el usuario
                 cur.execute("SELECT id_usuario FROM usuarios WHERE usuario = %s", (usuario,))
                 if cur.fetchone():
                     flash("El usuario ya existe.")
                     return redirect(url_for("auth.registrar_usuario"))
 
-                # Insertar nuevo usuario
-                cur.execute("INSERT INTO usuarios (usuario, clave_hash) VALUES (%s, %s)", (usuario, clave_hash))
+                cur.execute(
+                    "INSERT INTO usuarios (id_usuario, nombre, usuario, clave_hash) VALUES (%s, %s, %s, %s)",
+                    (nuevo_id, nombre_default, usuario, clave_hash)
+                )
                 conn.commit()
                 flash("Usuario registrado correctamente. Ingresá con tus credenciales.")
                 return redirect(url_for("auth.login"))

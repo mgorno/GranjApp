@@ -81,13 +81,41 @@ def cancelar_remito(id_remito):
             result = cur.fetchone()
             if result:
                 id_pedido = result[0]
-                # Opcional: volver el pedido a "cancelado"
+                # Cambiar estado del pedido a cancelado
                 cur.execute("""
                     UPDATE pedidos
                     SET estado = 'cancelado'
                     WHERE id_pedido = %s;
                 """, (id_pedido,))
-                flash("Remito cancelado.")
+
+                # Buscar el movimiento en cuenta corriente asociado al remito
+                cur.execute("""
+                    SELECT id_movimiento, id_cliente, importe
+                    FROM movimientos_cuenta_corriente
+                    WHERE id_remito = %s;
+                """, (id_remito,))
+                mov = cur.fetchone()
+                if mov:
+                    id_movimiento, id_cliente, importe = mov
+
+                    # Restar importe al saldo del cliente (revertir movimiento)
+                    cur.execute("""
+                        UPDATE clientes_cuenta_corriente
+                        SET saldo = saldo - %s
+                        WHERE id_cliente = %s;
+                    """, (importe, id_cliente))
+
+                    # Insertar movimiento inverso para dejar registro de la cancelación
+                    cur.execute("""
+                        INSERT INTO movimientos_cuenta_corriente (
+                            id_movimiento, id_cliente, fecha, tipo_mov, importe, forma_pago, id_remito
+                        ) VALUES (
+                            uuid_generate_v4()::text, %s, CURRENT_DATE, %s, %s, %s, NULL
+                        );
+                    """, (id_cliente, 'cancelacion_remito', -importe, 'cancelacion'))
+
+                flash("Remito cancelado y cuenta corriente ajustada.")
             else:
                 flash("El remito ya fue entregado y no puede cancelarse.")
     return redirect(url_for("remitos_generados.lista_remitos"))
+

@@ -3,7 +3,8 @@ from flask_login import login_user, logout_user, UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 from models import get_conn
 
-auth = Blueprint("auth", __name__, url_prefix="/auth")
+# Aquí quitamos url_prefix para poder hacer rutas sin /auth
+auth = Blueprint("auth", __name__)  
 
 class Usuario(UserMixin):
     def __init__(self, id_usuario, usuario):
@@ -13,7 +14,7 @@ class Usuario(UserMixin):
 def es_hash_valido(hash_str):
     return isinstance(hash_str, str) and any(hash_str.startswith(prefix) for prefix in ("pbkdf2:", "sha256:", "bcrypt:", "scrypt:"))
 
-@auth.route("/login", methods=["GET", "POST"])
+@auth.route("/auth/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         usuario = request.form["usuario"]
@@ -34,14 +35,14 @@ def login():
 
     return render_template("login.html")
 
-@auth.route("/logout")
+@auth.route("/auth/logout")
 def logout():
     logout_user()
     flash("Sesión cerrada.")
     return redirect(url_for("auth.login"))
 
 
-@auth.route("/registrar", methods=["GET", "POST"])
+@auth.route("/registrar_usuario", methods=["GET", "POST"])
 def registrar_usuario():
     if request.method == "POST":
         usuario = request.form["usuario"]
@@ -64,5 +65,3 @@ def registrar_usuario():
                 return redirect(url_for("auth.login"))
 
     return render_template("registrar_usuario.html")
-
-

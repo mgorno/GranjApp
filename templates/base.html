@@ -15,7 +15,6 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <script src="https://unpkg.com/lucide@latest"></script>
 
-
   <!-- Estilo personalizado -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
 
@@ -32,6 +31,7 @@
 
 <body class="d-flex flex-column h-100 bg-dark text-light">
 
+  {% if current_user.is_authenticated %}
   <!-- Navbar superior -->
   <nav class="navbar navbar-dark bg-black border-bottom border-secondary fixed-top">
     <div class="container-fluid">
@@ -43,69 +43,73 @@
   </nav>
 
   <!-- Menú lateral -->
-<div class="offcanvas offcanvas-start bg-dark text-light" tabindex="-1" id="menu">
-  <div class="offcanvas-header border-bottom border-secondary">
-    <h5 class="offcanvas-title d-flex align-items-center gap-2">
-      <i class="bi bi-ui-checks-grid fs-4"></i>
-      Menú
-    </h5>
-    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+  <div class="offcanvas offcanvas-start bg-dark text-light" tabindex="-1" id="menu">
+    <div class="offcanvas-header border-bottom border-secondary">
+      <h5 class="offcanvas-title d-flex align-items-center gap-2">
+        <i class="bi bi-ui-checks-grid fs-4"></i> Menú
+      </h5>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+    </div>
+    <div class="offcanvas-body px-0">
+      <nav class="nav flex-column fs-5">
+        <a class="nav-link d-flex align-items-center gap-3 px-4 py-3 border-bottom border-secondary text-light"
+          href="/">
+          <i data-lucide="store"></i> Inicio
+        </a>
+        <a class="nav-link d-flex align-items-center gap-3 px-4 py-3 border-bottom border-secondary text-light"
+          href="/pedidos/nuevo">
+          <i class="bi bi-clipboard-plus"></i> Nuevo Pedido
+        </a>
+        <a class="nav-link d-flex align-items-center gap-3 px-4 py-3 border-bottom border-secondary text-light"
+          href="/entregas">
+          <i data-lucide="truck"></i> Entregas Pendientes
+        </a>
+        <a class="nav-link d-flex align-items-center gap-3 px-4 py-3 border-bottom border-secondary text-light"
+          href="/clientes">
+          <i class="bi bi-person-lines-fill"></i> Clientes
+        </a>
+        <a class="nav-link d-flex align-items-center gap-3 px-4 py-3 border-bottom border-secondary text-light"
+          href="/productos">
+          <i data-lucide="beef"></i> Productos
+        </a>
+        <a class="nav-link d-flex align-items-center gap-3 px-4 py-3 border-bottom border-secondary text-light"
+          href="/pagos">
+          <i class="bi bi-credit-card-2-front"></i> Pagos
+        </a>
+        <a class="nav-link d-flex align-items-center gap-3 px-4 py-3 border-bottom border-secondary text-light"
+          href="/cuenta_corriente">
+          <i class="bi bi-wallet2"></i> Cuenta Corriente
+        </a>
+        <a class="nav-link d-flex align-items-center gap-3 px-4 py-3 border-bottom border-secondary text-light"
+          href="/remitos_generados">
+          <i class="bi bi-file-earmark-check"></i> Remitos Generados
+        </a>
+        <a class="nav-link d-flex align-items-center gap-3 px-4 py-3 text-light" href="/auth/logout">
+          <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+        </a>
+      </nav>
+    </div>
   </div>
-  <div class="offcanvas-body px-0">
-    <nav class="nav flex-column fs-5">
-      <a class="nav-link d-flex align-items-center gap-3 px-4 py-3 border-bottom border-secondary text-light" href="/">
-        <i data-lucide="store"></i> Inicio
-      </a>
-      <a class="nav-link d-flex align-items-center gap-3 px-4 py-3 border-bottom border-secondary text-light" href="/pedidos/nuevo">
-        <i class="bi bi-clipboard-plus"></i> Nuevo Pedido
-      </a>
-      <a class="nav-link d-flex align-items-center gap-3 px-4 py-3 border-bottom border-secondary text-light" href="/entregas">
-        <i data-lucide="truck"></i> Entregas Pendientes
-      </a>
-      <a class="nav-link d-flex align-items-center gap-3 px-4 py-3 border-bottom border-secondary text-light" href="/clientes">
-        <i class="bi bi-person-lines-fill"></i> Clientes
-      </a>
-      <a class="nav-link d-flex align-items-center gap-3 px-4 py-3 border-bottom border-secondary text-light" href="/productos">
-        <i data-lucide="beef"></i> Productos
-      </a>
-      <a class="nav-link d-flex align-items-center gap-3 px-4 py-3 border-bottom border-secondary text-light" href="/pagos">
-        <i class="bi bi-credit-card-2-front"></i> Pagos
-      </a>
-      <a class="nav-link d-flex align-items-center gap-3 px-4 py-3 border-bottom border-secondary text-light" href="/cuenta_corriente">
-        <i class="bi bi-wallet2"></i> Cuenta Corriente
-      </a>
-      <a class="nav-link d-flex align-items-center gap-3 px-4 py-3 border-bottom border-secondary text-light" href="/remitos_generados">
-        <i class="bi bi-file-earmark-check"></i> Remitos Generados
-      </a>
-      <a class="nav-link d-flex align-items-center gap-3 px-4 py-3 text-light" href="/registrar_usuario">
-        <i class="bi bi-file-earmark-check"></i> Registrar Usuario
-      </a>
-    </nav>
-  </div>
-</div>
-
-  </div>
-
+  {% endif %}
 
   <!-- Contenido -->
   <main class="flex-shrink-0" style="margin-top: 56px;">
     <div class="container py-4">
-
-      <!-- Carteles flash estilizados para fondo oscuro -->
+      <!-- Flash messages -->
       {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
       <div class="mb-3">
         {% for category, message in messages %}
         <div class="alert d-flex justify-content-between align-items-center
-                    {% if category == 'success' %}
-                      alert-success
-                    {% elif category == 'error' or category == 'danger' %}
-                      alert-danger
-                    {% else %}
-                      alert-secondary
-                    {% endif %}
-                    bg-dark text-light border border-{{ category if category != 'message' else 'secondary' }}
-                    alert-dismissible fade show" role="alert" style="border-left: 5px solid;">
+                          {% if category == 'success' %}
+                            alert-success
+                          {% elif category == 'error' or category == 'danger' %}
+                            alert-danger
+                          {% else %}
+                            alert-secondary
+                          {% endif %}
+                          bg-dark text-light border border-{{ category if category != 'message' else 'secondary' }}
+                          alert-dismissible fade show" role="alert" style="border-left: 5px solid;">
           <div class="me-3">
             {% if category == 'success' %}
             <i class="bi bi-check-circle-fill me-2 text-success"></i>
@@ -123,15 +127,12 @@
       {% endif %}
       {% endwith %}
 
-
-
       {% block content %}{% endblock %}
     </div>
   </main>
 
   {% block scripts %}{% endblock %}
 
-  <!-- Script global -->
   <script>
     function toggleEdit(btn, field) {
       const input = document.getElementById('input-' + field);
@@ -142,10 +143,8 @@
       btn.classList.add('d-none');
     }
 
-  lucide.createIcons();  
+    lucide.createIcons();  
   </script>
-
-
 
 </body>
 

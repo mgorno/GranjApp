@@ -1,22 +1,24 @@
 import os
-from flask import Flask, redirect, url_for
+from flask import Flask, redirect, url_for, request
 from flask_login import LoginManager, current_user
 from models import init_db, get_conn
 from routes import register_all_blueprints
 from routes.auth import Usuario
-from flask import request
-from flask_login import current_user
 
+# Crear la app
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-key")
 
+# Inicializar base de datos y registrar blueprints
 init_db()
 register_all_blueprints(app)
 
+# Configurar Flask-Login
 login_manager = LoginManager()
-login_manager.login_view = "auth.login" 
+login_manager.login_view = "auth.login"  # Si no está logueado, redirige acá
 login_manager.init_app(app)
 
+# Recuperar usuario desde la base
 @login_manager.user_loader
 def load_user(user_id):
     with get_conn() as conn:
@@ -27,6 +29,12 @@ def load_user(user_id):
                 return Usuario(user_id, row[0])
     return None
 
+# Hacer current_user disponible en los templates
+@app.context_processor
+def inject_user():
+    return dict(current_user=current_user)
+
+# Redirección raíz
 @app.route("/")
 def root():
     if current_user.is_authenticated:
@@ -34,7 +42,24 @@ def root():
     else:
         return redirect(url_for("auth.login"))
 
-# Filtros Jinja
+# Filtro global: protege toda la app excepto ciertas rutas públicas
+@app.before_request
+def require_login():
+    rutas_publicas = (
+        "auth.login",
+        "auth.logout",
+        "auth.registrar_usuario",
+        "static",  # permite acceder a CSS, JS, imágenes, etc.
+    )
+
+    endpoint = request.endpoint or ""
+    if any(endpoint.startswith(r) for r in rutas_publicas):
+        return  # permitir acceso
+
+    if not current_user.is_authenticated:
+        return redirect(url_for("auth.login"))
+
+# Filtros Jinja para formato
 def formato_cantidad(n):
     try:
         n = float(n)
@@ -68,22 +93,7 @@ app.jinja_env.filters["formato_precio"] = formato_precio
 app.jinja_env.filters["formato_precio_sin_signo"] = formato_precio_sin_signo
 app.jinja_env.filters["formato_precio_arg"] = formato_precio_arg
 
-@app.before_request
-def require_login():
-    rutas_publicas = (
-        "auth.login",
-        "auth.logout",
-        "auth.registrar_usuario",
-        "static",  # para permitir archivos estáticos
-    )
-
-    if request.endpoint is not None:
-        if request.endpoint.startswith("static") or request.endpoint in rutas_publicas:
-            return  # permitir
-
-    if not current_user.is_authenticated:
-        return redirect(url_for("auth.login"))
-
+# Ejecutar en modo local
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     debug = os.environ.get("FLASK_DEBUG") == "1"

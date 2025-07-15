@@ -1,8 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask_login import login_user, logout_user
-from werkzeug.security import check_password_hash
+from flask_login import login_user, logout_user, UserMixin
+from werkzeug.security import check_password_hash, generate_password_hash
 from models import get_conn
-from flask_login import UserMixin
 
 auth = Blueprint("auth", __name__)
 
@@ -10,6 +9,9 @@ class Usuario(UserMixin):
     def __init__(self, id_usuario, usuario):
         self.id = id_usuario
         self.usuario = usuario
+
+def es_hash_valido(hash_str):
+    return isinstance(hash_str, str) and any(hash_str.startswith(prefix) for prefix in ("pbkdf2:", "sha256:", "bcrypt:", "scrypt:"))
 
 @auth.route("/login", methods=["GET", "POST"])
 def login():
@@ -22,7 +24,7 @@ def login():
                 cur.execute("SELECT id_usuario, clave_hash FROM usuarios WHERE usuario = %s", (usuario,))
                 row = cur.fetchone()
 
-        if row and check_password_hash(row[1], clave):
+        if row and es_hash_valido(row[1]) and check_password_hash(row[1], clave):
             user = Usuario(row[0], usuario)
             login_user(user)
             flash("Ingreso exitoso.")
@@ -37,3 +39,21 @@ def logout():
     logout_user()
     flash("Sesión cerrada.")
     return redirect(url_for("auth.login"))
+
+@auth.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        usuario = request.form["usuario"]
+        clave = request.form["clave"]
+        clave_hash = generate_password_hash(clave)
+
+        with get_conn() as conn:
+            with conn.cursor() as cur:
+                # Validar si usuario existe antes (no incluido acá)
+                cur.execute("INSERT INTO usuarios (usuario, clave_hash) VALUES (%s, %s)", (usuario, clave_hash))
+                conn.commit()
+
+        flash("Usuario registrado correctamente. Ya podés ingresar.")
+        return redirect(url_for("auth.login"))
+
+    return render_template("register.html")

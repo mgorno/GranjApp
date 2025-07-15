@@ -3,7 +3,7 @@ from flask_login import login_user, logout_user, UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 from models import get_conn
 
-auth = Blueprint("auth", __name__)
+auth = Blueprint("auth", __name__, url_prefix="/auth")
 
 class Usuario(UserMixin):
     def __init__(self, id_usuario, usuario):

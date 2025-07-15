@@ -12,6 +12,7 @@ def get_conn():
 
 
 DDL = """
+
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE IF NOT EXISTS clientes (
@@ -88,6 +89,14 @@ CREATE TABLE IF NOT EXISTS detalle_remito (
     id_producto TEXT REFERENCES productos(id_producto),
     cantidad NUMERIC(10,3) NOT NULL,
     precio NUMERIC(12,0) NOT NULL
+);
+
+
+CREATE TABLE IF NOT EXISTS usuarios (
+    id_usuario TEXT PRIMARY KEY,
+    nombre     TEXT NOT NULL,
+    usuario    TEXT UNIQUE NOT NULL,
+    clave_hash TEXT NOT NULL
 );
 
 

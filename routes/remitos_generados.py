@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from models import get_conn
-from decoradores import login_requerido, rol_requerido
+from utils.decoradores import login_requerido, rol_requerido
 
 bp_remitos_generados = Blueprint("remitos_generados", __name__, url_prefix="/remitos_generados")
 

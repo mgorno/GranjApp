@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_login import LoginManager
 from .auth import Usuario
-from .models import get_conn
+from models import get_conn
 
 # Importá y registrá todos los blueprints acá
 def register_all_blueprints(app):

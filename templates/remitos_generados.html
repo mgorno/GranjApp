@@ -6,78 +6,79 @@
     <i class="bi bi-file-earmark-text me-2 text-info"></i>Remitos Generados
 </h1>
 
+<!-- Filtro -->
 <form method="get" class="row g-3 mb-4 align-items-end">
-    <div class="col-md-4">
-        <label class="form-label text-white">Cliente</label>
-        <select name="cliente" class="form-select bg-dark text-light border-secondary">
-            <option value="">Todos</option>
-            {% for c in clientes %}
-            <option value="{{ c[0] }}" {% if request.args.cliente==c[0] %}selected{% endif %}>{{ c[1] }}</option>
-            {% endfor %}
-        </select>
-    </div>
-    <div class="col-md-4">
-        <label class="form-label text-white">Fecha</label>
-        <input type="date" name="fecha" class="form-control bg-dark text-light border-secondary"
-            value="{{ request.args.fecha or '' }}">
-    </div>
-    <div class="col-md-4">
-        <label class="form-label text-white invisible">Buscar</label>
-        <button type="submit" class="btn btn-outline-light w-100">
-            <i class="bi bi-search me-1"></i>Buscar
-        </button>
-    </div>
+  <div class="col-md-4">
+    <label class="form-label text-white">Cliente</label>
+    <select name="cliente" class="form-select bg-dark text-light border-secondary">
+      <option value="">Todos</option>
+      {% for c in clientes %}
+      <option value="{{ c[0] }}" {% if request.args.cliente==c[0] %}selected{% endif %}>{{ c[1] }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-4">
+    <label class="form-label text-white">Fecha</label>
+    <input type="date" name="fecha" class="form-control bg-dark text-light border-secondary"
+           value="{{ request.args.fecha or '' }}">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label text-white invisible">Buscar</label>
+    <button type="submit" class="btn btn-outline-light btn-sm">
+      <i class="bi bi-search me-1"></i>Buscar
+    </button>
+  </div>
 </form>
 
+<!-- Tabla -->
 <div class="table-responsive">
-    <table class="table table-dark table-bordered align-middle">
-        <thead class="table-secondary text-dark">
-            <tr>
-                <th>Nro Remito</th>
-                <th>Cliente</th>
-                <th>Fecha</th>
-                <th>Total</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for r in remitos %}
-            <tr>
-                <td>{{ r[0] }}</td>
-                <td>{{ r[4] }}</td>
-                <td>{{ r[1].strftime("%Y-%m-%d") }}</td>
-                <td>${{ "{:,.0f}".format(r[2]) }}</td>
-                <td>
-                    {% if r[3] == 'emitido' %}
-                    <span class="badge bg-warning text-dark fw-semibold px-2 py-1">Emitido</span>
-                    {% elif r[3] == 'entregado' %}
-                    <span class="badge bg-success fw-semibold px-2 py-1">Entregado</span>
-                    {% elif r[3] == 'cancelado' %}
-                    <span class="badge bg-danger fw-semibold px-2 py-1">Cancelado</span>
-                    {% else %}
-                    <span class="badge bg-secondary fw-semibold px-2 py-1">{{ r[3] }}</span>
-                    {% endif %}
-                </td>
-                <td>
-                    {% if r[3] == 'emitido' %}
-                    <div class="d-flex gap-2 flex-wrap">
-                        <a href="{{ url_for('remitos_generados.entregar_remito', id_remito=r[0]) }}"
-                            class="btn btn-sm btn-outline-success flex-fill">
-                            <i class="bi bi-check2-circle"></i> Entregar
-                        </a>
-                        <a href="{{ url_for('remitos_generados.cancelar_remito', id_remito=r[0]) }}"
-                            class="btn btn-sm btn-outline-danger flex-fill">
-                            <i class="bi bi-x-circle"></i> Cancelar
-                        </a>
-                    </div>
-                    {% else %}
-                    <span class="text-muted">Sin acciones</span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+  <table class="table table-dark table-bordered align-middle">
+    <thead class="table-secondary text-dark">
+      <tr>
+        <th>Nro Remito</th>
+        <th>Cliente</th>
+        <th>Fecha</th>
+        <th>Total</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in remitos %}
+      <tr>
+        <td>{{ r[0] }}</td>
+        <td>{{ r[4] }}</td>
+        <td>{{ r[1].strftime("%Y-%m-%d") }}</td>
+        <td>${{ "{:,.0f}".format(r[2]) }}</td>
+        <td>
+          {% if r[3] == 'emitido' %}
+          <span class="badge bg-warning text-dark fw-semibold px-2 py-1">Emitido</span>
+          {% elif r[3] == 'entregado' %}
+          <span class="badge bg-success fw-semibold px-2 py-1">Entregado</span>
+          {% elif r[3] == 'cancelado' %}
+          <span class="badge bg-danger fw-semibold px-2 py-1">Cancelado</span>
+          {% else %}
+          <span class="badge bg-secondary fw-semibold px-2 py-1">{{ r[3] }}</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if r[3] == 'emitido' %}
+          <div class="d-flex gap-2">
+            <a href="{{ url_for('remitos_generados.entregar_remito', id_remito=r[0]) }}"
+               class="btn btn-sm btn-outline-success d-inline-flex align-items-center">
+              <i class="bi bi-check2-circle me-1"></i> Entregar
+            </a>
+            <a href="{{ url_for('remitos_generados.cancelar_remito', id_remito=r[0]) }}"
+               class="btn btn-sm btn-outline-danger d-inline-flex align-items-center">
+              <i class="bi bi-x-circle me-1"></i> Cancelar
+            </a>
+          </div>
+          {% else %}
+          <span class="text-muted">Sin acciones</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
-{% endblock %}

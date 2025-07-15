@@ -13,9 +13,10 @@ init_db()
 
 register_all_blueprints(app)
 
-print("Blueprints registrados:")
-for name, blueprint in app.blueprints.items():
-    print(f"- {name}: {blueprint.url_prefix}")
+print("\n Rutas registradas:")
+for rule in app.url_map.iter_rules():
+    print(f"{rule.endpoint:30s} {rule.methods} -> {rule.rule}")
+
 # Configurar Flask-Login
 login_manager = LoginManager()
 login_manager.login_view = "auth.login" 

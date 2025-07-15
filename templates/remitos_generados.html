@@ -62,21 +62,45 @@
           {% endif %}
         </td>
         <td>
-          {% if r[3] == 'emitido' %}
-          <div class="d-flex gap-2">
-            <a href="{{ url_for('remitos_generados.entregar_remito', id_remito=r[0]) }}"
-               class="btn btn-sm btn-outline-success d-inline-flex align-items-center">
-              <i class="bi bi-check2-circle me-1"></i> Entregar
-            </a>
-            <a href="{{ url_for('remitos_generados.cancelar_remito', id_remito=r[0]) }}"
-               class="btn btn-sm btn-outline-danger d-inline-flex align-items-center">
-              <i class="bi bi-x-circle me-1"></i> Cancelar
-            </a>
+  {% if r[3] == 'emitido' %}
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('remitos_generados.entregar_remito', id_remito=r[0]) }}"
+       class="btn btn-sm btn-outline-success d-inline-flex align-items-center">
+      <i class="bi bi-check2-circle me-1"></i> Entregar
+    </a>
+
+    <!-- Botón que abre el modal -->
+    <button class="btn btn-sm btn-outline-danger d-inline-flex align-items-center"
+            data-bs-toggle="modal" data-bs-target="#modalCancelar{{ r[0] }}">
+      <i class="bi bi-x-circle me-1"></i> Cancelar
+    </button>
+
+    <!-- Modal de confirmación -->
+    <div class="modal fade" id="modalCancelar{{ r[0] }}" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content bg-dark text-light border border-danger">
+          <div class="modal-header py-2">
+            <h5 class="modal-title fs-6">Confirmar cancelación</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
           </div>
-          {% else %}
-          <span class="text-muted">Sin acciones</span>
-          {% endif %}
-        </td>
+          <div class="modal-body p-3">
+            ¿Seguro que querés cancelar el remito <strong>#{{ r[0] }}</strong>?
+          </div>
+          <div class="modal-footer py-2">
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">No</button>
+            <form action="{{ url_for('remitos_generados.cancelar_remito', id_remito=r[0]) }}" method="POST" class="d-inline">
+              <button type="submit" class="btn btn-danger btn-sm">Sí, Cancelar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <span class="text-muted">Sin acciones</span>
+  {% endif %}
+</td>
+
       </tr>
       {% endfor %}
     </tbody>

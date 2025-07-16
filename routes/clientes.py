@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from models import get_conn
 import uuid, re
 from collections import defaultdict
@@ -40,6 +40,8 @@ def nuevo_cliente():
 
         if existe:
             flash(f"El cliente '{nombre}' ya existe.", "warning")
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return jsonify({"status": "error", "message": "Cliente ya existe"}), 400
             return redirect(url_for('clientes.clientes'))
 
         # SI NO EXISTE, CREAR NUEVO CLIENTE
@@ -53,7 +55,12 @@ def nuevo_cliente():
             conn.commit()
 
         flash("Cliente creado correctamente.", "success")
-        return redirect(url_for('clientes.clientes'))
+
+        # AJAX: devolver JSON. HTML normal: redirigir
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return jsonify({"status": "ok"}), 200
+        else:
+            return redirect(url_for('clientes.clientes'))
 
     return render_template('nuevo_cliente.html')
 
@@ -87,7 +94,7 @@ def editar_cliente(id_cliente):
         conn.commit()
 
     flash("Cliente actualizado", "success")
-    return redirect(url_for("clientes.clientes"))  # corregí endpoint
+    return redirect(url_for("clientes.clientes"))
 
 
 @bp_clientes.route("/borrar/<id_cliente>")
@@ -105,4 +112,3 @@ def borrar_cliente(id_cliente):
 
     flash("Cliente eliminado correctamente", "success")
     return redirect(url_for("clientes.clientes"))
-

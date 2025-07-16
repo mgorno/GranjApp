@@ -22,6 +22,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const targetSelector = button.getAttribute('data-bs-target');
     const collapseEl = document.querySelector(targetSelector);
 
+    if (!collapseEl) return;
+
+    button.addEventListener('click', () => {
+      const isShown = collapseEl.classList.contains('show');
+      button.style.transform = isShown ? 'rotate(0deg)' : 'rotate(90deg)';
+    });
+
     collapseEl.addEventListener('shown.bs.collapse', () => {
       button.style.transform = 'rotate(90deg)';
     });
@@ -33,18 +40,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Estado inicial
     if (collapseEl.classList.contains('show')) {
       button.style.transform = 'rotate(90deg)';
-    } else {
-      button.style.transform = 'rotate(0deg)';
     }
   });
 
-  // === Botón editar campos (habilita todos los inputs del form) ===
+  // === Botón editar campos ===
   document.querySelectorAll('.btn-editar-campos').forEach(btn => {
     btn.addEventListener('click', () => {
       const form = btn.closest('form');
       if (!form) return;
 
-      // Habilitar todos los inputs y checkboxes
       form.querySelectorAll('input, select, textarea').forEach(el => {
         if (el.type === 'checkbox') {
           el.removeAttribute('disabled');
@@ -53,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
 
-      // Mostrar botones de acción
       btn.classList.add('d-none');
       form.querySelector('.btn-guardar')?.classList.remove('d-none');
       form.querySelector('.btn-cancelar')?.classList.remove('d-none');
@@ -66,25 +69,23 @@ document.addEventListener('DOMContentLoaded', () => {
       const form = btn.closest('form');
       if (!form) return;
 
-      // Restaurar el estado original del form
       form.reset();
 
-      form.querySelectorAll('input').forEach(input => {
-        if (input.type === 'checkbox') {
-          input.setAttribute('disabled', '');
+      form.querySelectorAll('input, select, textarea').forEach(el => {
+        if (el.type === 'checkbox') {
+          el.setAttribute('disabled', '');
         } else {
-          input.setAttribute('readonly', '');
+          el.setAttribute('readonly', '');
         }
       });
 
-      // Restaurar visibilidad de botones
       form.querySelector('.btn-editar-campos')?.classList.remove('d-none');
       form.querySelector('.btn-guardar')?.classList.add('d-none');
       form.querySelector('.btn-cancelar')?.classList.add('d-none');
     });
   });
 
-  // === (Opcional) Si querés ocultar inputs individuales de edición tipo inline ===
+  // === (Opcional) Edición inline de campos individuales ===
   document.querySelectorAll('.btn-editar-campo').forEach(btn => {
     btn.addEventListener('click', () => {
       const parent = btn.closest('.d-flex.align-items-center.gap-2');
@@ -100,90 +101,63 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.classList.add('d-none');
       }
     });
+  });
 
-    document.querySelectorAll('.accordion-collapse').forEach(collapse => {
-      collapse.addEventListener('hidden.bs.collapse', () => {
-        const inputs = collapse.querySelectorAll('input:not(.d-none)');
-        inputs.forEach(input => {
-          const parent = input.closest('.d-flex.align-items-center.gap-2');
-          if (!parent) return;
-          const span = parent.querySelector('.valor-campo');
-          const btn = parent.querySelector('.btn-editar-campo');
+  // === Reset de campos inline al cerrar el accordion ===
+  document.querySelectorAll('.accordion-collapse').forEach(collapse => {
+    collapse.addEventListener('hidden.bs.collapse', () => {
+      const inputs = collapse.querySelectorAll('input:not(.d-none)');
+      inputs.forEach(input => {
+        const parent = input.closest('.d-flex.align-items-center.gap-2');
+        if (!parent) return;
+        const span = parent.querySelector('.valor-campo');
+        const btn = parent.querySelector('.btn-editar-campo');
 
-          if (span && btn) {
-            input.classList.add('d-none');
-            span.classList.remove('d-none');
-            btn.classList.remove('d-none');
-          }
-        });
-      });
-    });
-
-    // Envío del formulario de nuevo cliente con "Procesando..."
-    const formNuevo = document.getElementById("formNuevoCliente");
-    if (formNuevo) {
-      const btnGuardar = formNuevo.querySelector("button[type='submit']");
-      const spinner = document.getElementById("spinnerCliente");
-      const texto = document.getElementById("textoBotonCliente");
-
-      formNuevo.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        btnGuardar.disabled = true;
-        spinner.classList.remove("d-none");
-        texto.textContent = "Procesando...";
-
-        const formData = new FormData(formNuevo);
-
-        const response = await fetch(formNuevo.action, {
-          method: "POST",
-          body: formData,
-          headers: {
-            "X-Requested-With": "XMLHttpRequest"
-          }
-        });
-
-        if (response.ok) {
-          const offcanvasEl = document.getElementById("offNuevoCliente");
-          const bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
-          if (bsOffcanvas) bsOffcanvas.hide();
-
-          setTimeout(() => location.reload(), 500);
-        } else {
-          alert("Ocurrió un error al guardar el cliente.");
-          btnGuardar.disabled = false;
-          spinner.classList.add("d-none");
-          texto.innerHTML = `<i class="bi bi-save2 me-1"></i>Guardar Cliente`;
+        if (span && btn) {
+          input.classList.add('d-none');
+          span.classList.remove('d-none');
+          btn.classList.remove('d-none');
         }
       });
-    }
+    });
+  });
 
-    // === Flechitas que giran en collapse ===
-    document.querySelectorAll('.btn-toggle-arrow').forEach(button => {
-      const icon = button.querySelector('i');
-      const targetSelector = button.getAttribute('data-bs-target');
-      const collapseEl = document.querySelector(targetSelector);
+  // === Envío del formulario de nuevo cliente ===
+  const formNuevo = document.getElementById("formNuevoCliente");
+  if (formNuevo) {
+    const btnGuardar = formNuevo.querySelector("button[type='submit']");
+    const spinner = document.getElementById("spinnerCliente");
+    const texto = document.getElementById("textoBotonCliente");
 
-      // Al hacer clic
-      button.addEventListener('click', () => {
-        const isShown = collapseEl.classList.contains('show');
-        button.style.transform = isShown ? 'rotate(0deg)' : 'rotate(90deg)';
+    formNuevo.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      btnGuardar.disabled = true;
+      spinner?.classList.remove("d-none");
+      if (texto) texto.textContent = "Procesando...";
+
+      const formData = new FormData(formNuevo);
+
+      const response = await fetch(formNuevo.action, {
+        method: "POST",
+        body: formData,
+        headers: {
+          "X-Requested-With": "XMLHttpRequest"
+        }
       });
 
-      // Cuando se muestra el collapse
-      collapseEl.addEventListener('shown.bs.collapse', () => {
-        button.style.transform = 'rotate(90deg)';
-      });
+      if (response.ok) {
+        const offcanvasEl = document.getElementById("offNuevoCliente");
+        const bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
+        if (bsOffcanvas) bsOffcanvas.hide();
 
-      // Cuando se oculta
-      collapseEl.addEventListener('hidden.bs.collapse', () => {
-        button.style.transform = 'rotate(0deg)';
-      });
-
-      // Estado inicial
-      if (collapseEl.classList.contains('show')) {
-        button.style.transform = 'rotate(90deg)';
+        setTimeout(() => location.reload(), 500);
+      } else {
+        alert("Ocurrió un error al guardar el cliente.");
+        btnGuardar.disabled = false;
+        spinner?.classList.add("d-none");
+        if (texto) texto.innerHTML = `<i class="bi bi-save2 me-1"></i>Guardar Cliente`;
       }
     });
-
-  });
+  }
+});

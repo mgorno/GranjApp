@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Cuando se cierra el accordion (collapse), vuelve todo a modo solo lectura
+  // Restaurar campos al cerrar el collapse
   document.querySelectorAll('.accordion-collapse').forEach(collapse => {
     collapse.addEventListener('hidden.bs.collapse', () => {
       const inputs = collapse.querySelectorAll('input:not(.d-none)');
@@ -53,4 +53,43 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   });
+
+  // Envío del formulario de nuevo cliente con "Procesando..."
+  const formNuevo = document.getElementById("formNuevoCliente");
+  if (formNuevo) {
+    const btnGuardar = formNuevo.querySelector("button[type='submit']");
+    const spinner = document.getElementById("spinnerCliente");
+    const texto = document.getElementById("textoBotonCliente");
+
+    formNuevo.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      btnGuardar.disabled = true;
+      spinner.classList.remove("d-none");
+      texto.textContent = "Procesando...";
+
+      const formData = new FormData(formNuevo);
+
+      const response = await fetch(formNuevo.action, {
+        method: "POST",
+        body: formData,
+        headers: {
+          "X-Requested-With": "XMLHttpRequest"
+        }
+      });
+
+      if (response.ok) {
+        const offcanvasEl = document.getElementById("offNuevoCliente");
+        const bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
+        if (bsOffcanvas) bsOffcanvas.hide();
+
+        setTimeout(() => location.reload(), 500);
+      } else {
+        alert("Ocurrió un error al guardar el cliente.");
+        btnGuardar.disabled = false;
+        spinner.classList.add("d-none");
+        texto.innerHTML = `<i class="bi bi-save2 me-1"></i>Guardar Cliente`;
+      }
+    });
+  }
 });

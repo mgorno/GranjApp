@@ -1,4 +1,13 @@
 
+(function () {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", iniciar);
+  } else {
+    iniciar();
+  }
+
+  function iniciar() {
+
 document.addEventListener("DOMContentLoaded", () => {
   // Buscador
   const input = document.getElementById("buscarProducto");
@@ -54,3 +63,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+  }
+})();

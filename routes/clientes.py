@@ -84,8 +84,7 @@ def editar_cliente(id_cliente):
     telefono = request.form.get("telefono")
     direccion = request.form.get("direccion")
     mail = request.form.get("mail")
-    activo = request.form.get("activo") == "true"  # Si está tildado → True
-
+    activo = request.form.get("activo") == "true"  
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("""

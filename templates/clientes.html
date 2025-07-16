@@ -69,26 +69,26 @@
       <div class="mb-3">
         <label class="form-label">Nombre</label>
         <input type="text" name="nombre" value="{{ c[1] }}" class="form-control bg-dark text-light border-secondary"
-          readonly required>
+          readonly="readonly" required>
       </div>
       <div class="mb-3">
         <label class="form-label">Teléfono</label>
         <input type="text" name="telefono" value="{{ c[2] or '' }}"
-          class="form-control bg-dark text-light border-secondary" readonly>
+          class="form-control bg-dark text-light border-secondary" readonly="readonly">
       </div>
       <div class="mb-3">
         <label class="form-label">Dirección</label>
         <input type="text" name="direccion" value="{{ c[3] or '' }}"
-          class="form-control bg-dark text-light border-secondary" readonly>
+          class="form-control bg-dark text-light border-secondary" readonly="readonly">
       </div>
       <div class="mb-4">
         <label class="form-label">Email</label>
         <input type="email" name="mail" value="{{ c[4] or '' }}"
-          class="form-control bg-dark text-light border-secondary" readonly>
+          class="form-control bg-dark text-light border-secondary" readonly="readonly">
       </div>
       <div class="form-check mb-4">
         <input class="form-check-input" type="checkbox" name="activo" id="activo{{ c[0] }}"
-          {% if c[5] %}checked{% endif %} disabled>
+          {% if c[5] %}checked{% endif %} disabled="disabled">
         <label class="form-check-label" for="activo{{ c[0] }}">
           Cliente activo
         </label>
@@ -139,5 +139,7 @@
 </div>
 {% endblock %}
 
-
-
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/clientes.js') }}"></script>
+{% endblock %}

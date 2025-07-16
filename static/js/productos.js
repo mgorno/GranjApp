@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       btnGuardar.disabled = true;
       spinner.classList.remove("d-none");
-      texto.textContent = "Procesando...";
+      texto.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Procesando...';
 
       const formData = new FormData(formNuevo);
 
@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
         alert("El producto ya existe o hay un error en los datos.");
         btnGuardar.disabled = false;
         spinner.classList.add("d-none");
-        texto.innerHTML = `<i class="bi bi-save2 me-1"></i>Guardar Producto`;
+        texto.innerHTML = '<i class="bi bi-save2 me-1"></i>Guardar Producto';
       }
     });
   }

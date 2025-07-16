@@ -100,96 +100,90 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.classList.add('d-none');
       }
     });
-  });
 
-<<<<<<< HEAD
-  // === Restaurar campos inline al cerrar collapse ===
-=======
-  // Restaurar campos al cerrar el collapse
->>>>>>> 6f23a2abdbc77e52d0e7d27de9a9e54af331ad41
-  document.querySelectorAll('.accordion-collapse').forEach(collapse => {
-    collapse.addEventListener('hidden.bs.collapse', () => {
-      const inputs = collapse.querySelectorAll('input:not(.d-none)');
-      inputs.forEach(input => {
-        const parent = input.closest('.d-flex.align-items-center.gap-2');
-        if (!parent) return;
-        const span = parent.querySelector('.valor-campo');
-        const btn = parent.querySelector('.btn-editar-campo');
+    document.querySelectorAll('.accordion-collapse').forEach(collapse => {
+      collapse.addEventListener('hidden.bs.collapse', () => {
+        const inputs = collapse.querySelectorAll('input:not(.d-none)');
+        inputs.forEach(input => {
+          const parent = input.closest('.d-flex.align-items-center.gap-2');
+          if (!parent) return;
+          const span = parent.querySelector('.valor-campo');
+          const btn = parent.querySelector('.btn-editar-campo');
 
-        if (span && btn) {
-          input.classList.add('d-none');
-          span.classList.remove('d-none');
-          btn.classList.remove('d-none');
-        }
+          if (span && btn) {
+            input.classList.add('d-none');
+            span.classList.remove('d-none');
+            btn.classList.remove('d-none');
+          }
+        });
       });
     });
-  });
 
-  // Envío del formulario de nuevo cliente con "Procesando..."
-  const formNuevo = document.getElementById("formNuevoCliente");
-  if (formNuevo) {
-    const btnGuardar = formNuevo.querySelector("button[type='submit']");
-    const spinner = document.getElementById("spinnerCliente");
-    const texto = document.getElementById("textoBotonCliente");
+    // Envío del formulario de nuevo cliente con "Procesando..."
+    const formNuevo = document.getElementById("formNuevoCliente");
+    if (formNuevo) {
+      const btnGuardar = formNuevo.querySelector("button[type='submit']");
+      const spinner = document.getElementById("spinnerCliente");
+      const texto = document.getElementById("textoBotonCliente");
 
-    formNuevo.addEventListener("submit", async (e) => {
-      e.preventDefault();
+      formNuevo.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-      btnGuardar.disabled = true;
-      spinner.classList.remove("d-none");
-      texto.textContent = "Procesando...";
+        btnGuardar.disabled = true;
+        spinner.classList.remove("d-none");
+        texto.textContent = "Procesando...";
 
-      const formData = new FormData(formNuevo);
+        const formData = new FormData(formNuevo);
 
-      const response = await fetch(formNuevo.action, {
-        method: "POST",
-        body: formData,
-        headers: {
-          "X-Requested-With": "XMLHttpRequest"
+        const response = await fetch(formNuevo.action, {
+          method: "POST",
+          body: formData,
+          headers: {
+            "X-Requested-With": "XMLHttpRequest"
+          }
+        });
+
+        if (response.ok) {
+          const offcanvasEl = document.getElementById("offNuevoCliente");
+          const bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
+          if (bsOffcanvas) bsOffcanvas.hide();
+
+          setTimeout(() => location.reload(), 500);
+        } else {
+          alert("Ocurrió un error al guardar el cliente.");
+          btnGuardar.disabled = false;
+          spinner.classList.add("d-none");
+          texto.innerHTML = `<i class="bi bi-save2 me-1"></i>Guardar Cliente`;
         }
       });
-
-      if (response.ok) {
-        const offcanvasEl = document.getElementById("offNuevoCliente");
-        const bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
-        if (bsOffcanvas) bsOffcanvas.hide();
-
-        setTimeout(() => location.reload(), 500);
-      } else {
-        alert("Ocurrió un error al guardar el cliente.");
-        btnGuardar.disabled = false;
-        spinner.classList.add("d-none");
-        texto.innerHTML = `<i class="bi bi-save2 me-1"></i>Guardar Cliente`;
-      }
-    });
-  }
+    }
 
     // === Flechitas que giran en collapse ===
-  document.querySelectorAll('.btn-toggle-arrow').forEach(button => {
-    const icon = button.querySelector('i');
-    const targetSelector = button.getAttribute('data-bs-target');
-    const collapseEl = document.querySelector(targetSelector);
+    document.querySelectorAll('.btn-toggle-arrow').forEach(button => {
+      const icon = button.querySelector('i');
+      const targetSelector = button.getAttribute('data-bs-target');
+      const collapseEl = document.querySelector(targetSelector);
 
-    // Al hacer clic
-    button.addEventListener('click', () => {
-      const isShown = collapseEl.classList.contains('show');
-      button.style.transform = isShown ? 'rotate(0deg)' : 'rotate(90deg)';
+      // Al hacer clic
+      button.addEventListener('click', () => {
+        const isShown = collapseEl.classList.contains('show');
+        button.style.transform = isShown ? 'rotate(0deg)' : 'rotate(90deg)';
+      });
+
+      // Cuando se muestra el collapse
+      collapseEl.addEventListener('shown.bs.collapse', () => {
+        button.style.transform = 'rotate(90deg)';
+      });
+
+      // Cuando se oculta
+      collapseEl.addEventListener('hidden.bs.collapse', () => {
+        button.style.transform = 'rotate(0deg)';
+      });
+
+      // Estado inicial
+      if (collapseEl.classList.contains('show')) {
+        button.style.transform = 'rotate(90deg)';
+      }
     });
 
-    // Cuando se muestra el collapse
-    collapseEl.addEventListener('shown.bs.collapse', () => {
-      button.style.transform = 'rotate(90deg)';
-    });
-
-    // Cuando se oculta
-    collapseEl.addEventListener('hidden.bs.collapse', () => {
-      button.style.transform = 'rotate(0deg)';
-    });
-
-    // Estado inicial
-    if (collapseEl.classList.contains('show')) {
-      button.style.transform = 'rotate(90deg)';
-    }
   });
-
-});

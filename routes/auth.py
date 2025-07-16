@@ -29,7 +29,7 @@ def login():
             user = Usuario(row[0], usuario)
             login_user(user)
             flash("Ingreso exitoso.")
-            return redirect(url_for("main.inicio")) 
+            return redirect(url_for("main.index")) 
         else:
             flash("Usuario o clave incorrectos.")
 

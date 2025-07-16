@@ -150,23 +150,10 @@
             <span>Total remito:</span><strong id="total-remito">0</strong>
           </p>
           <p class="d-flex justify-content-between mb-2">
-            <span>Saldo anterior:</span><strong id="saldo-anterior">
-  {% if remito_generado %}
-    {{ saldo_anterior | formato_precio_arg }}
-  {% else %}
-    0
-  {% endif %}
-</strong>
+            <span>Saldo anterior:</span><strong>{{ saldo_anterior | formato_precio_arg }}</strong>
           </p>
           <p class="d-flex justify-content-between mb-2">
-            <<strong id="saldo-total">
-  {% if remito_generado %}
-    {{ saldo_total | formato_precio_arg }}
-  {% else %}
-    0
-  {% endif %}
-</strong>
-
+            <span>Saldo total:</span><strong id="saldo-total">0</strong>
           </p>
         </div>
       </div>

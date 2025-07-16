@@ -8,12 +8,9 @@
 
 <div class="d-flex mb-4 gap-3 flex-wrap align-items-center">
   <input type="search" id="buscarUsuario" class="form-control bg-dark text-light border-secondary flex-grow-1" placeholder="Buscar usuarios...">
-  
-  {% if current_user.rol == 'admin' %}
   <button class="btn btn-sm btn-outline-warning flex-shrink-0" data-bs-toggle="offcanvas" data-bs-target="#offNuevoUsuario">
     <i class="bi bi-person-plus-fill me-1"></i>Nuevo Usuario
   </button>
-  {% endif %}
 </div>
 
 <!-- OFFCANVAS: Nuevo Usuario -->
@@ -89,9 +86,11 @@
             <i class="bi bi-key-fill"></i> Contraseña
           </a>
           {% if current_user.rol == 'admin' %}
-          <a href="{{ url_for('auth.eliminar_usuario', id_usuario=u.id_usuario) }}" class="btn btn-sm btn-danger">
-            <i class="bi bi-trash me-1"></i>Eliminar
-          </a>
+          <form action="{{ url_for('auth.eliminar_usuario', id_usuario=u.id_usuario) }}" method="POST" class="d-inline">
+            <button class="btn btn-sm btn-danger">
+              <i class="bi bi-trash me-1"></i>Eliminar
+            </button>
+          </form>
           {% endif %}
         </div>
       </div>

@@ -39,38 +39,35 @@ def logout():
     flash("Sesión cerrada.", "info")
     return redirect(url_for("auth.login"))
 
-@auth.route("/registrar_usuario", methods=["GET", "POST"])
+@auth.route("/registrar_usuario", methods=["POST"])
 @login_required
 def registrar_usuario():
     if current_user.rol != "admin":
         flash("Acceso denegado.", "danger")
         return redirect(url_for("main.index"))
 
-    if request.method == "POST":
-        usuario = request.form["usuario"]
-        clave = request.form["clave"]
-        rol = request.form["rol"]
-        nombre = usuario  # o cualquier lógica
+    usuario = request.form["usuario"]
+    clave = request.form["clave"]
+    rol = request.form["rol"]
+    nombre = request.form.get("nombre", usuario)
 
-        clave_hash = generate_password_hash(clave)
-        nuevo_id = str(uuid.uuid4())
+    clave_hash = generate_password_hash(clave)
+    nuevo_id = str(uuid.uuid4())
 
-        with get_conn() as conn:
-            with conn.cursor() as cur:
-                cur.execute("SELECT id_usuario FROM usuarios WHERE usuario = %s", (usuario,))
-                if cur.fetchone():
-                    flash("El usuario ya existe.")
-                    return redirect(url_for("auth.registrar_usuario"))
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT id_usuario FROM usuarios WHERE usuario = %s", (usuario,))
+            if cur.fetchone():
+                flash("El usuario ya existe.", "warning")
+                return redirect(url_for("auth.listar_usuarios"))
 
-                cur.execute(
-                    "INSERT INTO usuarios (id_usuario, nombre, usuario, clave_hash, rol) VALUES (%s, %s, %s, %s, %s)",
-                    (nuevo_id, nombre, usuario, clave_hash, rol)
-                )
-                conn.commit()
-                flash("Usuario registrado correctamente.")
-                return redirect(url_for("auth.login"))
-
-    return render_template("registrar_usuario.html")
+            cur.execute(
+                "INSERT INTO usuarios (id_usuario, nombre, usuario, clave_hash, rol) VALUES (%s, %s, %s, %s, %s)",
+                (nuevo_id, nombre, usuario, clave_hash, rol)
+            )
+            conn.commit()
+            flash("Usuario registrado correctamente.", "success")
+            return redirect(url_for("auth.listar_usuarios"))
 
 @auth.route("/usuarios")
 @login_required
@@ -81,12 +78,12 @@ def listar_usuarios():
 
     with get_conn() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT id_usuario, usuario, rol FROM usuarios ORDER BY usuario")
-            usuarios = cur.fetchall()
+            cur.execute("SELECT id_usuario, nombre, usuario, rol FROM usuarios ORDER BY usuario")
+            usuarios = [dict(id_usuario=u[0], nombre=u[1], usuario=u[2], rol=u[3]) for u in cur.fetchall()]
 
     return render_template("usuarios.html", usuarios=usuarios)
 
-@auth.route("/usuarios/eliminar/<id_usuario>", methods=["POST"])
+@auth.route("/usuarios/eliminar/<id_usuario>")
 @login_required
 def eliminar_usuario(id_usuario):
     if current_user.rol != "admin":

@@ -24,7 +24,7 @@
     </h5>
     <button class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
   </div>
-  <form action="{{ url_for('productos.nuevo') }}" method="POST" class="offcanvas-body">
+  <form id="formNuevoProducto" action="{{ url_for('productos.nuevo') }}" method="POST" class="offcanvas-body">
     <div class="mb-3">
       <label class="form-label">Descripción</label>
       <input type="text" name="descripcion" class="form-control bg-dark text-light border-secondary" required>
@@ -41,7 +41,9 @@
       <label class="form-label">Precio ($)</label>
       <input name="precio" class="form-control bg-dark text-light border-secondary" required>
     </div>
-    <button class="btn btn-success w-100">
+    <button type="submit" class="btn btn-success w-100">
+  <span class="spinner-border spinner-border-sm d-none" id="spinnerProducto"></span>
+  <span id="textoBotonProducto"><i class="bi bi-save2 me-1"></i>Guardar Producto</span>
       <i class="bi bi-save2 me-1"></i>Guardar
     </button>
   </form>

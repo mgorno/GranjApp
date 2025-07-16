@@ -92,10 +92,15 @@
               <div class="modal-body p-3">
                 ¿Seguro que querés borrar al cliente <strong>{{ c.1 }}</strong>?
               </div>
-              <div class="modal-footer p-2 d-flex justify-content-between gap-2">
-                <button type="button" class="btn btn-outline-secondary btn-sm flex-fill" data-bs-dismiss="modal">Cancelar</button>
-                <a href="{{ url_for('clientes.borrar', id=p.0) }}" class="btn btn-danger btn-sm flex-fill">Borrar</a>
-              </div>
+             <div class="modal-footer p-2 d-flex justify-content-between gap-2">
+  <button type="button" class="btn btn-outline-secondary btn-sm flex-fill" data-bs-dismiss="modal">
+    Cancelar
+  </button>
+  <a href="{{ url_for('clientes.borrar_cliente', id=c[0]) }}" class="btn btn-danger btn-sm flex-fill">
+    Borrar
+  </a>
+</div>
+
             </div>
           </div>
         </div>

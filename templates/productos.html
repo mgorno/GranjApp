@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 {% block title %}Productos{% endblock %}
 
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/productos.js') }}"></script>
+{% endblock %}
+
 {% block content %}
 <h1 class="mb-4 text-white border-bottom pb-2" style="font-weight: 500;">
   <i class="bi bi-box-seam me-2 text-success"></i>Productos
@@ -44,7 +49,6 @@
     <button type="submit" class="btn btn-success w-100">
   <span class="spinner-border spinner-border-sm d-none" id="spinnerProducto"></span>
   <span id="textoBotonProducto"><i class="bi bi-save2 me-1"></i>Guardar Producto</span>
-      <i class="bi bi-save2 me-1"></i>Guardar
     </button>
   </form>
 </div>

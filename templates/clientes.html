@@ -24,7 +24,7 @@
     </h5>
     <button class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
   </div>
-  <form action="{{ url_for('clientes.nuevo_cliente') }}" method="POST" class="offcanvas-body">
+  <form id="formNuevoCliente" action="{{ url_for('clientes.nuevo_cliente') }}" method="POST" class="offcanvas-body">
     <div class="mb-3">
       <label class="form-label">Nombre</label>
       <input type="text" name="nombre" class="form-control bg-dark text-light border-secondary" required>
@@ -41,8 +41,9 @@
       <label class="form-label">Email</label>
       <input type="email" name="mail" class="form-control bg-dark text-light border-secondary">
     </div>
-    <button class="btn btn-success w-100">
-      <i class="bi bi-save2 me-1"></i>Guardar Cliente
+    <button type="submit" class="btn btn-success w-100">
+      <span class="spinner-border spinner-border-sm d-none" id="spinnerCliente"></span>
+      <span id="textoBotonCliente"><i class="bi bi-save2 me-1"></i>Guardar Cliente</span>
     </button>
   </form>
 </div>
@@ -51,19 +52,15 @@
 <div class="list-group">
   {% for c in clientes %}
   <div class="list-group-item list-group-item-dark d-flex align-items-center rounded mb-2">
-
-    <!-- Botón flecha para abrir/cerrar collapse -->
     <button class="btn btn-sm btn-toggle-arrow d-flex align-items-center text-white p-0 me-3" 
       data-bs-toggle="collapse" data-bs-target="#collapse{{ c[0] }}" aria-expanded="false" aria-controls="collapse{{ c[0] }}" style="width: 32px; height: 32px; border: none; background: transparent; transition: transform 0.3s;">
       <i class="bi bi-chevron-right fs-5"></i>
     </button>
-
     <div class="flex-grow-1 fw-semibold">{{ c[1] | title }}</div>
   </div>
 
   <div class="collapse mb-3" id="collapse{{ c[0] }}">
     <form action="{{ url_for('clientes.editar_cliente', id_cliente=c[0]) }}" method="POST" class="bg-dark border border-secondary rounded p-3 text-light">
-
       <div class="mb-3">
         <label class="form-label">Nombre</label>
         <input type="text" name="nombre" value="{{ c[1] }}" class="form-control bg-dark text-light border-secondary" readonly required>
@@ -85,7 +82,6 @@
         <button type="button" class="btn btn-sm btn-outline-light btn-editar-campos">
           <i class="bi bi-pencil-fill me-1"></i>Editar
         </button>
-
         <div>
           <button type="submit" class="btn btn-sm btn-success d-none btn-guardar">
             <i class="bi bi-save2 me-1"></i>Guardar
@@ -121,74 +117,9 @@
   </div>
   {% endfor %}
 </div>
-
 {% endblock %}
 
 {% block scripts %}
 {{ super() }}
-<script>
-  // Cambiar icono flecha al abrir/cerrar collapse con rotación suave
-  document.querySelectorAll('.btn-toggle-arrow').forEach(button => {
-    const icon = button.querySelector('i');
-    button.addEventListener('click', () => {
-      const collapseId = button.getAttribute('data-bs-target');
-      const collapseEl = document.querySelector(collapseId);
-      const isShown = collapseEl.classList.contains('show');
-
-      // La rotación la hago al botón entero para animación más suave
-      if (isShown) {
-        button.style.transform = 'rotate(0deg)';
-      } else {
-        button.style.transform = 'rotate(90deg)';
-      }
-    });
-  });
-
-  document.querySelectorAll('.btn-toggle-arrow').forEach(button => {
-    const targetSelector = button.getAttribute('data-bs-target');
-    const collapseEl = document.querySelector(targetSelector);
-
-    // Al abrir
-    collapseEl.addEventListener('shown.bs.collapse', () => {
-      button.style.transform = 'rotate(90deg)';
-    });
-
-    // Al cerrar
-    collapseEl.addEventListener('hidden.bs.collapse', () => {
-      button.style.transform = 'rotate(0deg)';
-    });
-
-    // Seteamos estado inicial al cargar (por si algún collapse viene abierto)
-    if (collapseEl.classList.contains('show')) {
-      button.style.transform = 'rotate(90deg)';
-    } else {
-      button.style.transform = 'rotate(0deg)';
-    }
-  });
-
-  // Botón para activar edición dentro del formulario
-  document.querySelectorAll('.btn-editar-campos').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const form = btn.closest('form');
-      // habilitar inputs
-      form.querySelectorAll('input').forEach(input => input.removeAttribute('readonly'));
-      // mostrar botones guardar y cancelar, ocultar editar
-      btn.classList.add('d-none');
-      form.querySelector('.btn-guardar').classList.remove('d-none');
-      form.querySelector('.btn-cancelar').classList.remove('d-none');
-    });
-  });
-
-  // Botón cancelar edición
-  document.querySelectorAll('.btn-cancelar').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const form = btn.closest('form');
-      form.reset();
-      form.querySelectorAll('input').forEach(input => input.setAttribute('readonly', ''));
-      form.querySelector('.btn-editar-campos').classList.remove('d-none');
-      form.querySelector('.btn-guardar').classList.add('d-none');
-      form.querySelector('.btn-cancelar').classList.add('d-none');
-    });
-  });
-</script>
+<script src="{{ url_for('static', filename='js/clientes.js') }}"></script>
 {% endblock %}

@@ -86,10 +86,7 @@
         </a>
 
         {% if current_user.rol == 'admin' %}
-        <a class="nav-link d-flex align-items-center gap-3 px-4 py-3 border-bottom border-secondary text-light"
-          href="{{ url_for('auth.registrar_usuario') }}">
-          <i class="bi bi-person-plus-fill"></i> Registrar Usuario
-        </a>
+      
         <a class="nav-link d-flex align-items-center gap-3 px-4 py-3 border-bottom border-secondary text-light"
           href="{{ url_for('auth.listar_usuarios') }}">
           <i class="bi bi-people-fill"></i> Usuarios

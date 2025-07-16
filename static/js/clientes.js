@@ -92,4 +92,33 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+    // === Flechitas que giran en collapse ===
+  document.querySelectorAll('.btn-toggle-arrow').forEach(button => {
+    const icon = button.querySelector('i');
+    const targetSelector = button.getAttribute('data-bs-target');
+    const collapseEl = document.querySelector(targetSelector);
+
+    // Al hacer clic
+    button.addEventListener('click', () => {
+      const isShown = collapseEl.classList.contains('show');
+      button.style.transform = isShown ? 'rotate(0deg)' : 'rotate(90deg)';
+    });
+
+    // Cuando se muestra el collapse
+    collapseEl.addEventListener('shown.bs.collapse', () => {
+      button.style.transform = 'rotate(90deg)';
+    });
+
+    // Cuando se oculta
+    collapseEl.addEventListener('hidden.bs.collapse', () => {
+      button.style.transform = 'rotate(0deg)';
+    });
+
+    // Estado inicial
+    if (collapseEl.classList.contains('show')) {
+      button.style.transform = 'rotate(90deg)';
+    }
+  });
+
 });

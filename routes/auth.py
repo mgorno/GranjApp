@@ -83,7 +83,7 @@ def listar_usuarios():
 
     return render_template("usuarios.html", usuarios=usuarios)
 
-@auth.route("/usuarios/eliminar/<id_usuario>")
+@auth.route("/usuarios/eliminar/<id_usuario>", methods=["POST"])
 @login_required
 def eliminar_usuario(id_usuario):
     if current_user.rol != "admin":
@@ -91,7 +91,7 @@ def eliminar_usuario(id_usuario):
         return redirect(url_for("main.index"))
 
     if current_user.id == id_usuario:
-        flash("No podés eliminar tu propio usuario.", "warning")
+        flash("No podés eliminar tu propio usuario Rey.", "warning")
         return redirect(url_for("auth.listar_usuarios"))
 
     with get_conn() as conn:

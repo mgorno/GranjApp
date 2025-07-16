@@ -69,7 +69,7 @@ def nuevo_cliente():
 def clientes():
     with get_conn() as conn, conn.cursor() as cur:
         cur.execute("""
-            SELECT id_cliente, nombre, telefono, direccion, mail
+            SELECT id_cliente, nombre, telefono, direccion, mail, activo
             FROM clientes
             ORDER BY nombre
         """)
@@ -84,7 +84,7 @@ def editar_cliente(id_cliente):
     telefono = request.form.get("telefono")
     direccion = request.form.get("direccion")
     mail = request.form.get("mail")
-    activo = 'activo' in request.form  # ✅ Corrección aquí
+    activo = 'activo' in request.form 
 
     with get_conn() as conn:
         with conn.cursor() as cur:

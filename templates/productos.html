@@ -1,125 +1,106 @@
-{% extends "base.html" %}
-{% block title %}Productos{% endblock %}
+{% extends 'base.html' %}
+{% block title %}
+  Productos
+{% endblock %}
 
 {% block scripts %}
-{{ super() }}
-<script src="{{ url_for('static', filename='js/productos.js') }}"></script>
+  {{ super() }}
+  <script src="{{ url_for('static', filename='js/productos.js') }}"></script>
 {% endblock %}
 
 {% block content %}
-<h1 class="mb-4 text-white border-bottom pb-2" style="font-weight: 500;">
-  <i class="bi bi-box-seam me-2 text-success"></i>Productos
-</h1>
+  <h1 class="mb-4 text-white border-bottom pb-2" style="font-weight: 500;"><i class="bi bi-box-seam me-2 text-success"></i>Productos</h1>
 
-<!-- Buscador + Botón Nuevo -->
-<div class="d-flex mb-4 gap-3 flex-wrap align-items-center">
-  <input type="search" id="buscarProducto" class="form-control bg-dark text-light border-secondary flex-grow-1" placeholder="Buscar productos...">
+  <!-- Buscador + Botón Nuevo -->
+  <div class="d-flex mb-4 gap-3 flex-wrap align-items-center">
+    <input type="search" id="buscarProducto" class="form-control bg-dark text-light border-secondary flex-grow-1" placeholder="Buscar productos..." />
 
-  <!-- Botón + que abre offcanvas -->
-  <button class="btn btn-sm btn-outline-success flex-shrink-0" data-bs-toggle="offcanvas" data-bs-target="#offNuevoProducto">
-    <i class="bi bi-plus-lg me-1"></i>Nuevo Producto
-  </button>
-</div>
-
-<!-- OFFCANVAS: Nuevo Producto -->
-<div class="offcanvas offcanvas-end bg-dark text-light" tabindex="-1" id="offNuevoProducto">
-  <div class="offcanvas-header border-bottom border-secondary">
-    <h5 class="offcanvas-title">
-      <i class="bi bi-plus-circle me-2 text-success"></i>Nuevo Producto
-    </h5>
-    <button class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
-  </div>
-  <form id="formNuevoProducto" action="{{ url_for('productos.nuevo') }}" method="POST" class="offcanvas-body">
-    <div class="mb-3">
-      <label class="form-label">Descripción</label>
-      <input type="text" name="descripcion" class="form-control bg-dark text-light border-secondary" required>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Unidad base</label>
-      <select name="unidad_base" class="form-select bg-dark text-light border-secondary" required>
-        <option value="" disabled selected>Elegí una unidad...</option>
-        <option value="Kg">Kg</option>
-        <option value="Cajón">Cajón</option>
-      </select>
-    </div>
-    <div class="mb-4">
-      <label class="form-label">Precio ($)</label>
-      <input name="precio" class="form-control bg-dark text-light border-secondary" required>
-    </div>
-    <button type="submit" class="btn btn-success w-100">
-  <span class="spinner-border spinner-border-sm d-none" id="spinnerProducto"></span>
-  <span id="textoBotonProducto"><i class="bi bi-save2 me-1"></i>Guardar Producto</span>
-    </button>
-  </form>
-</div>
-
-<!-- Lista productos -->
-<div class="list-group">
-  {% for p in productos %}
-  <div class="list-group-item list-group-item-dark d-flex align-items-center rounded mb-2">
-    <!-- Botón flecha para abrir/cerrar collapse -->
-    <button class="btn btn-sm btn-toggle-arrow d-flex align-items-center text-white p-0 me-3"
-      data-bs-toggle="collapse" data-bs-target="#collapse{{ p[0] }}" aria-expanded="false" aria-controls="collapse{{ p[0] }}"
-      style="width: 32px; height: 32px; border: none; background: transparent; transition: transform 0.3s;">
-      <i class="bi bi-chevron-right fs-5"></i>
-    </button>
-    <div class="flex-grow-1 fw-semibold">{{ p[1] | title }}</div>
+    <!-- Botón + que abre offcanvas -->
+    <button class="btn btn-sm btn-outline-success flex-shrink-0" data-bs-toggle="offcanvas" data-bs-target="#offNuevoProducto"><i class="bi bi-plus-lg me-1"></i>Nuevo Producto</button>
   </div>
 
-  <div class="collapse mb-3" id="collapse{{ p[0] }}">
-    <form action="{{ url_for('productos.editar', id=p[0]) }}" method="POST" class="bg-dark border border-secondary rounded p-3 text-light">
+  <!-- OFFCANVAS: Nuevo Producto -->
+  <div class="offcanvas offcanvas-end bg-dark text-light" tabindex="-1" id="offNuevoProducto">
+    <div class="offcanvas-header border-bottom border-secondary">
+      <h5 class="offcanvas-title"><i class="bi bi-plus-circle me-2 text-success"></i>Nuevo Producto</h5>
+      <button class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <form id="formNuevoProducto" action="{{ url_for('productos.nuevo') }}" method="POST" class="offcanvas-body">
       <div class="mb-3">
         <label class="form-label">Descripción</label>
-        <input type="text" name="descripcion" value="{{ p[1] }}" class="form-control bg-dark text-light border-secondary" readonly required>
+        <input type="text" name="descripcion" class="form-control bg-dark text-light border-secondary" required />
       </div>
       <div class="mb-3">
         <label class="form-label">Unidad base</label>
-        <input type="text" name="unidad_base" value="{{ p[2] }}" class="form-control bg-dark text-light border-secondary" readonly required>
+        <select name="unidad_base" class="form-select bg-dark text-light border-secondary" required>
+          <option value="" disabled selected>Elegí una unidad...</option>
+          <option value="Kg">Kg</option>
+          <option value="Cajón">Cajón</option>
+        </select>
       </div>
       <div class="mb-4">
         <label class="form-label">Precio ($)</label>
-        <input type="number" step="0.01" name="precio" value="{{ p[3] }}" class="form-control bg-dark text-light border-secondary" readonly required>
+        <input name="precio" class="form-control bg-dark text-light border-secondary" required />
       </div>
-      <div class="d-flex justify-content-between align-items-center">
-        <button type="button" class="btn btn-sm btn-outline-light btn-editar-campos">
-          <i class="bi bi-pencil-fill me-1"></i>Editar
-        </button>
-        <div>
-          <button type="submit" class="btn btn-sm btn-success d-none btn-guardar">
-            <i class="bi bi-save2 me-1"></i>Guardar
-          </button>
-          <button type="button" class="btn btn-sm btn-secondary d-none btn-cancelar">
-            Cancelar
-          </button>
-          <button type="button" class="btn btn-sm btn-danger ms-2" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ p[0] }}">
-            <i class="bi bi-trash me-1"></i>Borrar
-          </button>
-        </div>
-      </div>
+      <button type="submit" class="btn btn-success w-100">
+        <span class="spinner-border spinner-border-sm d-none" id="spinnerProducto"></span>
+        <span id="textoBotonProducto"><i class="bi bi-save2 me-1"></i>Guardar Producto</span>
+      </button>
     </form>
+  </div>
 
-    <!-- Modal eliminar -->
-    <div class="modal fade" id="confirmDeleteModal{{ p[0] }}" tabindex="-1" aria-labelledby="confirmDeleteLabel{{ p[0] }}" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content bg-dark text-light">
-          <div class="modal-header p-2">
-            <h5 class="modal-title fs-6" id="confirmDeleteLabel{{ p[0] }}">Confirmar eliminación</h5>
-            <button type="button" class="btn-close btn-close-white p-1" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+  <!-- Lista productos -->
+  <div class="list-group">
+    {% for p in productos %}
+      <div class="list-group-item list-group-item-dark d-flex align-items-center rounded mb-2">
+        <!-- Botón flecha para abrir/cerrar collapse -->
+        <button class="btn btn-sm btn-toggle-arrow d-flex align-items-center text-white p-0 me-3" data-bs-toggle="collapse" data-bs-target="#collapse{{ p.0 }}" aria-expanded="false" aria-controls="collapse{{ p.0 }}" style="width: 32px; height: 32px; border: none; background: transparent; transition: transform 0.3s;"><i class="bi bi-chevron-right fs-5"></i></button>
+        <div class="flex-grow-1 fw-semibold">{{ p.1|title }}</div>
+      </div>
+
+      <div class="collapse mb-3" id="collapse{{ p.0 }}">
+        <form action="{{ url_for('productos.editar', id=p.0) }}" method="POST" class="bg-dark border border-secondary rounded p-3 text-light">
+          <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <input type="text" name="descripcion" value="{{ p.1 }}" class="form-control bg-dark text-light border-secondary" readonly required />
           </div>
-          <div class="modal-body p-3">
-            ¿Seguro que querés borrar el producto <strong>{{ p[1] }}</strong>?
+          <div class="mb-3">
+            <label class="form-label">Unidad base</label>
+            <input type="text" name="unidad_base" value="{{ p.2 }}" class="form-control bg-dark text-light border-secondary" readonly required />
           </div>
-          <div class="modal-footer p-2">
-            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
-            <a href="{{ url_for('productos.borrar', id=p[0]) }}" class="btn btn-danger btn-sm">Borrar</a>
+          <div class="mb-4">
+            <label class="form-label">Precio ($)</label>
+            <input type="number" step="0.01" name="precio" value="{{ p.3 }}" class="form-control bg-dark text-light border-secondary" readonly required />
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <button type="button" class="btn btn-sm btn-outline-light btn-editar-campos"><i class="bi bi-pencil-fill me-1"></i>Editar</button>
+            <div>
+              <button type="submit" class="btn btn-sm btn-success d-none btn-guardar"><i class="bi bi-save2 me-1"></i>Guardar</button>
+              <button type="button" class="btn btn-sm btn-secondary d-none btn-cancelar">Cancelar</button>
+              <button type="button" class="btn btn-sm btn-danger ms-2" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ p.0 }}"><i class="bi bi-trash me-1"></i>Borrar</button>
+            </div>
+          </div>
+        </form>
+
+        <!-- Modal eliminar -->
+        <div class="modal fade" id="confirmDeleteModal{{ p.0 }}" tabindex="-1" aria-labelledby="confirmDeleteLabel{{ p.0 }}" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content bg-dark text-light">
+              <div class="modal-header p-2">
+                <h5 class="modal-title fs-6" id="confirmDeleteLabel{{ p.0 }}">Confirmar eliminación</h5>
+                <button type="button" class="btn-close btn-close-white p-1" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+              </div>
+              <div class="modal-body p-3">
+                ¿Seguro que querés borrar el producto <strong>{{ p.1 }}</strong>?
+              </div>
+              <div class="modal-footer p-2 d-flex gap-2">
+                <button type="button" class="btn btn-secondary btn-sm w-50" data-bs-dismiss="modal">Cancelar</button>
+                <a href="{{ url_for('productos.borrar', id=p.0) }}" class="btn btn-danger btn-sm w-50">Borrar</a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    {% endfor %}
   </div>
-  {% endfor %}
-</div>
-
 {% endblock %}
-
-

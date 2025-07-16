@@ -118,36 +118,4 @@
 
 {% endblock %}
 
-{% block scripts %}
-{{ super() }}
-<script>
-  document.querySelectorAll('.btn-toggle-arrow').forEach(button => {
-    const targetSelector = button.getAttribute('data-bs-target');
-    const collapseEl = document.querySelector(targetSelector);
-    collapseEl.addEventListener('shown.bs.collapse', () => button.style.transform = 'rotate(90deg)');
-    collapseEl.addEventListener('hidden.bs.collapse', () => button.style.transform = 'rotate(0deg)');
-    if (collapseEl.classList.contains('show')) button.style.transform = 'rotate(90deg)';
-  });
 
-  document.querySelectorAll('.btn-editar-campos').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const form = btn.closest('form');
-      form.querySelectorAll('input').forEach(input => input.removeAttribute('readonly'));
-      btn.classList.add('d-none');
-      form.querySelector('.btn-guardar').classList.remove('d-none');
-      form.querySelector('.btn-cancelar').classList.remove('d-none');
-    });
-  });
-
-  document.querySelectorAll('.btn-cancelar').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const form = btn.closest('form');
-      form.reset();
-      form.querySelectorAll('input').forEach(input => input.setAttribute('readonly', ''));
-      form.querySelector('.btn-editar-campos').classList.remove('d-none');
-      form.querySelector('.btn-guardar').classList.add('d-none');
-      form.querySelector('.btn-cancelar').classList.add('d-none');
-    });
-  });
-</script>
-{% endblock %}

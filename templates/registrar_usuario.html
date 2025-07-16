@@ -1,22 +1,31 @@
 {% extends "base.html" %}
-
-{% block title %}Registrarse{% endblock %}
+{% block title %}Registrar Usuario{% endblock %}
 
 {% block content %}
-<div class="container mt-5" style="max-width: 400px;">
-  <h2 class="mb-4">Registro Usuario</h2>
+<h1 class="mb-4 text-white border-bottom pb-2" style="font-weight: 500;">
+  <i class="bi bi-person-plus-fill me-2 text-success"></i>Registrar Usuario
+</h1>
 
-  <form method="POST">
-    <div class="mb-3">
-      <label for="usuario" class="form-label">Usuario</label>
-      <input type="text" class="form-control" name="usuario" id="usuario" required>
-    </div>
-    <div class="mb-3">
-      <label for="clave" class="form-label">Clave</label>
-      <input type="password" class="form-control" name="clave" id="clave" required>
-    </div>
-    <button type="submit" class="btn btn-primary">Registrar</button>
-    <a href="{{ url_for('auth.login') }}" class="btn btn-link">Ya tengo cuenta</a>
-  </form>
-</div>
+<form method="POST" class="bg-dark p-4 rounded border text-white">
+
+  <div class="mb-3">
+    <label for="usuario" class="form-label">Nombre de usuario</label>
+    <input type="text" class="form-control bg-dark text-white border-secondary" name="usuario" id="usuario" required>
+  </div>
+
+  <div class="mb-3">
+    <label for="clave" class="form-label">Contraseña</label>
+    <input type="password" class="form-control bg-dark text-white border-secondary" name="clave" id="clave" required>
+  </div>
+
+  <div class="mb-3">
+    <label for="rol" class="form-label">Rol</label>
+    <select name="rol" id="rol" class="form-select bg-dark text-white border-secondary">
+      <option value="empleado" selected>Empleado</option>
+      <option value="admin">Administrador</option>
+    </select>
+  </div>
+
+  <button type="submit" class="btn btn-success">Registrar</button>
+</form>
 {% endblock %}

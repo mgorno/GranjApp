@@ -1,0 +1,26 @@
+	{% extends "base.html" %}
+	{% block title %}Cambiar Contraseña{% endblock %}
+	{% block content %}
+	<h1 class="mb-4 text-white border-bottom pb-2">
+	  <i class="bi bi-key me-2 text-warning"></i>Cambiar Contraseña
+	</h1>
+
+	<form method="POST" class="bg-dark p-4 rounded border text-white">
+	  <div class="mb-3">
+		<label for="clave_actual" class="form-label">Contraseña actual</label>
+		<input type="password" class="form-control bg-dark text-white border-secondary" name="clave_actual" required>
+	  </div>
+
+	  <div class="mb-3">
+		<label for="nueva_clave" class="form-label">Nueva contraseña</label>
+		<input type="password" class="form-control bg-dark text-white border-secondary" name="nueva_clave" required>
+	  </div>
+
+	  <div class="mb-3">
+		<label for="confirmar_clave" class="form-label">Confirmar nueva contraseña</label>
+		<input type="password" class="form-control bg-dark text-white border-secondary" name="confirmar_clave" required>
+	  </div>
+
+	  <button type="submit" class="btn btn-success">Actualizar contraseña</button>
+	</form>
+	{% endblock %}

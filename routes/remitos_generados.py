@@ -43,8 +43,6 @@ def lista_remitos():
 
 
 @bp_remitos_generados.route("/entregar/<int:id_remito>")
-@login_requerido
-@rol_requerido("admin", "empleado")
 def entregar_remito(id_remito):
     with get_conn() as conn:
         with conn.cursor() as cur:
@@ -69,8 +67,6 @@ def entregar_remito(id_remito):
 
 
 @bp_remitos_generados.route("/cancelar/<int:id_remito>", methods=["POST"])
-@login_requerido
-@rol_requerido("admin")
 def cancelar_remito(id_remito):
     try:
         with get_conn() as conn:

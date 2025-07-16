@@ -1,12 +1,12 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from models import get_conn
 from utils.decoradores import login_requerido, rol_requerido
+from flask_login import login_required
 
 bp_remitos_generados = Blueprint("remitos_generados", __name__, url_prefix="/remitos_generados")
 
 @bp_remitos_generados.route("/", methods=["GET"])
-@login_requerido
-@rol_requerido("admin", "empleado")
+@login_required
 def lista_remitos():
     cliente = request.args.get("cliente")
     fecha = request.args.get("fecha")

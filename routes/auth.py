@@ -4,15 +4,13 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from models import get_conn
 import uuid
 
-auth = Blueprint("auth", __name__)  
+auth = Blueprint("auth", __name__)
 
 class Usuario(UserMixin):
-    def __init__(self, id_usuario, usuario):
+    def __init__(self, id_usuario, usuario, rol):
         self.id = id_usuario
         self.usuario = usuario
-
-def es_hash_valido(hash_str):
-    return isinstance(hash_str, str) and any(hash_str.startswith(prefix) for prefix in ("pbkdf2:", "sha256:", "bcrypt:", "scrypt:"))
+        self.usuario_rol = rol
 
 @auth.route("/auth/login", methods=["GET", "POST"])
 def login():
@@ -22,36 +20,34 @@ def login():
 
         with get_conn() as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT id_usuario, clave_hash FROM usuarios WHERE usuario = %s", (usuario,))
+                cur.execute("SELECT id_usuario, clave_hash, rol FROM usuarios WHERE usuario = %s", (usuario,))
                 row = cur.fetchone()
 
-        if row and es_hash_valido(row[1]) and check_password_hash(row[1], clave):
-            user = Usuario(row[0], usuario)
+        if row and check_password_hash(row[1], clave):
+            user = Usuario(row[0], usuario, row[2])
             login_user(user)
-            flash("Ingreso exitoso.")
-            return redirect(url_for("main.index")) 
+            flash("Ingreso exitoso.", "success")
+            return redirect(url_for("main.index"))
         else:
-            flash("Usuario o clave incorrectos.")
+            flash("Usuario o clave incorrectos.", "danger")
 
     return render_template("login.html")
-
 
 @auth.route("/auth/logout")
 def logout():
     logout_user()
-    flash("Sesión cerrada.")
+    flash("Sesión cerrada.", "info")
     return redirect(url_for("auth.login"))
-
 
 @auth.route("/registrar_usuario", methods=["GET", "POST"])
 def registrar_usuario():
     if request.method == "POST":
         usuario = request.form["usuario"]
         clave = request.form["clave"]
+        rol = request.form["rol"]
 
         clave_hash = generate_password_hash(clave)
         nuevo_id = str(uuid.uuid4())
-        nombre_default = usuario  # o podés cambiar por un valor fijo
 
         with get_conn() as conn:
             with conn.cursor() as cur:
@@ -61,11 +57,11 @@ def registrar_usuario():
                     return redirect(url_for("auth.registrar_usuario"))
 
                 cur.execute(
-                    "INSERT INTO usuarios (id_usuario, nombre, usuario, clave_hash) VALUES (%s, %s, %s, %s)",
-                    (nuevo_id, nombre_default, usuario, clave_hash)
+                    "INSERT INTO usuarios (id_usuario, nombre, usuario, clave_hash, rol) VALUES (%s, %s, %s, %s, %s)",
+                    (nuevo_id, usuario, usuario, clave_hash, rol)
                 )
                 conn.commit()
-                flash("Usuario registrado correctamente. Ingresá con tus credenciales.")
+                flash("Usuario registrado correctamente.")
                 return redirect(url_for("auth.login"))
 
     return render_template("registrar_usuario.html")

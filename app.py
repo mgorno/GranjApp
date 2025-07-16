@@ -23,11 +23,12 @@ login_manager.init_app(app)
 def load_user(user_id):
     with get_conn() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT usuario FROM usuarios WHERE id_usuario = %s", (user_id,))
+            cur.execute("SELECT usuario, rol FROM usuarios WHERE id_usuario = %s", (user_id,))
             row = cur.fetchone()
             if row:
-                return Usuario(user_id, row[0])
+                return Usuario(user_id, row[0], row[1])  
     return None
+
 
 # Hacer current_user disponible en los templates
 @app.context_processor

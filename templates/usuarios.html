@@ -60,7 +60,8 @@
   </div>
 
   <div class="collapse mb-3" id="collapse{{ u.id_usuario }}">
-    <form action="{{ url_for('auth.editar_usuario', id_usuario=u.id_usuario) }}" method="POST" class="bg-dark border border-secondary rounded p-3 text-light">
+    <form class="bg-dark border border-secondary rounded p-3 text-light" onsubmit="return false;">
+
       <div class="mb-3">
         <label class="form-label">Nombre</label>
         <input type="text" name="nombre" value="{{ u.nombre }}" class="form-control bg-dark text-light border-secondary" readonly required>

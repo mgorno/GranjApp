@@ -84,7 +84,8 @@ def editar_cliente(id_cliente):
     telefono = request.form.get("telefono")
     direccion = request.form.get("direccion")
     mail = request.form.get("mail")
-    activo = request.form.get("activo") == "true"  
+    activo = 'activo' in request.form  # ✅ Corrección aquí
+
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("""
@@ -96,6 +97,7 @@ def editar_cliente(id_cliente):
 
     flash("Cliente actualizado", "success")
     return redirect(url_for("clientes.clientes"))
+
 
 
 

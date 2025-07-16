@@ -6,14 +6,72 @@
 {% block content %}
   <h1 class="mb-4 text-white border-bottom pb-2" style="font-weight: 500;"><i class="bi bi-people-fill me-2 text-success"></i>Clientes</h1>
 
+<<<<<<< HEAD
+<!-- Buscador + Botón Nuevo -->
+<div class="d-flex mb-4 gap-3 flex-wrap align-items-center">
+  <input type="search" id="buscarCliente" class="form-control bg-dark text-light border-secondary flex-grow-1"
+    placeholder="Buscar clientes...">
+
+  <!-- Botón + que abre offcanvas -->
+  <button class="btn btn-sm btn-outline-success flex-shrink-0" data-bs-toggle="offcanvas"
+    data-bs-target="#offNuevoCliente" style="white-space: nowrap;">
+    <i class="bi bi-plus-lg me-1"></i>Nuevo Cliente
+  </button>
+</div>
+=======
   <!-- Buscador + Botón Nuevo -->
   <div class="d-flex mb-4 gap-3 flex-wrap align-items-center">
     <input type="search" id="buscarCliente" class="form-control bg-dark text-light border-secondary flex-grow-1" placeholder="Buscar clientes..." />
+>>>>>>> 6f23a2abdbc77e52d0e7d27de9a9e54af331ad41
 
     <!-- Botón + que abre offcanvas -->
     <button class="btn btn-sm btn-outline-success flex-shrink-0" data-bs-toggle="offcanvas" data-bs-target="#offNuevoCliente" style="white-space: nowrap;"><i class="bi bi-plus-lg me-1"></i>Nuevo Cliente</button>
   </div>
+<<<<<<< HEAD
+  <form action="{{ url_for('clientes.nuevo_cliente') }}" method="POST" class="offcanvas-body">
+    <div class="mb-3">
+      <label class="form-label">Nombre</label>
+      <input type="text" name="nombre" class="form-control bg-dark text-light border-secondary" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Teléfono</label>
+      <input type="text" name="telefono" class="form-control bg-dark text-light border-secondary">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Dirección</label>
+      <input type="text" name="direccion" class="form-control bg-dark text-light border-secondary">
+    </div>
+    <div class="mb-4">
+      <label class="form-label">Email</label>
+      <input type="email" name="mail" class="form-control bg-dark text-light border-secondary">
+    </div>
 
+    <button class="btn btn-success w-100">
+      <i class="bi bi-save2 me-1"></i>Guardar Cliente
+    </button>
+  </form>
+</div>
+=======
+>>>>>>> 6f23a2abdbc77e52d0e7d27de9a9e54af331ad41
+
+<<<<<<< HEAD
+<!-- Lista clientes -->
+<div class="list-group">
+  {% for c in clientes %}
+  <div class="list-group-item list-group-item-dark d-flex align-items-center rounded mb-2">
+    <button class="btn btn-sm btn-toggle-arrow d-flex align-items-center text-white p-0 me-3" data-bs-toggle="collapse"
+      data-bs-target="#collapse{{ c[0] }}" aria-expanded="false" aria-controls="collapse{{ c[0] }}"
+      style="width: 32px; height: 32px; border: none; background: transparent; transition: transform 0.3s;">
+      <i class="bi bi-chevron-right fs-5"></i>
+    </button>
+    <div class="flex-grow-1 fw-semibold">{{ c[1] | title }}</div>
+  </div>
+
+  <div class="collapse mb-3" id="collapse{{ c[0] }}">
+    <form action="{{ url_for('clientes.editar_cliente', id_cliente=c[0]) }}" method="POST"
+      class="bg-dark border border-secondary rounded p-3 text-light">
+
+=======
   <!-- OFFCANVAS: Nuevo Cliente -->
   <div class="offcanvas offcanvas-end bg-dark text-light" tabindex="-1" id="offNuevoCliente">
     <div class="offcanvas-header border-bottom border-secondary">
@@ -21,42 +79,105 @@
       <button class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
     </div>
     <form id="formNuevoCliente" action="{{ url_for('clientes.nuevo_cliente') }}" method="POST" class="offcanvas-body">
+>>>>>>> 6f23a2abdbc77e52d0e7d27de9a9e54af331ad41
       <div class="mb-3">
         <label class="form-label">Nombre</label>
+<<<<<<< HEAD
+        <input type="text" name="nombre" value="{{ c[1] }}" class="form-control bg-dark text-light border-secondary"
+          readonly required>
+=======
         <input type="text" name="nombre" class="form-control bg-dark text-light border-secondary" required />
+>>>>>>> 6f23a2abdbc77e52d0e7d27de9a9e54af331ad41
       </div>
       <div class="mb-3">
         <label class="form-label">Teléfono</label>
+<<<<<<< HEAD
+        <input type="text" name="telefono" value="{{ c[2] or '' }}"
+          class="form-control bg-dark text-light border-secondary" readonly>
+=======
         <input type="text" name="telefono" class="form-control bg-dark text-light border-secondary" />
+>>>>>>> 6f23a2abdbc77e52d0e7d27de9a9e54af331ad41
       </div>
       <div class="mb-3">
         <label class="form-label">Dirección</label>
+<<<<<<< HEAD
+        <input type="text" name="direccion" value="{{ c[3] or '' }}"
+          class="form-control bg-dark text-light border-secondary" readonly>
+=======
         <input type="text" name="direccion" class="form-control bg-dark text-light border-secondary" />
+>>>>>>> 6f23a2abdbc77e52d0e7d27de9a9e54af331ad41
       </div>
       <div class="mb-4">
         <label class="form-label">Email</label>
+<<<<<<< HEAD
+        <input type="email" name="mail" value="{{ c[4] or '' }}"
+          class="form-control bg-dark text-light border-secondary" readonly>
+=======
         <input type="email" name="mail" class="form-control bg-dark text-light border-secondary" />
+>>>>>>> 6f23a2abdbc77e52d0e7d27de9a9e54af331ad41
       </div>
+<<<<<<< HEAD
+      <div class="form-check mb-4">
+        <input class="form-check-input" type="checkbox" name="activo" id="activo{{ c[0] }}"
+          {% if c[5] %}checked{% endif %} disabled>
+        <label class="form-check-label" for="activo{{ c[0] }}">
+          Cliente activo
+        </label>
+      </div>
+=======
       <button type="submit" class="btn btn-success w-100">
         <span class="spinner-border spinner-border-sm d-none" id="spinnerCliente"></span>
         <span id="textoBotonCliente"><i class="bi bi-save2 me-1"></i>Guardar Cliente</span>
       </button>
     </form>
   </div>
+>>>>>>> 6f23a2abdbc77e52d0e7d27de9a9e54af331ad41
 
+<<<<<<< HEAD
+      <div class="d-flex justify-content-between align-items-center">
+        <button type="button" class="btn btn-sm btn-outline-light btn-editar-campos">
+          <i class="bi bi-pencil-fill me-1"></i>Editar
+        </button>
+
+        <div>
+          <button type="submit" class="btn btn-sm btn-success d-none btn-guardar">
+            <i class="bi bi-save2 me-1"></i>Guardar
+          </button>
+          <button type="button" class="btn btn-sm btn-secondary d-none btn-cancelar">
+            Cancelar
+          </button>
+          <button type="button" class="btn btn-sm btn-danger ms-2" data-bs-toggle="modal"
+            data-bs-target="#confirmDeleteModal{{ c[0] }}">
+            <i class="bi bi-trash me-1"></i>Borrar
+          </button>
+        </div>
+=======
   <!-- Lista clientes -->
   <div class="list-group">
     {% for c in clientes %}
       <div class="list-group-item list-group-item-dark d-flex align-items-center rounded mb-2">
         <button class="btn btn-sm btn-toggle-arrow d-flex align-items-center text-white p-0 me-3" data-bs-toggle="collapse" data-bs-target="#collapse{{ c.0 }}" aria-expanded="false" aria-controls="collapse{{ c.0 }}" style="width: 32px; height: 32px; border: none; background: transparent; transition: transform 0.3s;"><i class="bi bi-chevron-right fs-5"></i></button>
         <div class="flex-grow-1 fw-semibold">{{ c.1|title }}</div>
+>>>>>>> 6f23a2abdbc77e52d0e7d27de9a9e54af331ad41
       </div>
 
+<<<<<<< HEAD
+    <!-- Modal confirmación borrar -->
+    <div class="modal fade" id="confirmDeleteModal{{ c[0] }}" tabindex="-1"
+      aria-labelledby="confirmDeleteLabel{{ c[0] }}" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content bg-dark text-light">
+          <div class="modal-header p-2">
+            <h5 class="modal-title fs-6" id="confirmDeleteLabel{{ c[0] }}">Confirmar eliminación</h5>
+            <button type="button" class="btn-close btn-close-white p-1" data-bs-dismiss="modal"
+              aria-label="Cerrar"></button>
+=======
       <div class="collapse mb-3" id="collapse{{ c.0 }}">
         <form action="{{ url_for('clientes.editar_cliente', id_cliente=c.0) }}" method="POST" class="bg-dark border border-secondary rounded p-3 text-light">
           <div class="mb-3">
             <label class="form-label">Nombre</label>
             <input type="text" name="nombre" value="{{ c.1 }}" class="form-control bg-dark text-light border-secondary" readonly required />
+>>>>>>> 6f23a2abdbc77e52d0e7d27de9a9e54af331ad41
           </div>
           <div class="mb-3">
             <label class="form-label">Teléfono</label>
@@ -102,9 +223,18 @@
       </div>
     {% endfor %}
   </div>
+<<<<<<< HEAD
+  {% endfor %}
+</div>
+=======
+>>>>>>> 6f23a2abdbc77e52d0e7d27de9a9e54af331ad41
 {% endblock %}
 
+<<<<<<< HEAD
+=======
 {% block scripts %}
   {{ super() }}
   <script src="{{ url_for('static', filename='js/clientes.js') }}"></script>
 {% endblock %}
+
+>>>>>>> 6f23a2abdbc77e52d0e7d27de9a9e54af331ad41

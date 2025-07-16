@@ -84,17 +84,20 @@ def editar_cliente(id_cliente):
     telefono = request.form.get("telefono")
     direccion = request.form.get("direccion")
     mail = request.form.get("mail")
+    activo = request.form.get("activo") == "true"  # Si está tildado → True
 
     with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("""
-                UPDATE clientes SET nombre=%s, telefono=%s, direccion=%s, mail=%s
+                UPDATE clientes
+                SET nombre=%s, telefono=%s, direccion=%s, mail=%s, activo=%s
                 WHERE id_cliente=%s
-            """, (nombre, telefono, direccion, mail, id_cliente))
+            """, (nombre, telefono, direccion, mail, activo, id_cliente))
         conn.commit()
 
     flash("Cliente actualizado", "success")
     return redirect(url_for("clientes.clientes"))
+
 
 
 @bp_clientes.route("/borrar/<id_cliente>")

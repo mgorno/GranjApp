@@ -20,14 +20,16 @@ CREATE TABLE IF NOT EXISTS clientes (
     nombre       TEXT NOT NULL,
     telefono     TEXT,
     direccion    TEXT,
-    mail         TEXT
+    mail         TEXT,
+    activo       BOOLEAN NOT NULL DEFAULT TRUE 
 );
 
 CREATE TABLE IF NOT EXISTS productos (
     id_producto  TEXT PRIMARY KEY,
     descripcion  TEXT NOT NULL,
     unidad_base  TEXT NOT NULL,
-    precio       NUMERIC(10,0) NOT NULL DEFAULT 0
+    precio       NUMERIC(10,0) NOT NULL DEFAULT 0,
+    activo       BOOLEAN NOT NULL DEFAULT TRUE 
 );
 
 CREATE TABLE IF NOT EXISTS pedidos (

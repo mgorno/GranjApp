@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Buscador
+  // === Buscador ===
   const input = document.getElementById('buscarCliente');
   if (input) {
     input.addEventListener('input', () => {
@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const clientes = document.querySelectorAll('.list-group > .list-group-item');
 
       clientes.forEach(cliente => {
-        const nombre = cliente.querySelector('.flex-grow-1 strong').textContent.toLowerCase();
+        const nombre = cliente.querySelector('.flex-grow-1')?.textContent.toLowerCase();
         const detalle = cliente.nextElementSibling;
         const coincide = nombre.includes(filtro);
 
@@ -17,7 +17,74 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Botón editar por campo
+  // === Flechas colapsables con rotación ===
+  document.querySelectorAll('.btn-toggle-arrow').forEach(button => {
+    const targetSelector = button.getAttribute('data-bs-target');
+    const collapseEl = document.querySelector(targetSelector);
+
+    collapseEl.addEventListener('shown.bs.collapse', () => {
+      button.style.transform = 'rotate(90deg)';
+    });
+
+    collapseEl.addEventListener('hidden.bs.collapse', () => {
+      button.style.transform = 'rotate(0deg)';
+    });
+
+    // Estado inicial
+    if (collapseEl.classList.contains('show')) {
+      button.style.transform = 'rotate(90deg)';
+    } else {
+      button.style.transform = 'rotate(0deg)';
+    }
+  });
+
+  // === Botón editar campos (habilita todos los inputs del form) ===
+  document.querySelectorAll('.btn-editar-campos').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const form = btn.closest('form');
+      if (!form) return;
+
+      // Habilitar todos los inputs y checkboxes
+      form.querySelectorAll('input, select, textarea').forEach(el => {
+        if (el.type === 'checkbox') {
+          el.removeAttribute('disabled');
+        } else {
+          el.removeAttribute('readonly');
+        }
+      });
+
+      // Mostrar botones de acción
+      btn.classList.add('d-none');
+      form.querySelector('.btn-guardar')?.classList.remove('d-none');
+      form.querySelector('.btn-cancelar')?.classList.remove('d-none');
+    });
+  });
+
+  // === Botón cancelar edición ===
+  document.querySelectorAll('.btn-cancelar').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const form = btn.closest('form');
+      if (!form) return;
+
+      // Restaurar el estado original del form
+      form.reset();
+
+      form.querySelectorAll('input').forEach(input => {
+        if (input.type === 'checkbox') {
+          input.setAttribute('disabled', '');
+        } else {
+          input.setAttribute('readonly', '');
+        }
+      });
+
+      // Restaurar visibilidad de botones
+      form.querySelector('.btn-editar-campos')?.classList.remove('d-none');
+      form.querySelector('.btn-guardar')?.classList.add('d-none');
+      form.querySelector('.btn-cancelar')?.classList.add('d-none');
+    });
+  });
+
+  // === (Opcional) Si querés ocultar inputs individuales de edición tipo inline ===
   document.querySelectorAll('.btn-editar-campo').forEach(btn => {
     btn.addEventListener('click', () => {
       const parent = btn.closest('.d-flex.align-items-center.gap-2');
@@ -35,7 +102,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+<<<<<<< HEAD
+  // === Restaurar campos inline al cerrar collapse ===
+=======
   // Restaurar campos al cerrar el collapse
+>>>>>>> 6f23a2abdbc77e52d0e7d27de9a9e54af331ad41
   document.querySelectorAll('.accordion-collapse').forEach(collapse => {
     collapse.addEventListener('hidden.bs.collapse', () => {
       const inputs = collapse.querySelectorAll('input:not(.d-none)');

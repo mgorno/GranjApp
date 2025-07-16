@@ -86,7 +86,7 @@ def nuevo():
 
 
 def obtener_clientes(cur):
-    cur.execute("SELECT id_cliente, nombre FROM clientes ORDER BY nombre")
+    cur.execute("SELECT id_cliente, nombre FROM clientes WHERE activo is true ORDER BY nombre")
     return cur.fetchall()
 
 

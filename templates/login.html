@@ -1,48 +1,59 @@
-{% extends "base.html" %}
-{% block title %}Login{% endblock %}
+{% extends 'base.html' %}
+{% block title %}
+  Login
+{% endblock %}
 
 {% block content %}
-<div class="container mt-5" style="max-width: 400px;">
-  <div class="text-center mb-4">
-    <img src="{{ url_for('static', filename='img/logo_granjapp.png') }}" alt="GranjApp" class="logo-login">
-  </div>
+  <div class="container mt-5" style="max-width: 400px;">
+    <div class="text-center">
+      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo GranjApp" class="rounded-circle mb-3 animate-fade-in" style="width: 120px; height: 120px; object-fit: cover;" />
+    </div>
 
-  <form method="POST" class="bg-dark border border-secondary rounded p-4 shadow animate-fade-in">
-    <div class="mb-3">
-      <label for="usuario" class="form-label text-light">Usuario</label>
-      <input type="text" class="form-control bg-dark text-light border-secondary" name="usuario" required>
-    </div>
-    <div class="mb-4">
-      <label for="clave" class="form-label text-light">Clave</label>
-      <input type="password" class="form-control bg-dark text-light border-secondary" name="clave" required>
-    </div>
-    <button type="submit" class="btn btn-success w-100">
-      <i class="bi bi-box-arrow-in-right me-1"></i>Ingresar
-    </button>
-  </form>
-</div>
+    <form method="POST" class="bg-dark border border-secondary rounded p-4 shadow animate-fade-in">
+      <div class="mb-3">
+        <label for="usuario" class="form-label text-light">Usuario</label>
+        <input type="text" class="form-control bg-dark text-light border-secondary" name="usuario" required />
+      </div>
+      <div class="mb-4">
+        <label for="clave" class="form-label text-light">Clave</label>
+        <input type="password" class="form-control bg-dark text-light border-secondary" name="clave" required />
+      </div>
+      <button type="submit" class="btn btn-success w-100"><i class="bi bi-box-arrow-in-right me-1"></i>Ingresar</button>
+    </form>
+  </div>
 {% endblock %}
 
 {% block styles %}
-{{ super() }}
-<style>
-  .animate-fade-in {
-    animation: fadeIn 1s ease-in-out both;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-  }
-
-  .logo-login {
-    width: 140px;
-    height: 140px;
-    object-fit: cover;
-    border-radius: 50%;
-    border: 2px solid #ccc;
-    background-color: transparent;
-  }
-</style>
+  {{ super() }}
+  <style>
+    .animate-fade-in {
+      animation: fadeIn 1s ease-in-out both;
+    }
+    
+    .animate-slide-up {
+      animation: slideUp 1s ease-in-out both;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
 {% endblock %}
-

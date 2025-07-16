@@ -96,8 +96,10 @@ CREATE TABLE IF NOT EXISTS usuarios (
     id_usuario TEXT PRIMARY KEY,
     nombre     TEXT NOT NULL,
     usuario    TEXT UNIQUE NOT NULL,
-    clave_hash TEXT NOT NULL
+    clave_hash TEXT NOT NULL,
+    rol        TEXT NOT NULL DEFAULT 'empleado'
 );
+
 
 
 """

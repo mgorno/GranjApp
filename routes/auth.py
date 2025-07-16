@@ -44,8 +44,9 @@ def registrar_usuario():
     if request.method == "POST":
         usuario = request.form["usuario"]
         clave = request.form["clave"]
-        rol = request.form["rol"]
+        rol = request.form.get("rol", "empleado")  # usa 'empleado' como valor por defecto
 
+        nombre_default = usuario  # o lo que quieras mostrar como nombre
         clave_hash = generate_password_hash(clave)
         nuevo_id = str(uuid.uuid4())
 
@@ -58,7 +59,7 @@ def registrar_usuario():
 
                 cur.execute(
                     "INSERT INTO usuarios (id_usuario, nombre, usuario, clave_hash, rol) VALUES (%s, %s, %s, %s, %s)",
-                    (nuevo_id, usuario, usuario, clave_hash, rol)
+                    (nuevo_id, nombre_default, usuario, clave_hash, rol)
                 )
                 conn.commit()
                 flash("Usuario registrado correctamente.")

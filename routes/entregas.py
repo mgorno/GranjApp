@@ -204,9 +204,9 @@ def remito(id_pedido):
                     if not mov_existente:
                         cur.execute("""
                             INSERT INTO movimientos_cuenta_corriente
-                                (id_movimiento, id_cliente, fecha, tipo_mov, importe, id_remito)
-                            VALUES (%s, %s, %s, 'compra', %s, %s)
-                        """, (str(uuid.uuid4()), cli['id_cliente'], datetime.utcnow().date(), total, id_remito))
+                                (id_cliente, fecha, tipo_mov, importe, id_remito)
+                            VALUES (%s, %s, 'compra', %s, %s)
+                        """, (cli['id_cliente'], datetime.utcnow().date(), total, id_remito))
 
                         cur.execute("""
                             INSERT INTO clientes_cuenta_corriente (id_cliente, saldo)
